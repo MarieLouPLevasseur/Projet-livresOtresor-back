@@ -35,17 +35,17 @@ class Kid
     private $profile_avatar;
 
     /**
-     * @ORM\ManyToMany(targetEntity=diploma::class, inversedBy="kids")
+     * @ORM\ManyToMany(targetEntity=Diploma::class, inversedBy="kids")
      */
     private $diploma;
 
     /**
-     * @ORM\ManyToMany(targetEntity=avatar::class, inversedBy="kids")
+     * @ORM\ManyToMany(targetEntity=Avatar::class, inversedBy="kids")
      */
     private $avatar;
 
     /**
-     * @ORM\ManyToOne(targetEntity=role::class, inversedBy="kids")
+     * @ORM\ManyToOne(targetEntity=Role::class, inversedBy="kids")
      */
     private $role;
 
