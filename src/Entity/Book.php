@@ -18,9 +18,9 @@ class Book
      * @ORM\Column(type="integer")
      */
     private $id;
-
+    
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="bigint")
      */
     private $isbn;
 
