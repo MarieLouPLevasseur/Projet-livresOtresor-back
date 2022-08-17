@@ -33,12 +33,12 @@ class BookKid
     private $is_read;
 
     /**
-     * @ORM\ManyToOne(targetEntity=kid::class, inversedBy="bookKids")
+     * @ORM\ManyToOne(targetEntity=Kid::class, inversedBy="bookKids")
      */
     private $kid;
 
     /**
-     * @ORM\ManyToOne(targetEntity=book::class, inversedBy="bookKids")
+     * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids")
      */
     private $book;
 

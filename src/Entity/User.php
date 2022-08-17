@@ -40,12 +40,12 @@ class User
     private $password;
 
     /**
-     * @ORM\ManyToOne(targetEntity=role::class, inversedBy="users")
+     * @ORM\ManyToOne(targetEntity=Role::class, inversedBy="users")
      */
     private $role;
 
     /**
-     * @ORM\OneToMany(targetEntity=kid::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Kid::class, mappedBy="user")
      */
     private $kid;
 
