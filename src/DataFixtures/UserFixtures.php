@@ -37,7 +37,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
         $userRole= $manager->getRepository(Role::class)->findOneByRoleName('ROLE_USER');
 
-          // USERS
+        // USERS
 
           $nbUsers= 15;
           for ($i = 0; $i < $nbUsers; $i++) {
@@ -60,38 +60,31 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
 
         // KIDS
-        $nbKids= 25;
-        $kidRole= $manager->getRepository(Role::class)->findOneByRoleName('ROLE_KID');
-        $kidProfil= $manager->getRepository(Avatar::class)->findOneByIsWinValue(0);
-        $allUsers= $manager->getRepository(User::class)->findAll();
+            $nbKids= 25;
+            $kidRole= $manager->getRepository(Role::class)->findOneByRoleName('ROLE_KID');
+            $kidProfil= $manager->getRepository(Avatar::class)->findOneByIsWinValue(0);
+            $allUsers= $manager->getRepository(User::class)->findAll();
 
-        for ($i = 0; $i < $nbKids; $i++) {
-            $kidObj = new Kid();
+                for ($i = 0; $i < $nbKids; $i++) {
+                    $kidObj = new Kid();
 
-            $kidObj->setUsername($faker->name());
+                    $kidObj->setUsername($faker->firstname());
 
-            // $hashedPassword = $this->passwordHasher->hashPassword($kidObj, 'devinci');
-            // $kidObj->setPassword($hashedPassword);
-            $kidObj->setPassword('devinci');
-            $kidObj->setRole($kidRole);
-            $kidObj->setProfileAvatar($kidProfil->getUrl());
+                    // $hashedPassword = $this->passwordHasher->hashPassword($kidObj, 'devinci');
+                    // $kidObj->setPassword($hashedPassword);
+                    $kidObj->setPassword('devinci');
+                    $kidObj->setRole($kidRole);
+                    $kidObj->setProfileAvatar($kidProfil->getUrl());
 
-            // Random User selection
+                // Random User selection
 
-                    $randomUser = $faker->randomElement($allUsers);
+                        $randomUser = $faker->randomElement($allUsers);
 
-                    $kidObj->SetUser($randomUser);
+                        $kidObj->SetUser($randomUser);
 
-            $manager->persist($kidObj);
-        }
-
-
-      
-            
-
-
-        
-
+                $manager->persist($kidObj);
+               }
+ 
         $manager->flush();
             
 
