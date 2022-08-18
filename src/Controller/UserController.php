@@ -30,4 +30,26 @@ class UserController extends AbstractController
         
         return $this->json($users, 200, [], ['groups' => 'user_list']);
     }
+
+    /**
+     * 
+     *
+     * @Route("/{id}", name="show", methods="GET", requirements={"id"="\d+"})
+     * @return Response
+     */
+    public function show(int $id, UserRepository $userRepository) :Response
+    {
+ 
+        $user = $userRepository->find($id);
+        if ($user === null )
+        {
+            // si le movie n'existe pas on le signale à l'utilisateur
+            $error = [
+                'error' => true,
+                'message' => 'No movie found for Id [' . $id . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_list']);
+    }
 }
