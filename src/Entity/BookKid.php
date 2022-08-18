@@ -4,6 +4,10 @@ namespace App\Entity;
 
 use App\Repository\BookKidRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+
+
+
 
 /**
  * @ORM\Entity(repositoryClass=BookKidRepository::class)
@@ -19,16 +23,22 @@ class BookKid
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"booksByCategory"})
+     * 
      */
     private $comment;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"booksByCategory"})
+     * 
      */
     private $rating;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"booksByCategory"})
+     * 
      */
     private $is_read;
 
@@ -39,16 +49,19 @@ class BookKid
 
     /**
      * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids")
+     * 
      */
     private $book;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="bookKids")
+     * 
      */
     private $category;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"booksByCategory"})
      */
     private $updated_at;
 
