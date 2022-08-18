@@ -9,10 +9,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * Categories class
+ * @Route("/api/v1/categories", name="api_category")
+ */
 class CategoryController extends AbstractController
 {
     /**
-     * @Route("/categories", name="category")
+     * List all category
+     * @Route("", name="categorylist", methods="GET")
+     * @return Response
      */
     public function categoryName(CategoryRepository $categoryRepository, SerializerInterface $serializer): Response
     {
