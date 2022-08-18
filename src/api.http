@@ -1,6 +1,19 @@
 ### List all users
 GET http://localhost:8000/api_v1/users
 
-###
+###List user by id
+
 GET http://localhost:8000/api_v1/user/90
+
+
+
+### List all book
+GET http://localhost:8000/api_v1/books
+
+### List book by id
+GET http://localhost:8000/api_v1/book/91
+
+
+
+
 
