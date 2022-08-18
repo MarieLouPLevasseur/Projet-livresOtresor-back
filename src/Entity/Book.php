@@ -17,31 +17,34 @@ class Book
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+
      * @Groups({"book_list"})
      */
     private $id;
-
+    
     /**
-     * @ORM\Column(type="integer")
-     * @Groups({"book_list"})
+
+     * @ORM\Column(type="bigint")
+     * @Groups({"booksByCategory","book_list})
+     * 
      */
     private $isbn;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list"})
+     * @Groups({"booksByCategory","book_list"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list"})
+     * @Groups({"booksByCategory","book_list"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"book_list"})
+     * @Groups({"booksByCategory","book_list"})
      */
     private $publisher;
 
@@ -53,7 +56,7 @@ class Book
 
     /**
      * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book")
-     * @Groups({"book_list"})
+     * @Groups({"booksByCategory","book_list"})
      */
     private $authors;
 

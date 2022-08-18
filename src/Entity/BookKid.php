@@ -20,23 +20,23 @@ class BookKid
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list"})
-
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *@Groups({"booksByCategory","book_list"})
+     * 
      */
     private $comment;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"book_list"})
-
+     * @Groups({"booksByCategory","book_list"})
+     * 
      */
     private $rating;
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"book_list"})
-
+     *@Groups({"booksByCategory","book_list"})
+     * 
      */
     private $is_read;
 
@@ -49,16 +49,19 @@ class BookKid
 
     /**
      * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids")
+     * @Groups({"booksByCategory"})
      */
     private $book;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="bookKids")
+     * @Groups({"booksByCategory"})
      */
     private $category;
 
     /**
      * @ORM\Column(type="datetime")
+     * 
      */
     private $updated_at;
 

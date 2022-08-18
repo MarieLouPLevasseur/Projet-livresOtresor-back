@@ -26,11 +26,13 @@ class Role
 
     /**
      * @ORM\OneToMany(targetEntity=Kid::class, mappedBy="role")
+     * @ORM\JoinColumn(name="kid_id", referencedColumnName="id", nullable=false)
      */
     private $kids;
 
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="role")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
     private $users;
 
