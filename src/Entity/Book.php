@@ -25,7 +25,7 @@ class Book
     /**
 
      * @ORM\Column(type="bigint")
-     * @Groups({"booksByCategory","book_list})
+     * @Groups({"booksByCategory","book_list"})
      * 
      */
     private $isbn;

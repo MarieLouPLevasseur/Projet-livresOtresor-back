@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
+use App\Repository\KidRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -63,4 +65,51 @@ class KidController extends AbstractController
 
         return new JsonResponse($jsonBooksCategoryList, Response::HTTP_OK, [],true);
     }
+
+    /**
+     * Show all avatars of a kid
+     * @Route("/{id_kid}/avatars", name="show_avatars", methods="GET", requirements={"id_kid"="\d+"})
+     * 
+     */
+    public function showAllAvatars(
+        int $id_kid,
+        KidRepository $kidRepository,
+        AvatarRepository $avatarRepository,
+        SerializerInterface $serializer
+       ): Response
+    {
+        $currentKid = $kidRepository->find($id_kid);
+
+
+
+        if ($currentKid === null )
+        {
+
+            $error = [
+                'error' => true,
+                'message' => 'No Kid found for Id [' . $id_kid . ']'
+            ];
+
+            return $this->json($error, Response::HTTP_NOT_FOUND); 
+        }
+
+        // count books
+        $currentbooks = $currentKid->getBookKids();
+        $totalBooks = count($currentbooks);
+
+        // check if totalBooks < or = to 'is_win' and set those
+        $currentAvatarsWon = $avatarRepository->findAllByIsWinValue($totalBooks);
+
+        foreach($currentAvatarsWon as $avatar){
+
+            $currentKid->addAvatar($avatar);
+        }
+
+        $currentKidAvatars = $currentKid->getAvatar();      
+        $jsonAvatarsList = $serializer->serialize($currentKidAvatars, 'json',['groups' => 'KidAvatar']);
+
+
+        return new JsonResponse($jsonAvatarsList, Response::HTTP_OK, [],true);
+    }
+
 }
