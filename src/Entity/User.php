@@ -53,12 +53,16 @@ class User
 
     /**
      * @ORM\OneToMany(targetEntity=Kid::class, mappedBy="user")
+     * @ORM\JoinColumn(name="kid_id", referencedColumnName="id", nullable=false)
+     * 
      */
     private $kid;
 
     public function __construct()
     {
         $this->kid = new ArrayCollection();
+        $this->role = "ROLE_USER";
+
     }
 
     public function getId(): ?int

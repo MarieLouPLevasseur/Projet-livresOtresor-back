@@ -39,6 +39,18 @@ class AvatarRepository extends ServiceEntityRepository
         }
     }
 
+    
+
+    public function findOneByIsWinValue($value): ?Avatar
+   {
+       return $this->createQueryBuilder('a')
+           ->andWhere('a.is_win = :val')
+           ->setParameter('val', $value)
+           ->getQuery()
+           ->getOneOrNullResult()
+       ;
+   }
+
 //    /**
 //     * @return Avatar[] Returns an array of Avatar objects
 //     */

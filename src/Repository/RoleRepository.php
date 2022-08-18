@@ -39,6 +39,15 @@ class RoleRepository extends ServiceEntityRepository
         }
     }
 
+    public function findOneByRoleName($value): ?Role
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.name = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 //    /**
 //     * @return Role[] Returns an array of Role objects
 //     */
@@ -54,13 +63,13 @@ class RoleRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Role
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+   public function findOneBySomeField($value): ?Role
+   {
+       return $this->createQueryBuilder('r')
+           ->andWhere('r.exampleField = :val')
+           ->setParameter('val', $value)
+           ->getQuery()
+           ->getOneOrNullResult()
+       ;
+   }
 }
