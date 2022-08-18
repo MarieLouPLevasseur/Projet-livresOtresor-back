@@ -1,0 +1,2 @@
+### List all users
+GET http://localhost:8000/api/users
