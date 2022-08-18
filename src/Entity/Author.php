@@ -22,6 +22,7 @@ class Author
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"booksByCategory"})
      * 
      */
     private $name;

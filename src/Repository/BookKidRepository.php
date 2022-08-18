@@ -66,7 +66,7 @@ class BookKidRepository extends ServiceEntityRepository
             ->setParameters(array('kid_id'=> $kid_id, 'category_id' => $category_id));
 
             // returns an array of Product objects
-            return $query->getArrayResult();
+            return $query->getResult();
 
 
 

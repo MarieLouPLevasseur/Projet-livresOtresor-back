@@ -23,25 +23,26 @@ class Book
     
     /**
      * @ORM\Column(type="bigint")
+     * @Groups({"booksByCategory"})
      * 
      */
     private $isbn;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * 
+     * @Groups({"booksByCategory"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * 
+     * @Groups({"booksByCategory"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * 
+     * @Groups({"booksByCategory"})
      */
     private $publisher;
 
@@ -52,7 +53,7 @@ class Book
 
     /**
      * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book")
-     * 
+     * @Groups({"booksByCategory"})
      */
     private $authors;
 

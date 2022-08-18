@@ -18,12 +18,14 @@ class Category
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups({"category"})
+     * @Groups({"booksByCategory"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"category"})
+     * @Groups({"booksByCategory"})
      * 
      */
     private $name;

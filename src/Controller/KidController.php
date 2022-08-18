@@ -50,17 +50,17 @@ class KidController extends AbstractController
        )//: Response
     {
 
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        // $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
         $allBooksByCategory = $bookKidRepository->findAllByKidAndCategory($id_kid, $id_cat);
 
-        $normalizer = new ObjectNormalizer($classMetadataFactory);
-        $serializer = new Serializer([$normalizer]);
+        // $normalizer = new ObjectNormalizer($classMetadataFactory);
+        // $serializer = new Serializer([$normalizer]);
 
        
-        $jsonBooksCategoryList = $serializer->normalize($allBooksByCategory, 'json',['groups' => 'booksByCategory']);
+        $jsonBooksCategoryList = $serializer->serialize($allBooksByCategory, 'json',['groups' => 'booksByCategory']);
 
 
-        return new JsonResponse($jsonBooksCategoryList, Response::HTTP_OK, []);
+        return new JsonResponse($jsonBooksCategoryList, Response::HTTP_OK, [],true);
     }
 }
