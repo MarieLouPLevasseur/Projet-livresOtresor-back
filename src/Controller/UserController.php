@@ -26,8 +26,8 @@ class UserController extends AbstractController
     public function list(UserRepository $userRepository): Response
     {
 
-        $user = $userRepository->findAll();
+        $users = $userRepository->findAll();
         
-        return $this->json($user, 200, [], ['groups' => 'user_list']);
+        return $this->json($users, 200, [], ['groups' => 'user_list']);
     }
 }
