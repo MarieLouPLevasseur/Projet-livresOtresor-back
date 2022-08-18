@@ -6,7 +6,6 @@ GET http://localhost:8000/api_v1/users
 GET http://localhost:8000/api_v1/user/90
 
 
-
 ### List all book
 GET http://localhost:8000/api_v1/books
 

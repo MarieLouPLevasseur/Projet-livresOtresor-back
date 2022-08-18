@@ -54,13 +54,13 @@ class Book
     /**
      * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book")
      * @Groups({"book_list"})
-
      */
     private $authors;
 
     /**
      * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="book")
      * @Groups({"book_list"})
+
      */
     private $bookKids;
 
