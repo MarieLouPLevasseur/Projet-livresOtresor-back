@@ -54,7 +54,7 @@ class AvatarRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findAllByIsWinValue($value)//: ?Avatar
+    public function findAllByIsWinValue($value)
    {
        return $this->createQueryBuilder('a')
            ->andWhere('a.is_win <= :val')
