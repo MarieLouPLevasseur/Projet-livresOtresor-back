@@ -13,21 +13,41 @@ use JetBrains\PhpStorm\Internal\ReturnTypeContract;
 
 /**
  * Undocumented class
- *  @Route("/api/users", name="api_user")
+ *  @Route("/api_v1", name="api_user")
  */
 class UserController extends AbstractController
 {
     /**
      * list all users
      *
-     * @Route("", name="list", methods="GET")
+     * @Route("/users", name="list", methods="GET")
      * @return Response
      */
     public function list(UserRepository $userRepository): Response
     {
 
-        $user = $userRepository->findAll();
+        $users = $userRepository->findAll();
         
-        return $this->json($user, 200, [], ['groups' => 'user_list']);
+        return $this->json($users, 200, [], ['groups' => 'user_list']);
+    }
+
+    /**
+     * @Route("/user/{id}", name="show", methods="GET", requirements={"id"="\d+"})
+     * @return Response
+     */
+    public function show(int $id, UserRepository $userRepository) :Response
+    {
+ 
+        $user = $userRepository->find($id);
+        if ($user === null )
+        {
+            // if the user doesn't  exist, display an error message.
+            $error = [
+                'error' => true,
+                'message' => 'No user found for Id [' . $id . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_list']);
     }
 }

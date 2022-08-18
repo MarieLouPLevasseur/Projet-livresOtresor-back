@@ -17,48 +17,53 @@ class Book
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * 
+
+     * @Groups({"book_list"})
      */
     private $id;
     
     /**
+
      * @ORM\Column(type="bigint")
-     * @Groups({"booksByCategory"})
+     * @Groups({"booksByCategory","book_list})
      * 
      */
     private $isbn;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"booksByCategory"})
+     * @Groups({"booksByCategory","book_list"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"booksByCategory"})
+     * @Groups({"booksByCategory","book_list"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"booksByCategory"})
+     * @Groups({"booksByCategory","book_list"})
      */
     private $publisher;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"book_list"})
      */
     private $created_at;
 
     /**
      * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book")
-     * @Groups({"booksByCategory"})
+     * @Groups({"booksByCategory","book_list"})
      */
     private $authors;
 
     /**
      * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="book")
+     * @Groups({"book_list"})
+
      */
     private $bookKids;
 
