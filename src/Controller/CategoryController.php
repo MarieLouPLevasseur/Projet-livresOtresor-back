@@ -23,7 +23,7 @@ class CategoryController extends AbstractController
     public function categoryName(CategoryRepository $categoryRepository, SerializerInterface $serializer): Response
     {
         $categoryList = $categoryRepository->findall();
-        $jsonCategoryList = $serializer->serialize($categoryList, 'json');
+        $jsonCategoryList = $serializer->serialize($categoryList, 'json',['groups' => 'category']);
 
         return new JsonResponse($jsonCategoryList, Response::HTTP_OK, [], true);
     }
