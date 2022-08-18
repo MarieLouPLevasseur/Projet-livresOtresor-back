@@ -2,14 +2,15 @@ security:
     enable_authenticator_manager: true
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
-        App\Entity\User: 'auto'
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 
-            algorithm: 'auto'
-            cost:      15
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
-       
+        # users_in_memory: { memory: null }
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
 
     firewalls:
         dev:
@@ -17,7 +18,8 @@ security:
             security: false
         main:
             lazy: true
-            provider: users_in_memory
+            # provider: users_in_memory
+            provider: app_user_provider
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
