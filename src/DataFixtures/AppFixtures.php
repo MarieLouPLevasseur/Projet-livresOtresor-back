@@ -10,6 +10,8 @@ use App\Entity\User;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 
 class AppFixtures extends Fixture
@@ -55,9 +57,9 @@ class AppFixtures extends Fixture
             $userObj->setLastname('front');
             $userObj->setEmail('livresOtresor@apotheose.com');
             
-            // $hashedPassword = $this->passwordHasher->hashPassword($userObj, 'devinci');
-            // $userObj->setPassword($hashedPassword);
-            $userObj->setPassword('devinci');
+            $hashedPassword = $this->passwordHasher->hashPassword($userObj, 'devinci');
+            $userObj->setPassword($hashedPassword);
+            // $userObj->setPassword('devinci');
             $userObj->setRole($roleObj);
 
             $manager->persist($userObj);

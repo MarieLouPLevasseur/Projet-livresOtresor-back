@@ -65,6 +65,7 @@ class Kid
         $this->diploma = new ArrayCollection();
         $this->avatar = new ArrayCollection();
         $this->bookKids = new ArrayCollection();
+        $this->role = "ROLE_KID";
     }
 
     public function getId(): ?int

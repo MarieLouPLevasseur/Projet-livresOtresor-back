@@ -1,6 +1,7 @@
 <?php
 
 namespace App\DataFixtures;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 use App\Entity\Kid;
 use App\Entity\Book;
@@ -12,6 +13,7 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
 
 class UserFixtures extends Fixture implements DependentFixtureInterface
 {
@@ -48,8 +50,8 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
               $userObj->setEmail($faker->unique->email());
 
 
-              // $hashedPassword = $this->passwordHasher->hashPassword($userObj, 'devinci');
-              // $userObj->setPassword($hashedPassword);
+            //   $hashedPassword = $this->passwordHasher->hashPassword($userObj, 'devinci');
+            //   $userObj->setPassword($hashedPassword);
               $userObj->setPassword('devinci');
               $userObj->setRole($userRole);
           
