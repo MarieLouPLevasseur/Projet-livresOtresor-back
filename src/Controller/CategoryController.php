@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\BookKid;
 use App\Repository\CategoryRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,4 +28,8 @@ class CategoryController extends AbstractController
 
         return new JsonResponse($jsonCategoryList, Response::HTTP_OK, [], true);
     }
+
+
+
+    
 }
