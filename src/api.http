@@ -2,10 +2,6 @@
 GET http://localhost:8000/api/v1/users
 
 ###List user by id
-<<<<<<< HEAD
-=======
-
->>>>>>> 2ad2b35fd9296a52b787dd8b53a2e0336e17d1be
 GET http://localhost:8000/api/v1/users/121
 
 ### List all book
@@ -13,3 +9,7 @@ GET http://localhost:8000/api/v1/books
 
 ### List all the books of one child by id
 GET http://localhost:8000/api/v1/kid/176/books
+
+### List all the books read by one child
+###
+GET http://localhost:8000/api/v1/kid/177/book

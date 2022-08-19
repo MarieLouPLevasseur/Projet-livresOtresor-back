@@ -33,11 +33,7 @@ class UserController extends AbstractController
     }
 
     /**
-<<<<<<< HEAD
-     * @Route("/user/{id}", name="show", methods="GET", requirements={"id"="\d+"})
-=======
      * @Route("/users/{id}", name="show", methods="GET", requirements={"id"="\d+"})
->>>>>>> 2ad2b35fd9296a52b787dd8b53a2e0336e17d1be
      * @return Response
      */
     public function show(int $id, UserRepository $userRepository) :Response
@@ -46,13 +42,9 @@ class UserController extends AbstractController
         $user = $userRepository->find($id);
         if ($user === null )
         {
-<<<<<<< HEAD
-            // if the user doesn't  exist, display an error message.
-=======
 
             // if the user doesn't  exist, display an error message.
 
->>>>>>> 2ad2b35fd9296a52b787dd8b53a2e0336e17d1be
             $error = [
                 'error' => true,
                 'message' => 'No user found for Id [' . $id . ']'
@@ -60,8 +52,6 @@ class UserController extends AbstractController
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_list']);
-<<<<<<< HEAD
-=======
     }
 
     /**
@@ -86,6 +76,5 @@ class UserController extends AbstractController
         $listKid = $user->getKid();
         
         return $this->json($listKid, 200, [], ['groups' => 'userkids_list']);
->>>>>>> 2ad2b35fd9296a52b787dd8b53a2e0336e17d1be
     }
 }

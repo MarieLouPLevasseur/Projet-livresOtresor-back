@@ -18,7 +18,7 @@ class Book
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
 
-     * @Groups({"book_list"})
+     * @Groups({"book_list", "books_read"})
      */
     private $id;
     
@@ -32,13 +32,13 @@ class Book
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"booksByCategory","book_list","books_infos"})
+     * @Groups({"booksByCategory","book_list","books_infos","books_read"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"booksByCategory","book_list","books_infos"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read"})
      */
     private $description;
 
@@ -56,7 +56,7 @@ class Book
 
     /**
      * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book")
-     * @Groups({"booksByCategory","book_list","books_infos"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read"})
      */
     private $authors;
 

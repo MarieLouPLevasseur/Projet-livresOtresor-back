@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\BookKidRepository;
 use App\Repository\BookRepository;
 use App\Repository\KidRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,9 +44,6 @@ class BookController extends AbstractController
 
     {
         $kid = $kidRepository->find($id);
-        //$bookRead = $bookRepository-> findAll();
-        
-
 
         if ($kid === null )
         {
@@ -67,6 +65,35 @@ class BookController extends AbstractController
             ['data' => $bookKid]
         );
     }
+
+
+    /**
+     * @Route("/kid/{id_kid}/book", name="show", methods="GET", requirements={"id"="\d+"})
+     * @return Response
+     */
+
+    public function showBookRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository){
+
+        $currentKid = $kidRepository->find($id_kid);
+    
+        if ($currentKid === null )
+            {
+                
+                $error = [
+                    'error' => true,
+                    'message' => 'No kid found for Id [' . $id_kid . ']'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
+        
+            $currentReadbooks = $bookKidRepository->findAllByIsRead(true, $id_kid);
+    
+            return $this->prepareResponse(
+                'OK',
+                ['groups' => 'books_read'],
+                ['data' => $currentReadbooks ]
+            );
+        }
 
     private function prepareResponse(
         string $message, 
