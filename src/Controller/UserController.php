@@ -45,20 +45,18 @@ class UserController extends AbstractController
 
         ): JsonResponse
             {
-        // $user = new User();
 
         $data = $request->getcontent();
-        // $data = $request->get('email');
-
         
         $user = $serializer->deserialize($data, User::class, 'json');
 
         $role = $roleRepository->findOneByRoleName("ROLE_USER");
         $user->setRole($role);
-        // dd($user);
 
-        // var_dump($user);
+        $password = $passwordHasher->hashPassword($user, $user->getPassword());
+        $user ->setPassword($password);
 
+      
         $em->persist($user);
         $em->flush();
 
