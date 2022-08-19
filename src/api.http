@@ -11,5 +11,4 @@ GET http://localhost:8000/api/v1/books
 GET http://localhost:8000/api/v1/kid/176/books
 
 ### List all the books read by one child
-###
-GET http://localhost:8000/api/v1/kid/177/book
+GET http://localhost:8000/api/v1/kid/177/books/read

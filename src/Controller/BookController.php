@@ -68,7 +68,7 @@ class BookController extends AbstractController
 
 
     /**
-     * @Route("/kid/{id_kid}/book", name="show", methods="GET", requirements={"id"="\d+"})
+     * @Route("/kid/{id_kid}/books/read", name="show", methods="GET", requirements={"id"="\d+"})
      * @return Response
      */
 
