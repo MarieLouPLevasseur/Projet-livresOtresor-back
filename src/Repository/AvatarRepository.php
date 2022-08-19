@@ -38,18 +38,33 @@ class AvatarRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
-    
-
+    /**
+     * find an avatar by a specific win value
+     *
+     * @param [type] $value
+     * @return void
+     */
     public function findOneByIsWinValue($value): ?Avatar
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.is_win <= :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function findAllByIsWinValue($value)
    {
        return $this->createQueryBuilder('a')
-           ->andWhere('a.is_win = :val')
+           ->andWhere('a.is_win <= :val')
            ->setParameter('val', $value)
            ->getQuery()
-           ->getOneOrNullResult()
+           ->getResult()
        ;
    }
+
+   
 
 //    /**
 //     * @return Avatar[] Returns an array of Avatar objects

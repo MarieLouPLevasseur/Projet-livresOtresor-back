@@ -17,11 +17,13 @@ class Diploma
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"KidDiploma"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"KidDiploma"})
      */
     private $url;
 

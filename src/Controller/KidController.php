@@ -2,19 +2,22 @@
 
 namespace App\Controller;
 
+use App\Repository\KidRepository;
+use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
+use App\Repository\DiplomaRepository;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\Common\Annotations\AnnotationReader;
+
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
-
-use Doctrine\Common\Annotations\AnnotationReader;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 
 /**
  * Kid class
@@ -63,4 +66,97 @@ class KidController extends AbstractController
 
         return new JsonResponse($jsonBooksCategoryList, Response::HTTP_OK, [],true);
     }
+
+    /**
+     * Show all avatars of a kid
+     * @Route("/{id_kid}/avatars", name="show_avatars", methods="GET", requirements={"id_kid"="\d+"})
+     * 
+     */
+    public function showAllAvatars(
+        int $id_kid,
+        KidRepository $kidRepository,
+        AvatarRepository $avatarRepository,
+        SerializerInterface $serializer
+       ): Response
+    {
+        $currentKid = $kidRepository->find($id_kid);
+
+
+
+        if ($currentKid === null )
+        {
+
+            $error = [
+                'error' => true,
+                'message' => 'No Kid found for Id [' . $id_kid . ']'
+            ];
+
+            return $this->json($error, Response::HTTP_NOT_FOUND); 
+        }
+
+        // count books
+        $currentbooks = $currentKid->getBookKids();
+        $totalBooks = count($currentbooks);
+
+        // check if totalBooks < or = to 'is_win' and set those
+        $currentAvatarsWon = $avatarRepository->findAllByIsWinValue($totalBooks);
+
+        foreach($currentAvatarsWon as $avatar){
+
+            $currentKid->addAvatar($avatar);
+        }
+
+        $currentKidAvatars = $currentKid->getAvatar();      
+        $jsonAvatarsList = $serializer->serialize($currentKidAvatars, 'json',['groups' => 'KidAvatar']);
+
+
+        return new JsonResponse($jsonAvatarsList, Response::HTTP_OK, [],true);
+    }
+
+     /**
+     * Show all diplomas of a kid
+     * @Route("/{id_kid}/diplomas", name="show_diplomas", methods="GET", requirements={"id_kid"="\d+"})
+     * 
+     */
+    public function showAllDiplomas(
+        int $id_kid,
+        KidRepository $kidRepository,
+        DiplomaRepository $diplomaRepository,
+        SerializerInterface $serializer
+       ): Response
+    {
+        $currentKid = $kidRepository->find($id_kid);
+
+
+
+        if ($currentKid === null )
+        {
+
+            $error = [
+                'error' => true,
+                'message' => 'No Kid found for Id [' . $id_kid . ']'
+            ];
+
+            return $this->json($error, Response::HTTP_NOT_FOUND); 
+        }
+
+        // count books
+        $currentbooks = $currentKid->getBookKids();
+        $totalBooks = count($currentbooks);
+
+        // check if totalBooks < or = to 'is_win' and set those
+        $currentDiplomasWon = $diplomaRepository->findAllByIsWinValue($totalBooks);
+
+        foreach($currentDiplomasWon as $diploma){
+
+            $currentKid->addDiploma($diploma);
+        }
+
+        $currentDiplomas = $currentKid->getDiploma();      
+        $jsonDiplomasList = $serializer->serialize($currentDiplomas, 'json',['groups' => 'KidDiploma']);
+
+
+        return new JsonResponse($jsonDiplomasList, Response::HTTP_OK, [],true);
+    }
+
 }
