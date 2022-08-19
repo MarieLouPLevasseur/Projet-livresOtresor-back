@@ -10,12 +10,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use JetBrains\PhpStorm\Internal\ReturnTypeContract;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
+use symfony\Component\Validator\Constraints as Assert;
 
 
 
@@ -41,27 +42,42 @@ class UserController extends AbstractController
         ValidatorInterface $validator,
         EntityManagerInterface $em,
         RoleRepository $roleRepository
-
-
-        ): JsonResponse
-            {
+        ): Response
+    {
 
         $data = $request->getcontent();
         
         $user = $serializer->deserialize($data, User::class, 'json');
 
-        $role = $roleRepository->findOneByRoleName("ROLE_USER");
-        $user->setRole($role);
 
-        $password = $passwordHasher->hashPassword($user, $user->getPassword());
-        $user ->setPassword($password);
-
-      
-        $em->persist($user);
-        $em->flush();
+        $errors = $validator->validate($user);
 
 
-        return $this->json('Created', 200, [], []);
+
+            if (count($errors) > 0) {
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+
+                return new Response($errorsString,400,[],Response::HTTP_BAD_REQUEST);
+            }
+
+
+            $role = $roleRepository->findOneByRoleName("ROLE_USER");
+            $user->setRole($role);
+    
+            $password = $passwordHasher->hashPassword($user, $user->getPassword());
+            $user ->setPassword($password);
+    
+          
+            $em->persist($user);
+            $em->flush();
+            $this->addFlash('success', "L'utilisateur a bien été enregistré");
+
+            return new Response("L'utilisateur a bien été enregistré");
 
        
     }

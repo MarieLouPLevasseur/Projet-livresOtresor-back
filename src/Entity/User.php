@@ -11,9 +11,13 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity(fields={"email"}, message="REND TON EMAIL UNIQUE")
+ * 
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -28,23 +32,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"user_list"})
+     * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
+     * @Assert\Length(min=3)( message = "Le prénom doit contenir au moins 3 caractères")
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"user_list"})
+     * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
+     * @Assert\Length(min=2)( message = "Le prénom doit contenir au moins 2 caractères")
      */
     private $lastname;
+    
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"user_list"})
+     * @Assert\Email( message = "Cet email n'est pas valide")
+     * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
+     * @Assert\Length(min=5)( message = "L'email doit contenir au moins 5 caractères")
+  
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
+     * @Assert\Length(min=5, max=20)( message = "Le mot de passe doit contenir entre 5 et 20 caractères")
      */
     private $password;
 
