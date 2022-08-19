@@ -20,26 +20,25 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"book_list"})
-     * @Groups({"books_infos"})
+     * @Groups({"book_list","books_infos", "userkids_list"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list","books_infos"})
+     * @Groups({"book_list","books_infos", "userkids_list"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"userkids_list"})
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list"})
-     * @Groups({"books_infos"})
+     * @Groups({"book_list","books_infos"})
      */
     private $profile_avatar;
 

@@ -23,19 +23,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_list"})
+     * @Groups({"user_list", "userkids_list"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_list"})
+     * @Groups({"user_list", "userkids_list"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_list"})
+     * @Groups({"user_list", "userkids_list"})
      */
     private $lastname;
 
@@ -58,7 +58,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\OneToMany(targetEntity=Kid::class, mappedBy="user")
      * @ORM\JoinColumn(name="kid_id", referencedColumnName="id", nullable=false)
-     * 
+     * @Groups({"userkids_list"})
      */
     private $kid;
 
