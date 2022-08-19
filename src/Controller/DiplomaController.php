@@ -2,40 +2,40 @@
 
 namespace App\Controller;
 
-use App\Repository\AvatarRepository;
+use App\Repository\DiplomaRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class AvatarController extends AbstractController
+class DiplomaController extends AbstractController
 {
     /**
-     * @Route("/api/v1/avatars/{id}", name="api_avatars", requirements={"id_kid"="\d+"})
+     * @Route("/api/v1/diplomas/{id}", name="api_diplomas", requirements={"id_kid"="\d+"})
      */
     public function show(
     int $id,
-    AvatarRepository $avatarRepository,
+    DiplomaRepository $diplomaRepository,
     SerializerInterface $serializer): Response
     {
-       $avatar = $avatarRepository->find($id);
+       $diploma = $diplomaRepository->find($id);
 
 
-        if ($avatar === null )
+        if ($diploma === null )
         {
         $error = [
             'error' => true,
-            'message' => 'No avatar found for Id [' . $id . ']'
+            'message' => 'No diploma found for Id [' . $id . ']'
         ];
 
         return $this->json($error, Response::HTTP_NOT_FOUND); // page 404
         }
     
-        $jsonAvatarsShow = $serializer->serialize($avatar, 'json',['groups' => 'KidAvatar']);
+        $jsonDiplomasShow = $serializer->serialize($diploma, 'json',['groups' => 'KidDiploma']);
 
 
-        return new JsonResponse($jsonAvatarsShow, Response::HTTP_OK, [],true);
+        return new JsonResponse($jsonDiplomasShow, Response::HTTP_OK, [],true);
 
     }
 }
