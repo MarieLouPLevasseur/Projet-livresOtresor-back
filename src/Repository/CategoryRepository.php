@@ -39,24 +39,6 @@ class CategoryRepository extends ServiceEntityRepository
         }
     }
 
-    // public function findForShow($categoryId): ?Category
-    // {
-    //     $entityManager = $this->getEntityManager();
-
-    //     $query = $entityManager->createQueryBuilder(
-    //         'SELECT c, bk, b, k
-    //         FROM App\Entity\Category c
-    //         JOIN c.bookKid bk
-    //         JOIN bk.book b
-    //         JOIN bk.kid k
-    //         WHERE 
-    //         '
-
-    //     )->setParameter('category_id',$categoryId);
-
-    //    return $query->();
-    // }
-
 //    /**
 //     * @return Category[] Returns an array of Category objects
 //     */
