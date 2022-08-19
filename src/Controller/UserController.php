@@ -13,7 +13,7 @@ use JetBrains\PhpStorm\Internal\ReturnTypeContract;
 
 /**
  * Undocumented class
- *  @Route("/api_v1", name="api_user")
+ *  @Route("/api/v1", name="api_user")
  */
 class UserController extends AbstractController
 {

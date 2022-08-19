@@ -20,12 +20,14 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * 
+     * @Groups({"book_list","books_infos"})
      */
     private $username;
 
@@ -36,6 +38,8 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $profile_avatar;
 
@@ -60,7 +64,9 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     private $user;
 
     /**
+
      * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="kid", fetch="EAGER")
+     * @Groups({"book_list"})
      */
     private $bookKids;
 

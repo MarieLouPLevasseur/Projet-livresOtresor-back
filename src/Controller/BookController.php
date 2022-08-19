@@ -3,13 +3,19 @@
 namespace App\Controller;
 
 use App\Repository\BookRepository;
+use App\Repository\KidRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+
 
 /**
  * Undocumented class
- *  @Route("/api_v1", name="api_book")
+ *  @Route("/api/v1", name="api_book")
  */
 class BookController extends AbstractController
 {
@@ -20,28 +26,66 @@ class BookController extends AbstractController
     public function list(BookRepository $bookRepository): Response
     {
 
-        $book = $bookRepository->findAll();
+        $books = $bookRepository->findAll();
         
-        return $this->json($book, 200, [], ['groups' => 'book_list']);
+        return $this->prepareResponse(
+            'OK',
+            ['groups' => 'book_list'],
+            ['data' => $books]
+        );
     }
 
     /**
-     * @Route("/book/{id}", name="show", methods="GET", requirements={"id"="\d+"})
+     * @Route("/kid/{id}/books", name="show", methods="GET", requirements={"id"="\d+"})
      * @return Response
      */
-    public function show(int $id, bookRepository $bookRepository): Response
+    public function showBookOfOneKid( int $id, KidRepository $kidRepository, bookRepository $bookRepository): Response
 
     {
-        $book = $bookRepository->find($id);
-        if ($book === null )
-        {
+        $kid = $kidRepository->find($id);
+        //$bookRead = $bookRepository-> findAll();
         
+
+
+        if ($kid === null )
+        {
+            
             $error = [
                 'error' => true,
-                'message' => 'No book found for Id [' . $id . ']'
+                'message' => 'No kid found for Id [' . $id . ']'
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
-        return $this->json($book, Response::HTTP_OK, [], ['groups' => 'book_list']);
+
+        $bookKid = $kid->getBookKids();
+    
+        //$jsonBooksKidList = $serializer->serialize($bookskids, 'json',['groups' => 'booksKid']);
+
+        return $this->prepareResponse(
+            'OK',
+            ['groups' => 'books_infos'],
+            ['data' => $bookKid]
+        );
+    }
+
+    private function prepareResponse(
+        string $message, 
+        array $options = [], 
+        array $data = [], 
+        bool $isError = false, 
+        int $httpCode = 200, 
+        array $headers = []
+    )
+    {
+        $responseData = [
+            'error' => $isError,
+            'message' => $message,
+        ];
+
+        foreach ($data as $key => $value)
+        {
+            $responseData[$key] = $value;
+        }
+        return $this->json($responseData, $httpCode, $headers, $options);
     }
 }
