@@ -58,7 +58,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\OneToMany(targetEntity=Kid::class, mappedBy="user")
      * @ORM\JoinColumn(name="kid_id", referencedColumnName="id", nullable=false)
-     * 
+     * @Groups({"userkids_list"})
      */
     private $kid;
 
