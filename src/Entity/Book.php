@@ -6,6 +6,7 @@ use App\Repository\BookRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=BookRepository::class)
@@ -16,41 +17,53 @@ class Book
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+
+     * @Groups({"book_list"})
      */
     private $id;
-
+    
     /**
-     * @ORM\Column(type="integer")
+
+     * @ORM\Column(type="bigint")
+     * @Groups({"booksByCategory","book_list"})
+     * 
      */
     private $isbn;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"booksByCategory","book_list","books_infos"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"booksByCategory","book_list","books_infos"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"booksByCategory","book_list","books_infos"})
      */
     private $publisher;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"books_infos"})
      */
     private $created_at;
 
     /**
      * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book")
+     * @Groups({"booksByCategory","book_list","books_infos"})
      */
     private $authors;
 
     /**
      * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="book")
+     * @Groups({"book_list"})
+     * 
      */
     private $bookKids;
 

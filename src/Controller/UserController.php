@@ -41,6 +41,9 @@ class UserController extends AbstractController
         $user = $userRepository->find($id);
         if ($user === null )
         {
+
+            // if the user doesn't  exist, display an error message.
+
             $error = [
                 'error' => true,
                 'message' => 'No user found for Id [' . $id . ']'

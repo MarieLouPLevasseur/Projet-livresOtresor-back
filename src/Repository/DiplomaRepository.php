@@ -39,6 +39,16 @@ class DiplomaRepository extends ServiceEntityRepository
         }
     }
 
+    public function findAllByIsWinValue($value)
+   {
+       return $this->createQueryBuilder('d')
+           ->andWhere('d.is_win <= :val')
+           ->setParameter('val', $value)
+           ->getQuery()
+           ->getResult()
+       ;
+   }
+
 //    /**
 //     * @return Diploma[] Returns an array of Diploma objects
 //     */
