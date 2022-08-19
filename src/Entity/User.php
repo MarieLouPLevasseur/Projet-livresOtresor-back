@@ -23,19 +23,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_list", "userkids_list"})
+     * @Groups({"user_list"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_list", "userkids_list"})
+     * @Groups({"user_list"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_list", "userkids_list"})
+     * @Groups({"user_list"})
      */
     private $lastname;
 
