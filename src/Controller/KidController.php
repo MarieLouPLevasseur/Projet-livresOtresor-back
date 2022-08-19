@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\BookKid;
 use App\Repository\KidRepository;
 use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
