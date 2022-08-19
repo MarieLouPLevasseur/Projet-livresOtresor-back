@@ -13,7 +13,7 @@ use JetBrains\PhpStorm\Internal\ReturnTypeContract;
 
 /**
  * Undocumented class
- *  @Route("/api_v1", name="api_user")
+ *  @Route("/api/v1", name="api_user")
  */
 class UserController extends AbstractController
 {
@@ -32,7 +32,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/user/{id}", name="show", methods="GET", requirements={"id"="\d+"})
+     * @Route("/users/{id}", name="show", methods="GET", requirements={"id"="\d+"})
      * @return Response
      */
     public function show(int $id, UserRepository $userRepository) :Response

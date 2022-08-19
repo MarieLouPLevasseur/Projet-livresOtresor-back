@@ -42,7 +42,6 @@ class User
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_list"})
      */
     private $password;
 
