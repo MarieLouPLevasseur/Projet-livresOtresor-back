@@ -1,6 +1,6 @@
 ### List all users
-GET http://localhost:8000/api_v1/users
+GET http://localhost:8000/api/v1/users
 
 ###
-GET http://localhost:8000/api_v1/user/90
+GET http://localhost:8000/api/v1/users/90
 

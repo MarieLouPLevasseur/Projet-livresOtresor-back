@@ -41,10 +41,9 @@ class UserController extends AbstractController
         $user = $userRepository->find($id);
         if ($user === null )
         {
-            // si le movie n'existe pas on le signale à l'utilisateur
             $error = [
                 'error' => true,
-                'message' => 'No movie found for Id [' . $id . ']'
+                'message' => 'No user found for Id [' . $id . ']'
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
