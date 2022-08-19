@@ -2,6 +2,10 @@
 
 namespace App\Controller;
 
+<<<<<<< HEAD
+=======
+use App\Entity\BookKid;
+>>>>>>> 2ad2b35fd9296a52b787dd8b53a2e0336e17d1be
 use App\Repository\KidRepository;
 use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
@@ -76,6 +80,10 @@ class KidController extends AbstractController
         int $id_kid,
         KidRepository $kidRepository,
         AvatarRepository $avatarRepository,
+<<<<<<< HEAD
+=======
+        BookKidRepository $bookKidRepository,
+>>>>>>> 2ad2b35fd9296a52b787dd8b53a2e0336e17d1be
         SerializerInterface $serializer
        ): Response
     {
@@ -95,11 +103,20 @@ class KidController extends AbstractController
         }
 
         // count books
+<<<<<<< HEAD
         $currentbooks = $currentKid->getBookKids();
         $totalBooks = count($currentbooks);
 
         // check if totalBooks < or = to 'is_win' and set those
         $currentAvatarsWon = $avatarRepository->findAllByIsWinValue($totalBooks);
+=======
+
+        $currentReadbooks = $bookKidRepository->findAllByIsRead(true,$id_kid);
+        $totalBooksRead = count($currentReadbooks);
+
+        // check if totalBooksRead < or = to 'is_win' and set those
+        $currentAvatarsWon = $avatarRepository->findAllByIsWinValue($totalBooksRead);
+>>>>>>> 2ad2b35fd9296a52b787dd8b53a2e0336e17d1be
 
         foreach($currentAvatarsWon as $avatar){
 
@@ -122,6 +139,10 @@ class KidController extends AbstractController
         int $id_kid,
         KidRepository $kidRepository,
         DiplomaRepository $diplomaRepository,
+<<<<<<< HEAD
+=======
+        BookKidRepository $bookKidRepository,
+>>>>>>> 2ad2b35fd9296a52b787dd8b53a2e0336e17d1be
         SerializerInterface $serializer
        ): Response
     {
@@ -141,11 +162,21 @@ class KidController extends AbstractController
         }
 
         // count books
+<<<<<<< HEAD
         $currentbooks = $currentKid->getBookKids();
         $totalBooks = count($currentbooks);
 
         // check if totalBooks < or = to 'is_win' and set those
         $currentDiplomasWon = $diplomaRepository->findAllByIsWinValue($totalBooks);
+=======
+
+        $currentReadbooks = $bookKidRepository->findAllByIsRead(true,$id_kid);
+        $totalBooksRead = count($currentReadbooks);
+
+
+        // check if totalBooks < or = to 'is_win' and set those
+        $currentDiplomasWon = $diplomaRepository->findAllByIsWinValue($totalBooksRead);
+>>>>>>> 2ad2b35fd9296a52b787dd8b53a2e0336e17d1be
 
         foreach($currentDiplomasWon as $diploma){
 
