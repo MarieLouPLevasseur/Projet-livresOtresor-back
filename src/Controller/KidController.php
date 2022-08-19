@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\BookKid;
 use App\Repository\KidRepository;
 use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
@@ -76,6 +77,7 @@ class KidController extends AbstractController
         int $id_kid,
         KidRepository $kidRepository,
         AvatarRepository $avatarRepository,
+        BookKidRepository $bookKidRepository,
         SerializerInterface $serializer
        ): Response
     {
@@ -95,11 +97,12 @@ class KidController extends AbstractController
         }
 
         // count books
-        $currentbooks = $currentKid->getBookKids();
-        $totalBooks = count($currentbooks);
 
-        // check if totalBooks < or = to 'is_win' and set those
-        $currentAvatarsWon = $avatarRepository->findAllByIsWinValue($totalBooks);
+        $currentReadbooks = $bookKidRepository->findAllByIsRead(true,$id_kid);
+        $totalBooksRead = count($currentReadbooks);
+
+        // check if totalBooksRead < or = to 'is_win' and set those
+        $currentAvatarsWon = $avatarRepository->findAllByIsWinValue($totalBooksRead);
 
         foreach($currentAvatarsWon as $avatar){
 

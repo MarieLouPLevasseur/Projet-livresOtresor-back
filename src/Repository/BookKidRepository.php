@@ -68,10 +68,33 @@ class BookKidRepository extends ServiceEntityRepository
             // returns an array of Product objects
             return $query->getResult();
 
-
-
-
       
+   }
+
+   /**
+    * Find all book of a kid : by read or not read
+    *
+    * @param boolean $is_read_value
+    * @param int $kid_id
+    * 
+    */
+   public function findAllByIsRead($is_read_value, $kid_id)//:BookKid
+   {
+            $entityManager = $this->getEntityManager();
+            $query = $entityManager->createQuery(
+                // ! les alias sont obligatoire ici
+                'SELECT bk, k
+                FROM App\Entity\BookKid bk
+                JOIN bk.kid k
+                WHERE k.id = :kid_id AND bk.is_read = :is_read_value
+                '
+            )
+            // ->setParameter('kid_id', $kid_id, 'category_id', $category_id);
+            ->setParameters(array('kid_id'=> $kid_id, 'is_read_value' => $is_read_value));
+
+            // returns an array of Product objects
+            return $query->getResult();
+
    }
 
 //    /**
