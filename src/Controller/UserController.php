@@ -4,12 +4,21 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\KidRepository;
+use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use JetBrains\PhpStorm\Internal\ReturnTypeContract;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
+
+
 
 
 /**
@@ -18,6 +27,47 @@ use JetBrains\PhpStorm\Internal\ReturnTypeContract;
  */
 class UserController extends AbstractController
 {
+
+    /**
+     * Add a user (registration)
+     *
+     * @Route("/users", name="create", methods="POST")
+     * 
+     */
+    public function addUser( 
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+        EntityManagerInterface $em,
+        RoleRepository $roleRepository
+
+
+        ): JsonResponse
+            {
+        // $user = new User();
+
+        $data = $request->getcontent();
+        // $data = $request->get('email');
+
+        
+        $user = $serializer->deserialize($data, User::class, 'json');
+
+        $role = $roleRepository->findOneByRoleName("ROLE_USER");
+        $user->setRole($role);
+        // dd($user);
+
+        // var_dump($user);
+
+        $em->persist($user);
+        $em->flush();
+
+
+        return $this->json('Created', 200, [], []);
+
+       
+    }
+
     /**
      * list all users
      *
@@ -77,4 +127,6 @@ class UserController extends AbstractController
         
         return $this->json($listKid, 200, [], ['groups' => 'userkids_list']);
     }
+
+
 }
