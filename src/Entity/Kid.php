@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 
 /**
@@ -19,11 +20,14 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"book_list","books_infos"})
      */
     private $username;
 
@@ -34,6 +38,8 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $profile_avatar;
 
@@ -58,7 +64,9 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     private $user;
 
     /**
-     * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="kid")
+
+     * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="kid", fetch="EAGER")
+     * @Groups({"book_list"})
      */
     private $bookKids;
 

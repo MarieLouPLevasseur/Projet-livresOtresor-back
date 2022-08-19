@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\BookKidRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=BookKidRepository::class)
@@ -14,41 +15,52 @@ class BookKid
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     *@Groups({"booksByCategory","book_list","books_infos"})
      */
     private $comment;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"booksByCategory","book_list","books_infos"})
+     * 
      */
     private $rating;
 
     /**
      * @ORM\Column(type="boolean")
+     *@Groups({"booksByCategory","book_list","books_infos"})
+     * 
      */
     private $is_read;
 
     /**
      * @ORM\ManyToOne(targetEntity=Kid::class, inversedBy="bookKids")
+     * 
      */
     private $kid;
 
     /**
      * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids")
+     * @Groups({"booksByCategory","books_infos"})
      */
     private $book;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="bookKids")
+     * @Groups({"booksByCategory"})
      */
     private $category;
 
     /**
      * @ORM\Column(type="datetime")
+     * 
      */
     private $updated_at;
 
