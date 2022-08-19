@@ -18,14 +18,14 @@ class Book
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
 
-     * @Groups({"book_list", "books_read", "books_wish"})
+     * @Groups({"booksByCategory","book_list", "books_read", "books_wish" , "books_infos"})
      */
     private $id;
     
     /**
 
      * @ORM\Column(type="bigint")
-     * @Groups({"booksByCategory","book_list"})
+     * @Groups({"booksByCategory","book_list","books_read", "books_wish", "books_infos"})
      * 
      */
     private $isbn;
