@@ -30,37 +30,41 @@ class Book
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $publisher;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $created_at;
 
     /**
      * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book")
      * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $authors;
 
     /**
      * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="book")
      * @Groups({"book_list"})
-
+     * 
      */
     private $bookKids;
 

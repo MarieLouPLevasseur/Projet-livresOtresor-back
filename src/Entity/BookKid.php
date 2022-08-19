@@ -16,12 +16,14 @@ class BookKid
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"book_list"})
+     * @Groups({"books_infos"})
 
      */
     private $comment;
@@ -29,26 +31,26 @@ class BookKid
     /**
      * @ORM\Column(type="integer", nullable=true)
      * @Groups({"book_list"})
-
+     * @Groups({"books_infos"})
      */
     private $rating;
 
     /**
      * @ORM\Column(type="boolean")
      * @Groups({"book_list"})
-
+     * @Groups({"books_infos"})
      */
     private $is_read;
 
     /**
      * @ORM\ManyToOne(targetEntity=Kid::class, inversedBy="bookKids")
-     * @Groups({"book_list"})
-
+     * 
      */
     private $kid;
 
     /**
      * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids")
+     *@Groups({"books_infos"})
      */
     private $book;
 

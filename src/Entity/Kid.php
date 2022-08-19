@@ -6,6 +6,8 @@ use App\Repository\KidRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+
 
 /**
  * @ORM\Entity(repositoryClass=KidRepository::class)
@@ -16,11 +18,15 @@ class Kid
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $username;
 
@@ -31,6 +37,8 @@ class Kid
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"book_list"})
+     * @Groups({"books_infos"})
      */
     private $profile_avatar;
 
@@ -56,6 +64,7 @@ class Kid
 
     /**
      * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="kid")
+     * @Groups({"book_list"})
      */
     private $bookKids;
 
