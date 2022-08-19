@@ -125,6 +125,7 @@ class KidController extends AbstractController
         int $id_kid,
         KidRepository $kidRepository,
         DiplomaRepository $diplomaRepository,
+        BookKidRepository $bookKidRepository,
         SerializerInterface $serializer
        ): Response
     {
@@ -144,11 +145,13 @@ class KidController extends AbstractController
         }
 
         // count books
-        $currentbooks = $currentKid->getBookKids();
-        $totalBooks = count($currentbooks);
+
+        $currentReadbooks = $bookKidRepository->findAllByIsRead(true,$id_kid);
+        $totalBooksRead = count($currentReadbooks);
+
 
         // check if totalBooks < or = to 'is_win' and set those
-        $currentDiplomasWon = $diplomaRepository->findAllByIsWinValue($totalBooks);
+        $currentDiplomasWon = $diplomaRepository->findAllByIsWinValue($totalBooksRead);
 
         foreach($currentDiplomasWon as $diploma){
 
