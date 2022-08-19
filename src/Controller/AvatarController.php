@@ -24,7 +24,6 @@ class AvatarController extends AbstractController
 
         if ($avatar === null )
         {
-        // si le movie n'existe pas on le signale à l'utilisateur
         $error = [
             'error' => true,
             'message' => 'No avatar found for Id [' . $id . ']'
