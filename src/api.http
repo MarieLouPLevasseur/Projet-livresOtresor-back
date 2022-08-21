@@ -7,7 +7,7 @@ GET http://localhost:8000/api/v1/users/121
 ### List all book
 GET http://localhost:8000/api/v1/books
 
-### List all the books of one child by id
+### List of all the books of one child by id
 GET http://localhost:8000/api/v1/kids/176/books 
 
 ### List of all the books read by one child
