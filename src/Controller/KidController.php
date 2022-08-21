@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\KidRepository;
 use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
+use App\Repository\BookRepository;
 use App\Repository\DiplomaRepository;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Response;
@@ -163,5 +164,88 @@ class KidController extends AbstractController
 
         return new JsonResponse($jsonDiplomasList, Response::HTTP_OK, [],true);
     }
+
+    /*************************Routes coded using the prepare response method*******************************************************************/
+      /**
+     * @Route("/{id_kid}/books", name="show_book_list", methods="GET", requirements={"id"="\d+"})
+     * @return Response
+     */
+    public function showBookOfOneKid( int $id_kid, KidRepository $kidRepository, BookRepository $bookRepository): Response
+
+    {
+        $kid = $kidRepository->find($id_kid);
+
+        if ($kid === null )
+        {
+            
+            $error = [
+                'error' => true,
+                'message' => 'No kid found for Id [' .$id_kid. ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        $bookKid = $kid->getBookKids();
+    
+        //$jsonBooksKidList = $serializer->serialize($bookskids, 'json',['groups' => 'booksKid']);
+
+        return $this->prepareResponse(
+            'OK',
+            ['groups' => 'books_infos'],
+            ['data' => $bookKid]
+        );
+    }
+
+    /**
+     * @Route("/{id_kid}/books/wish", name="show_book_wish_list", methods="GET", requirements={"id"="\d+"})
+     * @return Response
+     */
+
+    public function WishToRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository){
+
+        $currentKid = $kidRepository->find($id_kid);
+    
+        if ($currentKid === null )
+            {
+                
+                $error = [
+                    'error' => true,
+                    'message' => 'No kid found for Id [' . $id_kid . ']'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
+        
+            $currentBooksWish = $bookKidRepository->findAllByIsRead(false, $id_kid);
+    
+            return $this->prepareResponse(
+                'OK',
+                ['groups' => 'books_wish'],
+                ['data' => $currentBooksWish ]
+            );
+        }
+
+        private function prepareResponse(
+            string $message, 
+            array $options = [], 
+            array $data = [], 
+            bool $isError = false, 
+            int $httpCode = 200, 
+            array $headers = []
+        )
+        {
+            $responseData = [
+                'error' => $isError,
+                'message' => $message,
+            ];
+    
+            foreach ($data as $key => $value)
+            {
+                $responseData[$key] = $value;
+            }
+            return $this->json($responseData, $httpCode, $headers, $options);
+        }
+
+    /*******************************************************************************************/
+
 
 }
