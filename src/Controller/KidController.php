@@ -179,6 +179,7 @@ class KidController extends AbstractController
         SerializerInterface $serializer
         ): Response
 
+        
     {
 
         $currentkid = $kidRepository->find($id_kid);
