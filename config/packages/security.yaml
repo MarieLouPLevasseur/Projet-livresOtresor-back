@@ -20,7 +20,15 @@ security:
             lazy: true
             # provider: users_in_memory
             provider: app_user_provider
-
+            form_login:
+                # "app_login" is the name of the route created previously
+                login_path: app_login
+                check_path: app_login
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                # TODO moyen de rediriger selon le login? Si USER ou KID vers une URL front?
+                # target: homepage
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
