@@ -198,11 +198,12 @@ class KidController extends AbstractController
 
 
     /**
-     * @Route("/{id_kid}/books/read", name="show_books_read", methods="GET", requirements={"id"="\d+"})
+     * @Route("/{id_kid}/books/wish", name="show_book_wish_list", methods="GET", requirements={"id"="\d+"})
      * @return Response
      */
 
-    public function showBookRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository){
+    public function WishToRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository){
+
 
         $currentKid = $kidRepository->find($id_kid);
     
@@ -216,12 +217,14 @@ class KidController extends AbstractController
                 return $this->json($error, Response::HTTP_NOT_FOUND);
             }
         
-            $currentReadbooks = $bookKidRepository->findAllByIsRead(true, $id_kid);
+
+            $currentBooksWish = $bookKidRepository->findAllByIsRead(false, $id_kid);
     
             return $this->prepareResponse(
                 'OK',
-                ['groups' => 'books_read'],
-                ['data' => $currentReadbooks ]
+                ['groups' => 'books_wish'],
+                ['data' => $currentBooksWish ]
+
             );
         }
 
