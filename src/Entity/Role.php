@@ -41,6 +41,10 @@ class Role
         $this->kids = new ArrayCollection();
         $this->users = new ArrayCollection();
     }
+    public function __toString()
+    {
+        return $this->getName();
+    }
 
     public function getId(): ?int
     {
