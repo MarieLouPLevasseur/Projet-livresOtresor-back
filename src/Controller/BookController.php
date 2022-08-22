@@ -21,7 +21,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class BookController extends AbstractController
 {
     /**
-     * @Route("/books", name="book_list", methods="GET")
+     * @Route("/books", name="book_
+     * list", methods="GET")
      * @return Response
      */
     public function list(BookRepository $bookRepository): Response
