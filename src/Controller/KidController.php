@@ -313,5 +313,33 @@ class KidController extends AbstractController
 
     /*******************************************************************************************/
 
+       /**
+     * @Route("/{id_kid}/books/wish", name="show_book_wish_list", methods="GET", requirements={"id"="\d+"})
+     * @return Response
+     */
 
+    public function WishToRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository){
+
+        $currentKid = $kidRepository->find($id_kid);
+
+        if ($currentKid === null )
+            {
+
+                $error = [
+                    'error' => true,
+                    'message' => 'No kid found for Id [' . $id_kid . ']'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
+
+            $currentBooksWish = $bookKidRepository->findAllByIsRead(false, $id_kid);
+
+            return $this->prepareResponse(
+                'OK',
+                ['groups' => 'books_wish'],
+                ['data' => $currentBooksWish ]
+            );
+        }
+
+    /*******************************************************************************************/
 }
