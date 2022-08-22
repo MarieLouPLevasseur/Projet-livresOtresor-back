@@ -165,7 +165,7 @@ class KidController extends AbstractController
         return new JsonResponse($jsonDiplomasList, Response::HTTP_OK, [],true);
     }
 
-    /*************************Routes coded using the prepare response method*******************************************************************/
+    /****************************Routes coded using the prepare response method*******************************************************************/
       /**
      * @Route("/{id_kid}/books", name="show_book_list", methods="GET", requirements={"id"="\d+"})
      * @return Response
