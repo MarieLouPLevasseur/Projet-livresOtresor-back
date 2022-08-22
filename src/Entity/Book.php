@@ -56,7 +56,7 @@ class Book
 
     /**
      * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book")
-     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "author_list"})
      */
     private $authors;
 

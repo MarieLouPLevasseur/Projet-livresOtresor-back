@@ -23,7 +23,7 @@ class Author
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list","booksByCategory","books_infos", "books_read", "books_wish"})
+     * @Groups({"book_list","booksByCategory","books_infos", "books_read", "books_wish", "author_list"})
      */
     private $name;
 

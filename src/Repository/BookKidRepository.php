@@ -98,30 +98,25 @@ class BookKidRepository extends ServiceEntityRepository
    }
 
    /**
-    * Find One book_kid by: kid and book 
     *
     * @param int $book_id
-    * @param int $kid_id
+    * @param int $author_id
     * 
     */
-    public function findOneByKidandBook($kid_id, $book_id)
+    public function findBooksAuthor($author_id ,$book_id)
     {
              $entityManager = $this->getEntityManager();
              $query = $entityManager->createQuery(
                  // ! les alias sont obligatoire ici
-                 'SELECT bk, k
+                'SELECT b
                  FROM App\Entity\BookKid bk
-                 JOIN bk.kid k
-                 JOIN bk.book o
-                 WHERE k.id = :kid_id AND o.id = :book_id
-                 '
+                 JOIN bk.book b
+                 JOIN bk.author a
+                 WHERE a.id = :author_id AND b.id =  :book_id'
              )
-             // ->setParameter('kid_id', $kid_id, 'category_id', $category_id);
-             ->setParameters(array('kid_id'=> $kid_id, 'book_id' => $book_id));
- 
-             // returns an array of Product objects
+             ->setParameters(array('author_id'=>  $author_id, 'book_id' => $book_id));
+
              return $query->getResult();
- 
     }
 
 //    /**

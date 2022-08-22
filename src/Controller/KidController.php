@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\AuthorRepository;
 use App\Repository\KidRepository;
 use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
@@ -340,6 +341,70 @@ class KidController extends AbstractController
                 ['data' => $currentBooksWish ]
             );
         }
+
+
+
+     /**
+     * @Route("/{id_kid}/books/authors", name="show_author_list", methods="GET", requirements={"id"="\d+"})
+     * @return Response
+     */
+
+    public function authorList(int $id_kid, kidRepository $kidRepository, AuthorRepository $authors): Response
+    {
+        $kid = $kidRepository->find($id_kid);
+        $bookKid = $kid->getBookKids();
+
+
+
+        if ($kid === null )
+        {
+
+            $error = [
+                'error' => true,
+                'message' => 'No kid found for Id [' . $id_kid . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        
+        return $this->prepareResponse(
+            'OK',
+            ['groups' => 'author_list'],
+            ['data' => $bookKid]
+        );
+    }
+
+    //api/v1/kids/194/books/authors/91
+
+     /**
+     * @Route("/{id_kid}/books/authors/{author_id}", name="show_books_of_one_author", methods="GET")
+     * @return Response
+     */
+
+    public function authorBookList(int $id_kid, int $author_id, kidRepository $kidRepository, AuthorRepository $authorsRepository, BookKidRepository $bookKidRepository, BookRepository $bookRepository): Response
+    {
+        $kid = $kidRepository->find($id_kid);
+        $author = $authorsRepository->find($author_id);
+    
+   
+        $books = $bookKidRepository->findBooksAuthor($author_id, $book_id);
+
+        if ($kid === null )
+        {
+
+            $error = [
+                'error' => true,
+                'message' => 'No kid found for Id [' . $id_kid . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+        
+        return $this->prepareResponse(
+            'OK',  
+            ['groups' => 'author_books'],
+            ['data' => '']
+        );
+    }
 
     /*******************************************************************************************/
 }

@@ -15,7 +15,7 @@ class BookKid
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"book_list", "book_list", "books_infos", "books_read", "books_wish"})
+     * @Groups({"book_list", "book_list", "books_infos", "books_read", "books_wish", "author_list"})
      */
     private $id;
 
@@ -41,13 +41,13 @@ class BookKid
 
     /**
      * @ORM\ManyToOne(targetEntity=Kid::class, inversedBy="bookKids")
-     *  @Groups({"books_read", "books_wish"})
+     *  @Groups({"books_read", "books_wish", "author_list", "author_books"})
      */
     private $kid;
 
     /**
      * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids")
-     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish"})
+     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish", "author_list"})
      */
     private $book;
 
