@@ -36,64 +36,7 @@ class BookController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/kid/{id}/books", name="show", methods="GET", requirements={"id"="\d+"})
-     * @return Response
-     */
-    public function showBookOfOneKid( int $id, KidRepository $kidRepository, bookRepository $bookRepository): Response
-
-    {
-        $kid = $kidRepository->find($id);
-
-        if ($kid === null )
-        {
-            
-            $error = [
-                'error' => true,
-                'message' => 'No kid found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
-        }
-
-        $bookKid = $kid->getBookKids();
-    
-        //$jsonBooksKidList = $serializer->serialize($bookskids, 'json',['groups' => 'booksKid']);
-
-        return $this->prepareResponse(
-            'OK',
-            ['groups' => 'books_infos'],
-            ['data' => $bookKid]
-        );
-    }
-
-
-    /**
-     * @Route("/kid/{id_kid}/book", name="show", methods="GET", requirements={"id"="\d+"})
-     * @return Response
-     */
-
-    public function showBookRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository){
-
-        $currentKid = $kidRepository->find($id_kid);
-    
-        if ($currentKid === null )
-            {
-                
-                $error = [
-                    'error' => true,
-                    'message' => 'No kid found for Id [' . $id_kid . ']'
-                ];
-                return $this->json($error, Response::HTTP_NOT_FOUND);
-            }
-        
-            $currentReadbooks = $bookKidRepository->findAllByIsRead(true, $id_kid);
-    
-            return $this->prepareResponse(
-                'OK',
-                ['groups' => 'books_read'],
-                ['data' => $currentReadbooks ]
-            );
-        }
+  
 
 
     /**
