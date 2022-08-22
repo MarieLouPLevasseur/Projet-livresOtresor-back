@@ -166,6 +166,7 @@ class KidController extends AbstractController
     }
 
 
+
      /**
      * @Route("/{id_kid}/books/{id_book}", name="show_book_details", methods="GET", requirements={"id_kid"="\d+"}, requirements={"id_book"="\d+"})
      * @return Response
@@ -189,14 +190,18 @@ class KidController extends AbstractController
 
         // catch errors
         if ($currentkid === null )
+
         {
             
             $error = [
                 'error' => true,
+
                 'message' => 'No kid found for Id [' . $id_kid . ']'
+
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
+
 
         if ($currentBook === null )
         {
@@ -224,5 +229,6 @@ class KidController extends AbstractController
         return new JsonResponse($jsonBookShow, Response::HTTP_OK, [],true);
 
     }
+
 
 }
