@@ -165,91 +165,70 @@ class KidController extends AbstractController
         return new JsonResponse($jsonDiplomasList, Response::HTTP_OK, [],true);
     }
 
-    /*************************Routes coded using the prepare response method*******************************************************************/
-      /**
-     * @Route("/{id_kid}/books", name="show_book_list", methods="GET", requirements={"id"="\d+"})
+
+
+     /**
+     * @Route("/{id_kid}/books/{id_book}", name="show_book_details", methods="GET", requirements={"id_kid"="\d+"}, requirements={"id_book"="\d+"})
      * @return Response
      */
-    public function showBookOfOneKid( int $id_kid, KidRepository $kidRepository, BookRepository $bookRepository): Response
+    public function showOneBookDetails( 
+        int $id_kid,
+        int $id_book,
+        KidRepository $kidRepository,
+        BookKidRepository $bookKidRepository,
+        BookRepository $bookRepository,
+        SerializerInterface $serializer
+        ): Response
 
     {
-        $kid = $kidRepository->find($id_kid);
 
-        if ($kid === null )
+        $currentkid = $kidRepository->find($id_kid);
+        $currentBook = $bookRepository->find($id_book);
+
+        // Find specific book
+        $currentBookKid = $bookKidRepository->findOneByKidandBook($id_kid, $id_book);
+
+        // catch errors
+        if ($currentkid === null )
+
         {
             
             $error = [
                 'error' => true,
-                'message' => 'No kid found for Id [' .$id_kid. ']'
+
+                'message' => 'No kid found for Id [' . $id_kid . ']'
+
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
 
-        $bookKid = $kid->getBookKids();
-    
-        //$jsonBooksKidList = $serializer->serialize($bookskids, 'json',['groups' => 'booksKid']);
 
-        return $this->prepareResponse(
-            'OK',
-            ['groups' => 'books_infos'],
-            ['data' => $bookKid]
-        );
-    }
-
-
-    /**
-     * @Route("/{id_kid}/books/wish", name="show_book_wish_list", methods="GET", requirements={"id"="\d+"})
-     * @return Response
-     */
-
-    public function WishToRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository){
-
-
-        $currentKid = $kidRepository->find($id_kid);
-    
-        if ($currentKid === null )
-            {
-                
-                $error = [
-                    'error' => true,
-                    'message' => 'No kid found for Id [' . $id_kid . ']'
-                ];
-                return $this->json($error, Response::HTTP_NOT_FOUND);
-            }
-        
-
-            $currentBooksWish = $bookKidRepository->findAllByIsRead(false, $id_kid);
-    
-            return $this->prepareResponse(
-                'OK',
-                ['groups' => 'books_wish'],
-                ['data' => $currentBooksWish ]
-
-            );
-        }
-
-        private function prepareResponse(
-            string $message, 
-            array $options = [], 
-            array $data = [], 
-            bool $isError = false, 
-            int $httpCode = 200, 
-            array $headers = []
-        )
+        if ($currentBook === null )
         {
-            $responseData = [
-                'error' => $isError,
-                'message' => $message,
+            
+            $error = [
+                'error' => true,
+                'message' => 'No book found for Id [' . $id_book . ']'
             ];
-    
-            foreach ($data as $key => $value)
-            {
-                $responseData[$key] = $value;
-            }
-            return $this->json($responseData, $httpCode, $headers, $options);
+            return $this->json($error, Response::HTTP_NOT_FOUND);
         }
 
-    /*******************************************************************************************/
+        if ($currentBookKid === [] )
+        {
+            
+            $error = [
+                'error' => true,
+                'message' => 'No book found for this request'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+   
+        $jsonBookShow = $serializer->serialize($currentBookKid, 'json',['groups' => 'books_infos']);
+
+        return new JsonResponse($jsonBookShow, Response::HTTP_OK, [],true);
+
+    }
 
 
 }
