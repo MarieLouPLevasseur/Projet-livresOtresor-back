@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\BookKidRepository;
 use App\Repository\BookRepository;
 use App\Repository\KidRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,7 +21,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class BookController extends AbstractController
 {
     /**
-     * @Route("/books", name="list", methods="GET")
+     * @Route("/books", name="book_list", methods="GET")
      * @return Response
      */
     public function list(BookRepository $bookRepository): Response
@@ -35,38 +36,36 @@ class BookController extends AbstractController
         );
     }
 
+
     /**
-     * @Route("/kid/{id}/books", name="show", methods="GET", requirements={"id"="\d+"})
+     * @Route("/kid/{id_kid}/book/wish", name="show", methods="GET", requirements={"id"="\d+"})
      * @return Response
      */
-    public function showBookOfOneKid( int $id, KidRepository $kidRepository, bookRepository $bookRepository): Response
 
-    {
-        $kid = $kidRepository->find($id);
-        //$bookRead = $bookRepository-> findAll();
+    public function WishToRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository){
+
+        $currentKid = $kidRepository->find($id_kid);
+    
+        if ($currentKid === null )
+            {
+                
+                $error = [
+                    'error' => true,
+                    'message' => 'No kid found for Id [' . $id_kid . ']'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
         
-
-
-        if ($kid === null )
-        {
-            
-            $error = [
-                'error' => true,
-                'message' => 'No kid found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
+            $currentBooksWish = $bookKidRepository->findAllByIsRead(false, $id_kid);
+    
+            return $this->prepareResponse(
+                'OK',
+                ['groups' => 'books_wish'],
+                ['data' => $currentBooksWish ]
+            );
         }
 
-        $bookKid = $kid->getBookKids();
-    
-        //$jsonBooksKidList = $serializer->serialize($bookskids, 'json',['groups' => 'booksKid']);
 
-        return $this->prepareResponse(
-            'OK',
-            ['groups' => 'books_infos'],
-            ['data' => $bookKid]
-        );
-    }
 
     private function prepareResponse(
         string $message, 

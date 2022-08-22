@@ -4,12 +4,22 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\KidRepository;
+use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use JetBrains\PhpStorm\Internal\ReturnTypeContract;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
+use symfony\Component\Validator\Constraints as Assert;
+
+
+
 
 
 /**
@@ -18,6 +28,60 @@ use JetBrains\PhpStorm\Internal\ReturnTypeContract;
  */
 class UserController extends AbstractController
 {
+
+    /**
+     * Add a user (registration)
+     *
+     * @Route("/users", name="create", methods="POST")
+     * 
+     */
+    public function addUser( 
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+        EntityManagerInterface $em,
+        RoleRepository $roleRepository
+        ): Response
+    {
+
+        $data = $request->getcontent();
+        
+        $user = $serializer->deserialize($data, User::class, 'json');
+
+
+        $errors = $validator->validate($user);
+
+
+
+            if (count($errors) > 0) {
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+
+                return new Response($errorsString,400,[],Response::HTTP_BAD_REQUEST);
+            }
+
+
+            $role = $roleRepository->findOneByRoleName("ROLE_USER");
+            $user->setRole($role);
+    
+            $password = $passwordHasher->hashPassword($user, $user->getPassword());
+            $user ->setPassword($password);
+    
+          
+            $em->persist($user);
+            $em->flush();
+            $this->addFlash('success', "L'utilisateur a bien été enregistré");
+
+            return new Response("L'utilisateur a bien été enregistré");
+
+       
+    }
+
     /**
      * list all users
      *
@@ -33,11 +97,7 @@ class UserController extends AbstractController
     }
 
     /**
-<<<<<<< HEAD
-     * @Route("/user/{id}", name="show", methods="GET", requirements={"id"="\d+"})
-=======
      * @Route("/users/{id}", name="show", methods="GET", requirements={"id"="\d+"})
->>>>>>> 2ad2b35fd9296a52b787dd8b53a2e0336e17d1be
      * @return Response
      */
     public function show(int $id, UserRepository $userRepository) :Response
@@ -46,13 +106,9 @@ class UserController extends AbstractController
         $user = $userRepository->find($id);
         if ($user === null )
         {
-<<<<<<< HEAD
-            // if the user doesn't  exist, display an error message.
-=======
 
             // if the user doesn't  exist, display an error message.
 
->>>>>>> 2ad2b35fd9296a52b787dd8b53a2e0336e17d1be
             $error = [
                 'error' => true,
                 'message' => 'No user found for Id [' . $id . ']'
@@ -60,8 +116,6 @@ class UserController extends AbstractController
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_list']);
-<<<<<<< HEAD
-=======
     }
 
     /**
@@ -86,6 +140,7 @@ class UserController extends AbstractController
         $listKid = $user->getKid();
         
         return $this->json($listKid, 200, [], ['groups' => 'userkids_list']);
->>>>>>> 2ad2b35fd9296a52b787dd8b53a2e0336e17d1be
     }
+
+
 }
