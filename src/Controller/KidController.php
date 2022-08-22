@@ -165,6 +165,66 @@ class KidController extends AbstractController
         return new JsonResponse($jsonDiplomasList, Response::HTTP_OK, [],true);
     }
 
+    /**
+     * @Route("/{id_kid}/books/{id_book}", name="show_book_details", methods="GET", requirements={"id_kid"="\d+"}, requirements={"id_book"="\d+"})
+     * @return Response
+     */
+    public function showOneBookDetails( 
+        int $id_kid,
+        int $id_book,
+        KidRepository $kidRepository,
+        BookKidRepository $bookKidRepository,
+        BookRepository $bookRepository,
+        SerializerInterface $serializer
+        ): Response
+
+        
+    {
+
+        $currentkid = $kidRepository->find($id_kid);
+        $currentBook = $bookRepository->find($id_book);
+
+        // Find specific book
+        $currentBookKid = $bookKidRepository->findOneByKidandBook($id_kid, $id_book);
+
+        // catch errors
+        if ($currentkid === null )
+        {
+            
+            $error = [
+                'error' => true,
+                'message' => 'No kid found for Id [' . $id_kid . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        if ($currentBook === null )
+        {
+            
+            $error = [
+                'error' => true,
+                'message' => 'No book found for Id [' . $id_book . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        if ($currentBookKid === [] )
+        {
+            
+            $error = [
+                'error' => true,
+                'message' => 'No book found for this request'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+   
+        $jsonBookShow = $serializer->serialize($currentBookKid, 'json',['groups' => 'books_infos']);
+
+        return new JsonResponse($jsonBookShow, Response::HTTP_OK, [],true);
+
+    }
+
 
      /*************************Routes coded using the prepare response method*******************************************************************/
       /**
