@@ -9,11 +9,12 @@ use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 
 
     class LoginController extends AbstractController
@@ -24,7 +25,8 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
     public function login(
         AuthenticationUtils $authenticationUtils,
         SerializerInterface $serializer,
-        Request $request
+        Request $request,
+        JWTTokenManagerInterface $JWTManager
         // InMemoryUser $user
             ): Response
     {
@@ -65,8 +67,10 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
         // $bearer = $request->headers->get('Authorization');
         // $accessToken = substr($bearer, 7);
+
+        $token =  $JWTManager->create($userConnected);
       
-       return new JsonResponse($jsonUserInfos,Response::HTTP_OK, [],true );
+       return new JsonResponse(['user'=>$jsonUserInfos,'token'=>$token],Response::HTTP_OK, [] );
     }
 
      /**
