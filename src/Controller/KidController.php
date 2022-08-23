@@ -312,7 +312,7 @@ class KidController extends AbstractController
             return $this->json($responseData, $httpCode, $headers, $options);
         }
 
-    /*******************************************************************************************/
+    
 
        /**
      * @Route("/{id_kid}/books/wish", name="show_book_wish_list", methods="GET", requirements={"id"="\d+"})
@@ -384,17 +384,18 @@ class KidController extends AbstractController
     public function authorBookList(int $id_kid, int $author_id, kidRepository $kidRepository, AuthorRepository $authorsRepository, BookKidRepository $bookKidRepository, BookRepository $bookRepository): Response
     {
         $kid = $kidRepository->find($id_kid);
-        $author = $authorsRepository->find($author_id);
-    
+        $authorsRepository->find($author_id);
+        $book_id = $bookRepository->findAll();
+
    
-        $books = $bookKidRepository->findBooksAuthor($author_id, $book_id);
+        $Authorbooks = $bookKidRepository->findBooksAuthor($author_id, $book_id);
 
         if ($kid === null )
         {
 
             $error = [
                 'error' => true,
-                'message' => 'No kid found for Id [' . $id_kid . ']'
+                'message' => 'No books found for Id [' . $book_id. ']'
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
@@ -402,7 +403,7 @@ class KidController extends AbstractController
         return $this->prepareResponse(
             'OK',  
             ['groups' => 'author_books'],
-            ['data' => '']
+            ['data' => $Authorbooks]
         );
     }
 

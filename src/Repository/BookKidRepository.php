@@ -109,13 +109,12 @@ class BookKidRepository extends ServiceEntityRepository
              $query = $entityManager->createQuery(
                  // ! les alias sont obligatoire ici
                 'SELECT b
-                 FROM App\Entity\BookKid bk
-                 JOIN bk.book b
-                 JOIN bk.author a
-                 WHERE a.id = :author_id AND b.id =  :book_id'
+                 FROM App\Entity\Book b
+                 JOIN b.bookKids bk
+                 JOIN b.authors a
+                 WHERE a.id = :author_id AND bk.id =  :book_id'
              )
              ->setParameters(array('author_id'=>  $author_id, 'book_id' => $book_id));
-
              return $query->getResult();
     }
 
