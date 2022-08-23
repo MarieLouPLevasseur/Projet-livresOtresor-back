@@ -13,14 +13,19 @@ security:
 
 
     firewalls:
-
-        login:
+        login_user:
             pattern: ^/api/login
             stateless: true
             json_login:
                 check_path: /api/login_check
                 success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure    
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        # api:
+        #     pattern: ^/api/v1
+        #     stateless: true
+        #     jwt: ~
+
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -29,28 +34,23 @@ security:
             # provider: users_in_memory
             provider: app_user_provider
             # form_login:
-            #     # "app_login" is the name of the route created previously
-            #     login_path: app_login
-            #     check_path: app_login
+                # "app_login" is the name of the route created previously
+                # login_path: app_login_user
+                # check_path: app_login_user
             json_login:
-                check_path: app_login
+                check_path: app_login_user
                 username_path: email
                 password_path: password
+            
             logout:
                 path: app_logout
-                # where to redirect after logout
-                # TODO moyen de rediriger selon le login? Si USER ou KID vers une URL front?
-                # target: homepage
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+               
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/login/user, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        # - { path: ^/api/v1/login/kid, roles: PUBLIC_ACCESS }
 
         # - { path: ^/, roles: ROLE_USER }
         # - { path: ^/profile, roles: ROLE_USER }
