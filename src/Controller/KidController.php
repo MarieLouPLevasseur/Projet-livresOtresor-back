@@ -311,7 +311,6 @@ class KidController extends AbstractController
             return $this->json($responseData, $httpCode, $headers, $options);
         }
 
-    /*******************************************************************************************/
 
        /**
      * @Route("/{id_kid}/books/wish", name="show_book_wish_list", methods="GET", requirements={"id"="\d+"})
