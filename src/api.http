@@ -18,9 +18,6 @@ GET http://localhost:8000/api/v1/users/121
 ### List all book
 GET http://localhost:8000/api/v1/books
 
-### list all the books a kid wishes to read
-GET http://localhost:8000/api/v1/kids/176/books/wish
-
 ### List all the diplomas of a kid by id
 GET http://localhost:8000/api/v1/kids/176/diplomas
 
