@@ -2,44 +2,37 @@
 
 namespace App\Controller;
 
+use App\Entity\Book;
+use App\Entity\BookKid;
 use App\Repository\KidRepository;
+use App\Repository\BookRepository;
 use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
-use App\Repository\BookRepository;
 use App\Repository\DiplomaRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\HttpFoundation\Request;
+
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\Common\Annotations\AnnotationReader;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 
 /**
  * Kid class
- * @Route("/api/v1/kids", name="api_kids")
+ * @Route("/api/v1/kids", name="api_kids_")
  */
 class KidController extends AbstractController
 {
     
-    /**
-     * @Route("", name="app_kid")
-     */
-    public function list()//: Response
-    {
-
-        // return new JsonResponse($jsonCategoryList, Response::HTTP_OK, [], true);
-
-       
-    }
-
-
-
+   
 
      /**
      * Show all books of a category for a kid
@@ -166,7 +159,6 @@ class KidController extends AbstractController
     }
 
 
-    /****************************Routes coded using the prepare response method*******************************************************************/
 
     /**
      * @Route("/{id_kid}/books/{id_book}", name="show_book_details", methods="GET", requirements={"id_kid"="\d+"}, requirements={"id_book"="\d+"})
@@ -226,6 +218,110 @@ class KidController extends AbstractController
 
         return new JsonResponse($jsonBookShow, Response::HTTP_OK, [],true);
 
+    }
+
+    /**
+     * @Route("/{id_kid}/books", name="create_book", methods="POST", requirements={"id_kid"="\d+"})
+     * @return Response
+     */
+    public function createBook( 
+        int $id_kid,
+        KidRepository $kidRepository,
+        BookKidRepository $bookKidRepository,
+        BookRepository $bookRepository,
+        SerializerInterface $serializer,
+        Request $request,
+        ValidatorInterface $validator,
+        EntityManagerInterface $em
+
+
+        )//: Response
+
+        
+    {
+        // recuperation des données
+        $data = $request->getcontent();
+        
+        $book = $serializer->deserialize($data, Book::class, 'json');
+        $newBookKid = $serializer->deserialize($data, BookKid::class, 'json');
+
+
+        $kid = $kidRepository->find($id_kid);
+
+        $errors = $validator->validate($book);
+
+
+        // Si les données sont incomplètes ou vides je le signale par une erreur
+            // données obligatoire: 
+                // titre, description, auteur, is_read, ISBN
+            // données facultatives:
+                // publisher
+
+        if (count($errors) > 0) {
+            /*
+            * Uses a __toString method on the $errors variable which is a
+            * ConstraintViolationList object. This gives us a nice string
+            * for debugging.
+            */
+            $errorsString = (string) $errors;
+
+            return new Response($errorsString,400,[],Response::HTTP_BAD_REQUEST);
+        }
+
+        // persister les authors
+            $authors= $book->getAuthors();
+            foreach($authors as $author){
+                $em->persist($author);
+            }
+        // je dois récupérer l'isbn 
+            $isbnGiven = $book->getIsbn();
+
+        // Je regarder si un objet correspond dans Book (avec requete)
+
+            $isbnExistingInBook = $bookRepository->findOneByIsbnCode($isbnGiven);
+
+
+        if ($isbnExistingInBook === null){
+            // si l'objet n'existe pas, je le créer en totalité dans un nouvelle objet book à partir des données transmises
+            
+            // création de la nouvelle liaison Bookkid
+
+            $newBookKid->setKid($kid);
+
+            $book-> addBookKid($newBookKid);
+            $em->persist($book);
+            $em->persist($newBookKid);
+
+
+        }
+        else{
+            // ! il faudra trier que l'enfant ne possède pas déjà l'ISBN dans sa propre table pour ne pas doubler les relations inutilement
+            // Si l'object correspond, je le recupere et affecte les relations
+                    // affection des obligatoires transmises
+                    // role en automatique à la création via construct?
+                    // affection d'un bookid ou je stocke le is_read transmis
+
+        // création de la nouvelle liaison Bookkid
+        
+            // $newBookkid = new BookKid ();
+            // $newBookkid->setIsRead();
+            $newBookKid->setKid($kid);
+
+            $em->persist($newBookKid);
+
+            $isbnExistingInBook->addBookKid($newBookKid);
+
+            $em->persist($isbnExistingInBook);
+
+        }
+        
+    
+          
+            $em->flush();
+            // $this->addFlash('success', "Le livre a bien été créer");
+        // je retourne l'information de la bonne création du livres
+
+            return $this->json("Le livre a bien été créé", 200);
     }
 
 
