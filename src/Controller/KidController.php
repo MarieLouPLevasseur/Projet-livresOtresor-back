@@ -239,7 +239,7 @@ class KidController extends AbstractController
 
         
     {
-        // recuperation des données
+        // GET DATAS
         $data = $request->getcontent();
         
         $book = $serializer->deserialize($data, Book::class, 'json');
@@ -248,43 +248,84 @@ class KidController extends AbstractController
 
         $kid = $kidRepository->find($id_kid);
 
-        $errors = $validator->validate($book);
+        $errorsBook = $validator->validate($book);
+        $errorsBookKid = $validator->validate($newBookKid);
 
 
-        // Si les données sont incomplètes ou vides je le signale par une erreur
-            // données obligatoire: 
-                // titre, description, auteur, is_read, ISBN
-            // données facultatives:
-                // publisher
 
-        if (count($errors) > 0) {
+        // CHECK ERRORS
+
+        if ((count($errorsBook) > 0) ){
             /*
             * Uses a __toString method on the $errors variable which is a
             * ConstraintViolationList object. This gives us a nice string
             * for debugging.
             */
-            $errorsString = (string) $errors;
+            $errorsStringBook = (string) $errorsBook;
 
-            return new Response($errorsString,400,[],Response::HTTP_BAD_REQUEST);
+            $error = [
+                'error' => true,
+                'message book' => $errorsStringBook
+            ];
+            return $this->json($error, Response::HTTP_BAD_REQUEST);
+
+            // return new Response($errorsString,400,[],Response::HTTP_BAD_REQUEST);
+            // return $this->json($errorsString,400);
         }
 
-        // persister les authors
+        if (count($errorsBookKid) > 0) {
+            /*
+            * Uses a __toString method on the $errors variable which is a
+            * ConstraintViolationList object. This gives us a nice string
+            * for debugging.
+            */
+            $errorsString = (string) $errorsBookKid;
+
+            $error = [
+                'error' => true,
+                'message' => $errorsString
+            ];
+            return $this->json($error, Response::HTTP_BAD_REQUEST);
+
+            // return new Response($errorsString,400,[],Response::HTTP_BAD_REQUEST);
+            // return $this->json($errorsString,400);
+
+        }
+
+      
+
+        // SET AUTHORS
+        // TODO secure author datas
             $authors= $book->getAuthors();
             foreach($authors as $author){
+
+                // $newAuthor = $serializer->deserialize($author, Authors::class, 'json');
+                // $errorsAuthor = $validator->validate($newAuthor);
+
+                //      if (count($errorsAuthor) > 0) {
+                //             /*
+                //             * Uses a __toString method on the $errors variable which is a
+                //             * ConstraintViolationList object. This gives us a nice string
+                //             * for debugging.
+                //             */
+                //             $errorsString = (string) $errorsAuthor;
+
+                //             return new Response($errorsString,400,[],Response::HTTP_BAD_REQUEST);
+                        // }
+
+
+
                 $em->persist($author);
             }
-        // je dois récupérer l'isbn 
+            
+        // CHECK ISBN exists 
             $isbnGiven = $book->getIsbn();
-
-        // Je regarder si un objet correspond dans Book (avec requete)
 
             $isbnExistingInBook = $bookRepository->findOneByIsbnCode($isbnGiven);
 
 
         if ($isbnExistingInBook === null){
-            // si l'objet n'existe pas, je le créer en totalité dans un nouvelle objet book à partir des données transmises
-            
-            // création de la nouvelle liaison Bookkid
+            // if doesn't exist: set new book and new relation with kid
 
             $newBookKid->setKid($kid);
 
@@ -295,16 +336,25 @@ class KidController extends AbstractController
 
         }
         else{
-            // ! il faudra trier que l'enfant ne possède pas déjà l'ISBN dans sa propre table pour ne pas doubler les relations inutilement
-            // Si l'object correspond, je le recupere et affecte les relations
-                    // affection des obligatoires transmises
-                    // role en automatique à la création via construct?
-                    // affection d'un bookid ou je stocke le is_read transmis
+            // if exist: only create new relation with kid for the book
 
-        // création de la nouvelle liaison Bookkid
-        
-            // $newBookkid = new BookKid ();
-            // $newBookkid->setIsRead();
+            // CHECK BOOKKID: check if kid already own this book
+
+            $bookKidExist = $bookKidRepository->findOneByKidandBook($id_kid,$isbnExistingInBook->getId());
+            
+
+            if($bookKidExist !== null){
+
+                $error = [
+                    'error' => true,
+                    'message' => 'The book [' .$isbnExistingInBook->getId() . '] already exist for the kid [' . $id_kid . ']'
+                ];
+                return $this->json($error, Response::HTTP_CONFLICT);
+
+
+            }
+            // if doesn't exist: set new relation with kid
+
             $newBookKid->setKid($kid);
 
             $em->persist($newBookKid);
@@ -318,8 +368,6 @@ class KidController extends AbstractController
     
           
             $em->flush();
-            // $this->addFlash('success', "Le livre a bien été créer");
-        // je retourne l'information de la bonne création du livres
 
             return $this->json("Le livre a bien été créé", 200);
     }

@@ -8,6 +8,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
+
 /**
  * @ORM\Entity(repositoryClass=AuthorRepository::class)
  */
@@ -24,6 +27,10 @@ class Author
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"book_list","booksByCategory","books_infos", "books_read", "books_wish"})
+     * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
+     * @Assert\NotBlank( message = "Ce champ ne peut pas être vide")
+     * @Assert\Length(min=5)( message = "Le nom est trop court")
+
      */
     private $name;
 

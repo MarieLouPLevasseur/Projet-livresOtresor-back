@@ -8,8 +8,13 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+
+
 /**
  * @ORM\Entity(repositoryClass=BookRepository::class)
+ * 
  */
 class Book
 {
@@ -26,6 +31,9 @@ class Book
 
      * @ORM\Column(type="bigint")
      * @Groups({"booksByCategory","book_list","books_read", "books_wish", "books_infos"})
+     * @Assert\NotNull
+     * @Assert\NotBlank
+     * @Assert\Length(min=13, max=13)
      * 
      */
     private $isbn;
@@ -33,12 +41,18 @@ class Book
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"booksByCategory","book_list","books_infos","books_read", "books_wish"})
+     * @Assert\NotNull
+     * @Assert\NotBlank
+     * @Assert\Length(min=2)
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish"})
+     * @Assert\NotNull
+     * @Assert\NotBlank
+     * @Assert\Length(min=10)
      */
     private $description;
 
@@ -57,6 +71,8 @@ class Book
     /**
      * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book")
      * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish"})
+     * @Assert\NotNull
+     * @Assert\NotBlank
      */
     private $authors;
 
