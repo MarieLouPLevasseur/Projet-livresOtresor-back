@@ -16,8 +16,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
-use symfony\Component\Validator\Constraints as Assert;
 
 
 
@@ -162,7 +162,7 @@ class UserController extends AbstractController
         $role = $roleRepository->findOneByRoleName("ROLE_KID");        
         $kidData = $serializer->deserialize($kidData, Kid::class, 'json');
         $password = $passwordHasher->hashPassword($user, $user->getPassword());
-        $kidData ->setPassword($password);
+        $kidData->setPassword($password);
         $kidData->setRole($role);
         $kidData->setUser($user);
         $kidData->setProfileAvatar('https://bombyxplm.com/wp-content/uploads/2021/01/421-4213053_default-avatar-icon-hd-png-download.png');
@@ -186,4 +186,74 @@ class UserController extends AbstractController
 
     }
 
+     /** 
+     * @Route("/users/{id}", name="update_user", methods="PATCH", requirements={"id"="\d+"})
+     * @return Response
+     */
+
+    public function update(
+        $id,
+        EntityManagerInterface $em, 
+        UserRepository $userRepository,
+        Request $request, 
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+        UserPasswordHasherInterface $passwordHasher
+        )
+    {
+        $user = $userRepository->find($id);
+        $password = $passwordHasher->hashPassword($user, $user->getPassword());
+        
+        $data = $request->getContent();
+        $data->setPassword($password);
+
+        if ($user === null )
+        {
+            $error = [
+                'error' => true,
+                'message' => 'No user found for Id [' . $id . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        $serializer->deserialize($data, User::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $user]);
+
+        $errors = $validator->validate($user);
+
+        if (count($errors) > 0) {
+
+            $errorsString = (string) $errors;
+
+            return $this->prepareResponse($errorsString, [], [], true, Response::HTTP_BAD_REQUEST);
+        }
+
+        // on enregistre en BDD
+        // $em->persist($movie);
+        $em->flush();
+
+        return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
+    }
+
+
+
+    private function prepareResponse(
+        string $message, 
+        array $options = [], 
+        array $data = [], 
+        bool $isError = false, 
+        int $httpCode = 200, 
+        array $headers = []
+    )
+    {
+        $responseData = [
+            'error' => $isError,
+            'message' => $message,
+        ];
+
+        foreach ($data as $key => $value)
+        {
+            $responseData[$key] = $value;
+        }
+        return $this->json($responseData, $httpCode, $headers, $options);
+    }
 }
