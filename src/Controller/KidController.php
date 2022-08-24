@@ -384,11 +384,20 @@ class KidController extends AbstractController
     public function authorBookList(int $id_kid, int $author_id, kidRepository $kidRepository, AuthorRepository $authorsRepository, BookKidRepository $bookKidRepository, BookRepository $bookRepository): Response
     {
         $kid = $kidRepository->find($id_kid);
-        $authorsRepository->find($author_id);
+        $authors = $authorsRepository->find($author_id);
+
         $book_id = $bookRepository->findAll();
 
    
-        $Authorbooks = $bookKidRepository->findBooksAuthor($author_id, $book_id);
+        // $Authorbooks = $bookKidRepository->findBooksAuthor($author_id, $book_id);
+
+        $booksAuthors = $authors->getBook();
+
+        $bookkidArray=[];
+        foreach ($booksAuthors as $book){
+
+            $bookkid = $bookKidRepository->find
+        }
 
         if ($kid === null )
         {
