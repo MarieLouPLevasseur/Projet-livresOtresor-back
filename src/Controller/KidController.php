@@ -291,30 +291,11 @@ class KidController extends AbstractController
             );
         }
 
-        private function prepareResponse(
-            string $message, 
-            array $options = [], 
-            array $data = [], 
-            bool $isError = false, 
-            int $httpCode = 200, 
-            array $headers = []
-        )
-        {
-            $responseData = [
-                'error' => $isError,
-                'message' => $message,
-            ];
 
-            foreach ($data as $key => $value)
-            {
-                $responseData[$key] = $value;
-            }
-            return $this->json($responseData, $httpCode, $headers, $options);
-        }
 
     
 
-       /**
+    /**
      * @Route("/{id_kid}/books/wish", name="show_book_wish_list", methods="GET", requirements={"id"="\d+"})
      * @return Response
      */
@@ -381,7 +362,15 @@ class KidController extends AbstractController
      * @return Response
      */
 
-    public function authorBookList(int $id_kid, int $author_id, kidRepository $kidRepository, AuthorRepository $authorsRepository, BookKidRepository $bookKidRepository, BookRepository $bookRepository): Response
+    public function authorBookList(
+        int $id_kid,
+        int $author_id,
+        kidRepository $kidRepository,
+        AuthorRepository $authorsRepository,
+        BookKidRepository $bookKidRepository,
+        BookRepository $bookRepository,
+        SerializerInterface $serializer
+        ): Response
     {
         $kid = $kidRepository->find($id_kid);
         $authors = $authorsRepository->find($author_id);
@@ -389,15 +378,17 @@ class KidController extends AbstractController
         $book_id = $bookRepository->findAll();
 
    
-        // $Authorbooks = $bookKidRepository->findBooksAuthor($author_id, $book_id);
 
         $booksAuthors = $authors->getBook();
 
         $bookkidArray=[];
         foreach ($booksAuthors as $book){
 
-            $bookkid = $bookKidRepository->find
+            $bookkid = $bookKidRepository->findOneByKidandBook($id_kid, $book->getId());
+
+            $bookkidArray [] = $bookkid;
         }
+
 
         if ($kid === null )
         {
@@ -408,12 +399,37 @@ class KidController extends AbstractController
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
+
+
         
         return $this->prepareResponse(
             'OK',  
-            ['groups' => 'author_books'],
-            ['data' => $Authorbooks]
+            ['groups' => 'books_infos'],
+            ['data' => $bookkidArray]
         );
+
+        
+    }
+
+    private function prepareResponse(
+        string $message, 
+        array $options = [], 
+        array $data = [], 
+        bool $isError = false, 
+        int $httpCode = 200, 
+        array $headers = []
+    )
+    {
+        $responseData = [
+            'error' => $isError,
+            'message' => $message,
+        ];
+
+        foreach ($data as $key => $value)
+        {
+            $responseData[$key] = $value;
+        }
+        return $this->json($responseData, $httpCode, $headers, $options);
     }
 
     /*******************************************************************************************/
