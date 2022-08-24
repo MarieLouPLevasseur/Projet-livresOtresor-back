@@ -355,6 +355,7 @@ class KidController extends AbstractController
         );
     }
 
+    //api/v1/kids/194/books/authors/91
 
      /**
      * @Route("/{id_kid}/books/authors/{author_id}", name="show_books_of_one_author", methods="GET")
@@ -367,7 +368,8 @@ class KidController extends AbstractController
         kidRepository $kidRepository,
         AuthorRepository $authorsRepository,
         BookKidRepository $bookKidRepository,
-        BookRepository $bookRepository
+        BookRepository $bookRepository,
+        SerializerInterface $serializer
         ): Response
     {
         $kid = $kidRepository->find($id_kid);
@@ -409,8 +411,7 @@ class KidController extends AbstractController
         
     }
 
-
-
+   
     private function prepareResponse(
         string $message, 
         array $options = [], 
