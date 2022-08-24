@@ -350,7 +350,7 @@ class KidController extends AbstractController
         
         return $this->prepareResponse(
             'OK',
-            ['groups' => 'books_infos'],
+            ['groups' => 'author_list'],
             ['data' => $bookKid]
         );
     }
