@@ -350,12 +350,11 @@ class KidController extends AbstractController
         
         return $this->prepareResponse(
             'OK',
-            ['groups' => 'author_list'],
+            ['groups' => 'books_infos'],
             ['data' => $bookKid]
         );
     }
 
-    //api/v1/kids/194/books/authors/91
 
      /**
      * @Route("/{id_kid}/books/authors/{author_id}", name="show_books_of_one_author", methods="GET")
@@ -368,8 +367,7 @@ class KidController extends AbstractController
         kidRepository $kidRepository,
         AuthorRepository $authorsRepository,
         BookKidRepository $bookKidRepository,
-        BookRepository $bookRepository,
-        SerializerInterface $serializer
+        BookRepository $bookRepository
         ): Response
     {
         $kid = $kidRepository->find($id_kid);
@@ -410,6 +408,8 @@ class KidController extends AbstractController
 
         
     }
+
+
 
     private function prepareResponse(
         string $message, 
