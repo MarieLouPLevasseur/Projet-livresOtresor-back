@@ -43,8 +43,6 @@ class BookKid
      *     type="boolean",
      *     message="The value passed is not a valid type. Boolean expected."
      * )
-     * @Assert\NotBlank
-     * @Assert\NotNull
      * 
      */
     private $is_read;
@@ -56,8 +54,9 @@ class BookKid
     private $kid;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids")
+     * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids", cascade={"persist"})
      * @Groups({"booksByCategory","books_infos", "books_read", "books_wish"})
+     * @Assert\Valid
      */
     private $book;
 
@@ -88,7 +87,7 @@ class BookKid
         return $this->comment;
     }
 
-    public function setComment(string $comment): self
+    public function setComment(?string $comment): self
     {
         $this->comment = $comment;
 

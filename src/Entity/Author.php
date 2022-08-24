@@ -27,15 +27,15 @@ class Author
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"book_list","booksByCategory","books_infos", "books_read", "books_wish"})
-     * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
-     * @Assert\NotBlank( message = "Ce champ ne peut pas être vide")
-     * @Assert\Length(min=5)( message = "Le nom est trop court")
-
+     * @Assert\NotNull
+     * @Assert\NotBlank
+     * 
+     * 
      */
     private $name;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Book::class, inversedBy="authors")
+     * @ORM\ManyToMany(targetEntity=Book::class, inversedBy="authors", cascade={"persist"})
      */
     private $book;
 

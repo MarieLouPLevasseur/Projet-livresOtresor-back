@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Author;
 use App\Entity\Book;
 use App\Entity\BookKid;
+use App\Repository\AuthorRepository;
 use App\Repository\KidRepository;
 use App\Repository\BookRepository;
 use App\Repository\AvatarRepository;
@@ -221,7 +223,7 @@ class KidController extends AbstractController
     }
 
     /**
-     * @Route("/{id_kid}/books", name="create_book", methods="POST", requirements={"id_kid"="\d+"})
+     * @Route("/{id_kid}/books/blabla", name="create_book", methods="POST", requirements={"id_kid"="\d+"})
      * @return Response
      */
     public function createBook( 
@@ -243,13 +245,14 @@ class KidController extends AbstractController
         $data = $request->getcontent();
         // $authorData= $data["authors"]["name"];
         // $jsonAuthorData = file_get_contents($request->getContent());
-        // $parsed_json = json_decode($data);
-        // $namesAuthorArray1 = $parsed_json->{'authors'}[0];
+        $parsed_json = json_decode($data);
+        $namesAuthorArray1 = $parsed_json->{'authors'}[0];
         // $namesAuthorArray2 = $parsed_json->{'authors'}[1];
         // $namesAuthorArray3 = $parsed_json->{'authors'}[2];
     // dd($namesAuthorArray1);
-        // $newAuthor = $serializer->deserialize($namesAuthorArray1, Authors::class, 'json');
+        $newAuthor = $serializer->deserialize($namesAuthorArray1, Author::class, 'json');
         // $newAuthor = $serializer->deserialize($data, Authors::class, 'json');
+        dd($newAuthor);
 
         
         $book = $serializer->deserialize($data, Book::class, 'json');
@@ -325,10 +328,10 @@ class KidController extends AbstractController
             $authors= $book->getAuthors();
 
                 foreach($authors as $author){
-                $newAuthor = $serializer->deserialize($author, Authors::class, 'json');
+                // $newAuthor = $serializer->deserialize($author, Authors::class, 'json');
 
 
-                $errorsAuthor = $validator->validate($newAuthor);
+                // $errorsAuthor = $validator->validate($newAuthor);
                 
                     // die;
                     
@@ -394,6 +397,135 @@ class KidController extends AbstractController
 
             // return $this->json("Le livre a bien été créé", 200);
     }
+
+     /**
+     * @Route("/{id_kid}/books", name="create_book", methods="POST", requirements={"id_kid"="\d+"})
+     * @return Response
+     */
+    public function createBookKidTest(
+            int $id_kid,
+            Request $request,
+            SerializerInterface $serializer,
+            ValidatorInterface $validator,
+            EntityManagerInterface $em,
+            AuthorRepository $authorRepository,
+            BookRepository $bookRepository,
+            KidRepository $kidRepository,
+            BookKidRepository $bookKidRepository
+
+    )
+    
+    
+    {
+        // ********  DATAS ************
+
+
+        $data = $request->getcontent();
+        $bookKid = $serializer->deserialize($data, BookKid::class, 'json');
+        $kid = $kidRepository->find($id_kid);
+
+        // dd($bookKid);
+
+        // ********  CHECK ERRORS ************
+
+        $errorsBookKid = $validator->validate($bookKid);
+
+        if ((count($errorsBookKid) > 0) ){
+            /*
+            * Uses a __toString method on the $errors variable which is a
+            * ConstraintViolationList object. This gives us a nice string
+            * for debugging.
+            */
+            $errorsStringBook = (string) $errorsBookKid;
+
+            $error = [
+                'error' => true,
+                'message book' => $errorsStringBook
+            ];
+            return $this->json($error, Response::HTTP_BAD_REQUEST);
+
+        }
+
+        // ********  CHECK if authors exists ************
+// TODO condition is not good: authors are double in database actually
+        // $testArrayAuthor=[];
+
+            $authors = $bookKid->getBook()->getAuthors();
+
+                foreach ($authors as $author) {
+                    $nameAuthorGiven = $author->getName();
+
+                    $isAuthorInBase = $authorRepository->findAuthorByName($nameAuthorGiven);
+
+                    if ($isAuthorInBase !== []) {
+                        // if exist set this one and don't let create a new author with same name
+
+                            foreach ($isAuthorInBase as $authorToSetFromBase) {
+                                $bookKid->getBook()->addAuthor($authorToSetFromBase);
+                                $em->persist($authorToSetFromBase);
+                                // $em->persist($newBookKid);
+                            }
+                    }
+                    // else{
+                    //     // only persist author given
+
+                    //     $em->persist($author);
+                    // }
+                }
+            // dd($testArrayAuthor);
+
+
+
+        // ********  CHECK if ISBN exists ************
+
+            $isbnGiven = $bookKid->getBook()->getIsbn();
+
+            $isbnExistingInBook = $bookRepository->findOneByIsbnCode($isbnGiven);
+
+// dd($isbnExistingInBook);
+            if ($isbnExistingInBook !== null){
+            // if exist: set book from database
+
+                // $bookKid->setKid($kid);
+
+                $bookKid-> setBook($isbnExistingInBook);
+
+                // If the book already exists then the Book kid might exists too
+
+                            // ********  CHECK if BOOK KID exists ************
+
+                $bookKidExist = $bookKidRepository->findOneByKidandBook($id_kid,$isbnExistingInBook->getId());
+
+                    if($bookKidExist !== []){
+
+                        $error = [
+                            'error' => true,
+                            'message' => 'The book [' .$isbnExistingInBook->getId() . '] already exist for the kid [' . $id_kid . ']'
+                        ];
+                        return $this->json($error, Response::HTTP_CONFLICT);
+        
+        
+                    }
+
+            }
+        
+
+
+
+        // ********  SET Kid ************
+
+            $bookKid->setKid($kid);
+
+            $em->persist($bookKid);
+
+            $em->flush();
+
+            return $this->prepareResponse(
+                'The book has been created',[],[],false, 201, 
+            );
+    }
+
+    
 
 
      /*************************Routes coded using the prepare response method*******************************************************************/

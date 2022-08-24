@@ -69,15 +69,14 @@ class Book
     private $created_at;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book")
+     * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book", cascade={"persist"})
      * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish"})
-     * @Assert\NotNull
-     * @Assert\NotBlank
+     * @Assert\Valid
      */
     private $authors;
 
     /**
-     * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="book")
+     * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="book", cascade={"persist"})
      * @Groups({"book_list"})
      * 
      * 
