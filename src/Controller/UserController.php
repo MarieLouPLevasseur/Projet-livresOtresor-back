@@ -30,6 +30,14 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 class UserController extends AbstractController
 {
 
+    private $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->passwordHasher = $passwordHasher;
+    }
+
+
     /**
      * Add a user (registration)
      *
@@ -201,11 +209,12 @@ class UserController extends AbstractController
         UserPasswordHasherInterface $passwordHasher
         )
     {
+        
+
         $user = $userRepository->find($id);
         $password = $passwordHasher->hashPassword($user, $user->getPassword());
-        
         $data = $request->getContent();
-        $data->setPassword($password);
+       // $data->setPassword($password);
 
         if ($user === null )
         {
@@ -227,14 +236,21 @@ class UserController extends AbstractController
             return $this->prepareResponse($errorsString, [], [], true, Response::HTTP_BAD_REQUEST);
         }
 
-        // on enregistre en BDD
-        // $em->persist($movie);
+  
         $em->flush();
 
         return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
     }
 
+    //api/v1/users/{id}
+    /** 
+     * @Route("/users/{id}", name="delete_user", methods="PATCH", requirements={"id"="\d+"})
+     * @return Response
+     */
 
+    public function delete(){
+
+    }
 
     private function prepareResponse(
         string $message, 
