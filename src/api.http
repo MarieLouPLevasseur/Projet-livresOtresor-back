@@ -18,4 +18,4 @@ GET http://localhost:8000/api/v1/kids/176/books/wish
 GET http://localhost:8000/api/v1/kids/194/books/authors
 
 ###list all books of author for one kid
-GET  http://localhost:8000/api/v1/kids/194/books/authors/91
+GET  http://localhost:8000/api/v1/kids/185/books/authors/115
