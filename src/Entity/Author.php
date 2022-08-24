@@ -39,10 +39,17 @@ class Author
      */
     private $book;
 
+    
+
     public function __construct()
     {
         $this->book = new ArrayCollection();
     }
+
+    //  public function __toString()
+    // {
+    //     return $this->getName() ;
+    // }
 
     public function getId(): ?int
     {

@@ -241,9 +241,22 @@ class KidController extends AbstractController
     {
         // GET DATAS
         $data = $request->getcontent();
+        // $authorData= $data["authors"]["name"];
+        // $jsonAuthorData = file_get_contents($request->getContent());
+        // $parsed_json = json_decode($data);
+        // $namesAuthorArray1 = $parsed_json->{'authors'}[0];
+        // $namesAuthorArray2 = $parsed_json->{'authors'}[1];
+        // $namesAuthorArray3 = $parsed_json->{'authors'}[2];
+    // dd($namesAuthorArray1);
+        // $newAuthor = $serializer->deserialize($namesAuthorArray1, Authors::class, 'json');
+        // $newAuthor = $serializer->deserialize($data, Authors::class, 'json');
+
         
         $book = $serializer->deserialize($data, Book::class, 'json');
         $newBookKid = $serializer->deserialize($data, BookKid::class, 'json');
+
+
+        // ! l'auteur ne pas pas etre deserializer car les attributes ne sont pas "name" mais authors. Je n'arrive pas a filtrer pour securiser l'auteur
 
 
         $kid = $kidRepository->find($id_kid);
@@ -251,6 +264,7 @@ class KidController extends AbstractController
         $errorsBook = $validator->validate($book);
         $errorsBookKid = $validator->validate($newBookKid);
 
+        // $errorsAuthor = $validator->validate($newAuthor);
 
 
         // CHECK ERRORS
@@ -287,37 +301,42 @@ class KidController extends AbstractController
             ];
             return $this->json($error, Response::HTTP_BAD_REQUEST);
 
-            // return new Response($errorsString,400,[],Response::HTTP_BAD_REQUEST);
-            // return $this->json($errorsString,400);
 
         }
 
-      
+        // if (count($errorsAuthor) > 0) {
+        //     /*
+        //     * Uses a __toString method on the $errors variable which is a
+        //     * ConstraintViolationList object. This gives us a nice string
+        //     * for debugging.
+        //     */
+        //     $errorsString = (string) $errorsBookKid;
+
+        //     $error = [
+        //         'error' => true,
+        //         'message' => $errorsString
+        //     ];
+        //     return $this->json($error, Response::HTTP_BAD_REQUEST);
+
+        // }
 
         // SET AUTHORS
-        // TODO secure author datas
+
             $authors= $book->getAuthors();
-            foreach($authors as $author){
 
-                // $newAuthor = $serializer->deserialize($author, Authors::class, 'json');
-                // $errorsAuthor = $validator->validate($newAuthor);
-
-                //      if (count($errorsAuthor) > 0) {
-                //             /*
-                //             * Uses a __toString method on the $errors variable which is a
-                //             * ConstraintViolationList object. This gives us a nice string
-                //             * for debugging.
-                //             */
-                //             $errorsString = (string) $errorsAuthor;
-
-                //             return new Response($errorsString,400,[],Response::HTTP_BAD_REQUEST);
-                        // }
+                foreach($authors as $author){
+                $newAuthor = $serializer->deserialize($author, Authors::class, 'json');
 
 
+                $errorsAuthor = $validator->validate($newAuthor);
+                
+                    // die;
+                    
 
-                $em->persist($author);
-            }
-            
+                    $em->persist($author);
+                    
+                }
+
         // CHECK ISBN exists 
             $isbnGiven = $book->getIsbn();
 
@@ -369,7 +388,11 @@ class KidController extends AbstractController
           
             $em->flush();
 
-            return $this->json("Le livre a bien été créé", 200);
+            return $this->prepareResponse(
+                'The book has been created',[],[],false, 201, 
+            );
+
+            // return $this->json("Le livre a bien été créé", 200);
     }
 
 

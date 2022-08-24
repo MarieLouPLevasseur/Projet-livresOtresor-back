@@ -80,6 +80,7 @@ class Book
      * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="book")
      * @Groups({"book_list"})
      * 
+     * 
      */
     private $bookKids;
 
