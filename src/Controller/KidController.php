@@ -222,187 +222,14 @@ class KidController extends AbstractController
 
     }
 
-    /**
-     * @Route("/{id_kid}/books/blabla", name="create_book", methods="POST", requirements={"id_kid"="\d+"})
-     * @return Response
-     */
-    public function createBook( 
-        int $id_kid,
-        KidRepository $kidRepository,
-        BookKidRepository $bookKidRepository,
-        BookRepository $bookRepository,
-        SerializerInterface $serializer,
-        Request $request,
-        ValidatorInterface $validator,
-        EntityManagerInterface $em
+        /*************************Routes coded using the prepare response method*******************************************************************/
 
-
-        )//: Response
-
-        
-    {
-        // GET DATAS
-        $data = $request->getcontent();
-        // $authorData= $data["authors"]["name"];
-        // $jsonAuthorData = file_get_contents($request->getContent());
-        $parsed_json = json_decode($data);
-        $namesAuthorArray1 = $parsed_json->{'authors'}[0];
-        // $namesAuthorArray2 = $parsed_json->{'authors'}[1];
-        // $namesAuthorArray3 = $parsed_json->{'authors'}[2];
-    // dd($namesAuthorArray1);
-        $newAuthor = $serializer->deserialize($namesAuthorArray1, Author::class, 'json');
-        // $newAuthor = $serializer->deserialize($data, Authors::class, 'json');
-        dd($newAuthor);
-
-        
-        $book = $serializer->deserialize($data, Book::class, 'json');
-        $newBookKid = $serializer->deserialize($data, BookKid::class, 'json');
-
-
-        // ! l'auteur ne pas pas etre deserializer car les attributes ne sont pas "name" mais authors. Je n'arrive pas a filtrer pour securiser l'auteur
-
-
-        $kid = $kidRepository->find($id_kid);
-
-        $errorsBook = $validator->validate($book);
-        $errorsBookKid = $validator->validate($newBookKid);
-
-        // $errorsAuthor = $validator->validate($newAuthor);
-
-
-        // CHECK ERRORS
-
-        if ((count($errorsBook) > 0) ){
-            /*
-            * Uses a __toString method on the $errors variable which is a
-            * ConstraintViolationList object. This gives us a nice string
-            * for debugging.
-            */
-            $errorsStringBook = (string) $errorsBook;
-
-            $error = [
-                'error' => true,
-                'message book' => $errorsStringBook
-            ];
-            return $this->json($error, Response::HTTP_BAD_REQUEST);
-
-            // return new Response($errorsString,400,[],Response::HTTP_BAD_REQUEST);
-            // return $this->json($errorsString,400);
-        }
-
-        if (count($errorsBookKid) > 0) {
-            /*
-            * Uses a __toString method on the $errors variable which is a
-            * ConstraintViolationList object. This gives us a nice string
-            * for debugging.
-            */
-            $errorsString = (string) $errorsBookKid;
-
-            $error = [
-                'error' => true,
-                'message' => $errorsString
-            ];
-            return $this->json($error, Response::HTTP_BAD_REQUEST);
-
-
-        }
-
-        // if (count($errorsAuthor) > 0) {
-        //     /*
-        //     * Uses a __toString method on the $errors variable which is a
-        //     * ConstraintViolationList object. This gives us a nice string
-        //     * for debugging.
-        //     */
-        //     $errorsString = (string) $errorsBookKid;
-
-        //     $error = [
-        //         'error' => true,
-        //         'message' => $errorsString
-        //     ];
-        //     return $this->json($error, Response::HTTP_BAD_REQUEST);
-
-        // }
-
-        // SET AUTHORS
-
-            $authors= $book->getAuthors();
-
-                foreach($authors as $author){
-                // $newAuthor = $serializer->deserialize($author, Authors::class, 'json');
-
-
-                // $errorsAuthor = $validator->validate($newAuthor);
-                
-                    // die;
-                    
-
-                    $em->persist($author);
-                    
-                }
-
-        // CHECK ISBN exists 
-            $isbnGiven = $book->getIsbn();
-
-            $isbnExistingInBook = $bookRepository->findOneByIsbnCode($isbnGiven);
-
-
-        if ($isbnExistingInBook === null){
-            // if doesn't exist: set new book and new relation with kid
-
-            $newBookKid->setKid($kid);
-
-            $book-> addBookKid($newBookKid);
-            $em->persist($book);
-            $em->persist($newBookKid);
-
-
-        }
-        else{
-            // if exist: only create new relation with kid for the book
-
-            // CHECK BOOKKID: check if kid already own this book
-
-            $bookKidExist = $bookKidRepository->findOneByKidandBook($id_kid,$isbnExistingInBook->getId());
-            
-
-            if($bookKidExist !== null){
-
-                $error = [
-                    'error' => true,
-                    'message' => 'The book [' .$isbnExistingInBook->getId() . '] already exist for the kid [' . $id_kid . ']'
-                ];
-                return $this->json($error, Response::HTTP_CONFLICT);
-
-
-            }
-            // if doesn't exist: set new relation with kid
-
-            $newBookKid->setKid($kid);
-
-            $em->persist($newBookKid);
-
-            $isbnExistingInBook->addBookKid($newBookKid);
-
-            $em->persist($isbnExistingInBook);
-
-        }
-        
-    
-          
-            $em->flush();
-
-            return $this->prepareResponse(
-                'The book has been created',[],[],false, 201, 
-            );
-
-            // return $this->json("Le livre a bien été créé", 200);
-    }
 
      /**
      * @Route("/{id_kid}/books", name="create_book", methods="POST", requirements={"id_kid"="\d+"})
      * @return Response
      */
-    public function createBookKidTest(
+    public function createBookKid(
             int $id_kid,
             Request $request,
             SerializerInterface $serializer,
@@ -456,15 +283,11 @@ class KidController extends AbstractController
                 if ($isAuthorInBase !== []) {
                     // if exist set this one and don't let create a new author with same name
 
-                            foreach ($isAuthorInBase as $authorToSetFromBase) {
-
-
-                                
-                                $bookKid->getBook()->removeAuthor($author);
-                                $bookKid->getBook()->addAuthor($authorToSetFromBase);
-                            }
-                        }
-               
+                    foreach ($isAuthorInBase as $authorToSetFromBase) {
+                        $bookKid->getBook()->removeAuthor($author);
+                        $bookKid->getBook()->addAuthor($authorToSetFromBase);
+                    }
+                }      
             }
                     
 
@@ -508,7 +331,6 @@ class KidController extends AbstractController
                     $bookKid->getBook()->setCover("https://i.pinimg.com/564x/11/1b/59/111b5913903c2bfbe7f11487bb3f06f6.jpg");
                 }
 
-// dd($coverExist);
 
         // ********  SET Kid ************
 
@@ -526,7 +348,6 @@ class KidController extends AbstractController
     
 
 
-     /*************************Routes coded using the prepare response method*******************************************************************/
 
       /**
      * @Route("/{id_kid}/books", name="show_book_list", methods="GET", requirements={"id"="\d+"})
