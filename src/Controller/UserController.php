@@ -55,16 +55,20 @@ class UserController extends AbstractController
 
 
 
-            if (count($errors) > 0) {
-                /*
-                * Uses a __toString method on the $errors variable which is a
-                * ConstraintViolationList object. This gives us a nice string
-                * for debugging.
-                */
-                $errorsString = (string) $errors;
+        if (count($errors) > 0) {
+            /*
+            * Uses a __toString method on the $errors variable which is a
+            * ConstraintViolationList object. This gives us a nice string
+            * for debugging.
+            */
+            $errorsStringBook = (string) $errors;
 
-                return new Response($errorsString,400,[],Response::HTTP_BAD_REQUEST);
-            }
+            $error = [
+                'error' => true,
+                'message' => $errorsStringBook
+            ];
+            return $this->json($error, Response::HTTP_BAD_REQUEST);
+        }
 
 
             $role = $roleRepository->findOneByRoleName("ROLE_USER");
@@ -76,9 +80,12 @@ class UserController extends AbstractController
           
             $em->persist($user);
             $em->flush();
-            $this->addFlash('success', "L'utilisateur a bien été enregistré");
 
-            return new Response("L'utilisateur a bien été enregistré");
+            $error = [
+                'error' => false,
+                'message' => "L'utilisateur a bien été enregistré"
+            ];
+            return $this->json($error, 201);
 
        
     }

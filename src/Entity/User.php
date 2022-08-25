@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @UniqueEntity(fields={"email"}, message="Email non valide. Merci de choisir un autre email")
+ * @UniqueEntity(fields={"email"}, message="email must be unique")
  * 
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -79,7 +79,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->kid = new ArrayCollection();
-        $this->role = "ROLE_USER";
+        // $this->role = "ROLE_USER";
 
     }
 
