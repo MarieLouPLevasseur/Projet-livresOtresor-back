@@ -29,29 +29,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
         JWTTokenManagerInterface $JWTManager
         // InMemoryUser $user
             ): Response
-    {
-
-
-            //  if (null === $user) {
-            //     // if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
-
-            //     return $this->json([
-            //         'message' => 'missing credentials',
-            //     ], Response::HTTP_UNAUTHORIZED);
-            // }
-           
-            //         // $token = ...; // somehow create an API token for $user
-           
-            //          return $this->json([
-            //             'message' => 'Welcome to your new controller!',
-            //             'path' => 'src/Controller/ApiLoginController.php',
-            //             'user'  => $user->getUserIdentifier(),
-            //             // 'token' => $token,
-            //           ]);
-
-
-
-
+    { 
        
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $this->json([
@@ -62,15 +40,11 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
         $userConnected= $this->getUser();
         $jsonUserInfos = $serializer->serialize($userConnected, 'json',['groups' => 'userConnected']);
 
-        // $session= $request->getSession();
-        // $token = $session->get('token');
-
-        // $bearer = $request->headers->get('Authorization');
-        // $accessToken = substr($bearer, 7);
-
         $token =  $JWTManager->create($userConnected);
+
+        $datas = ['user'=>$jsonUserInfos,'token'=>$token];
       
-       return new JsonResponse(['user'=>$jsonUserInfos,'token'=>$token],Response::HTTP_OK, [] );
+        return $this->json($datas, 201);
     }
 
      /**
