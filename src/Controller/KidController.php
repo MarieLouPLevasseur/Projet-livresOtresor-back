@@ -411,6 +411,7 @@ class KidController extends AbstractController
         
     }
 
+   
     private function prepareResponse(
         string $message, 
         array $options = [], 
