@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Kid;
 use App\Entity\User;
 use App\Repository\KidRepository;
 use App\Repository\RoleRepository;
@@ -142,5 +143,47 @@ class UserController extends AbstractController
         return $this->json($listKid, 200, [], ['groups' => 'userkids_list']);
     }
 
+    /** 
+     * @Route("/users/{id}/kids", name="create_kid", methods="POST", requirements={"id"="\d+"})
+     * @return Response
+     */
+    public function createKid( int $id, 
+    EntityManagerInterface $em, 
+    Request $request, 
+    UserRepository $userRepository, 
+    SerializerInterface $serializer,
+    RoleRepository $roleRepository,
+    UserPasswordHasherInterface $passwordHasher
+    ):Response
+    
+    {
+        $user = $userRepository->find($id);
+        $kidData = $request->getcontent();
+        $role = $roleRepository->findOneByRoleName("ROLE_KID");        
+        $kidData = $serializer->deserialize($kidData, Kid::class, 'json');
+        $password = $passwordHasher->hashPassword($user, $user->getPassword());
+        $kidData ->setPassword($password);
+        $kidData->setRole($role);
+        $kidData->setUser($user);
+        $kidData->setProfileAvatar('https://bombyxplm.com/wp-content/uploads/2021/01/421-4213053_default-avatar-icon-hd-png-download.png');
+    
+
+        if ($user === null )
+        {
+            $error = [
+                'error' => true,
+                'message' => 'No user found for Id [' . $id . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+          
+        $em->persist($kidData);
+        $em->flush();
+        $this->addFlash('success', "L'enfant a bien été enregistré");
+
+        return new Response("L'enfant a bien été enregistré");
+        
+
+    }
 
 }

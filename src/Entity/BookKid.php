@@ -49,7 +49,9 @@ class BookKid
 
     /**
      * @ORM\ManyToOne(targetEntity=Kid::class, inversedBy="bookKids")
-     * @Groups({"books_read", "books_wish"})
+
+     * @Groups({"books_read", "books_wish", "author_books"})
+
      */
     private $kid;
 

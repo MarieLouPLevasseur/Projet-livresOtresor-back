@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+
 use App\Entity\Author;
 use App\Entity\Book;
 use App\Entity\BookKid;
+
 use App\Repository\AuthorRepository;
 use App\Repository\KidRepository;
 use App\Repository\BookRepository;
@@ -408,30 +410,11 @@ class KidController extends AbstractController
             );
         }
 
-        private function prepareResponse(
-            string $message, 
-            array $options = [], 
-            array $data = [], 
-            bool $isError = false, 
-            int $httpCode = 200, 
-            array $headers = []
-        )
-        {
-            $responseData = [
-                'error' => $isError,
-                'message' => $message,
-            ];
 
-            foreach ($data as $key => $value)
-            {
-                $responseData[$key] = $value;
-            }
-            return $this->json($responseData, $httpCode, $headers, $options);
-        }
 
-    /*******************************************************************************************/
+    
 
-       /**
+    /**
      * @Route("/{id_kid}/books/wish", name="show_book_wish_list", methods="GET", requirements={"id"="\d+"})
      * @return Response
      */
@@ -458,6 +441,116 @@ class KidController extends AbstractController
                 ['data' => $currentBooksWish ]
             );
         }
+
+
+
+     /**
+     * @Route("/{id_kid}/books/authors", name="show_author_list", methods="GET", requirements={"id"="\d+"})
+     * @return Response
+     */
+
+    public function authorList(int $id_kid, kidRepository $kidRepository, AuthorRepository $authors): Response
+    {
+        $kid = $kidRepository->find($id_kid);
+        $bookKid = $kid->getBookKids();
+
+
+
+        if ($kid === null )
+        {
+
+            $error = [
+                'error' => true,
+                'message' => 'No kid found for Id [' . $id_kid . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        
+        return $this->prepareResponse(
+            'OK',
+            ['groups' => 'author_list'],
+            ['data' => $bookKid]
+        );
+    }
+
+    //api/v1/kids/194/books/authors/91
+
+     /**
+     * @Route("/{id_kid}/books/authors/{author_id}", name="show_books_of_one_author", methods="GET")
+     * @return Response
+     */
+
+    public function authorBookList(
+        int $id_kid,
+        int $author_id,
+        kidRepository $kidRepository,
+        AuthorRepository $authorsRepository,
+        BookKidRepository $bookKidRepository,
+        BookRepository $bookRepository,
+        SerializerInterface $serializer
+        ): Response
+    {
+        $kid = $kidRepository->find($id_kid);
+        $authors = $authorsRepository->find($author_id);
+
+        $book_id = $bookRepository->findAll();
+
+   
+
+        $booksAuthors = $authors->getBook();
+
+        $bookkidArray=[];
+        foreach ($booksAuthors as $book){
+
+            $bookkid = $bookKidRepository->findOneByKidandBook($id_kid, $book->getId());
+
+            $bookkidArray [] = $bookkid;
+        }
+
+
+        if ($kid === null )
+        {
+
+            $error = [
+                'error' => true,
+                'message' => 'No books found for Id [' . $book_id. ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+
+        
+        return $this->prepareResponse(
+            'OK',  
+            ['groups' => 'books_infos'],
+            ['data' => $bookkidArray]
+        );
+
+        
+    }
+
+   
+    private function prepareResponse(
+        string $message, 
+        array $options = [], 
+        array $data = [], 
+        bool $isError = false, 
+        int $httpCode = 200, 
+        array $headers = []
+    )
+    {
+        $responseData = [
+            'error' => $isError,
+            'message' => $message,
+        ];
+
+        foreach ($data as $key => $value)
+        {
+            $responseData[$key] = $value;
+        }
+        return $this->json($responseData, $httpCode, $headers, $options);
+    }
 
     /*******************************************************************************************/
 }

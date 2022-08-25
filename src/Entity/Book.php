@@ -71,9 +71,11 @@ class Book
     private $created_at;
 
     /**
+
      * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book", cascade={"persist"})
-     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "author_list"})
      * @Assert\Valid
+
      */
     private $authors;
 
