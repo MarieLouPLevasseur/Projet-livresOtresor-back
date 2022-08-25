@@ -13,6 +13,19 @@ security:
 
 
     firewalls:
+        login_user:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: app_login_user
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        # api:
+        #     pattern: ^/api/v1
+        #     stateless: true
+        #     jwt: ~
+
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -20,17 +33,26 @@ security:
             lazy: true
             # provider: users_in_memory
             provider: app_user_provider
-
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+            # form_login:
+                # "app_login" is the name of the route created previously
+                # login_path: app_login_user
+                # check_path: app_login_user
+            json_login:
+                check_path: app_login_user
+                username_path: email
+                password_path: password
+            
+            logout:
+                path: app_logout
+               
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        # - { path: ^/api/v1/login/kid, roles: PUBLIC_ACCESS }
+
+        # - { path: ^/, roles: ROLE_USER }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
