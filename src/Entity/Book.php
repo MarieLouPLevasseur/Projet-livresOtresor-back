@@ -85,6 +85,11 @@ class Book
      */
     private $bookKids;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $cover;
+
     public function __construct()
     {
         $this->authors = new ArrayCollection();
@@ -212,6 +217,18 @@ class Book
                 $bookKid->setBook(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCover(): ?string
+    {
+        return $this->cover;
+    }
+
+    public function setCover(string $cover): self
+    {
+        $this->cover = $cover;
 
         return $this;
     }

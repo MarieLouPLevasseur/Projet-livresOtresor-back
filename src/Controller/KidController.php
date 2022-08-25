@@ -424,7 +424,6 @@ class KidController extends AbstractController
         $bookKid = $serializer->deserialize($data, BookKid::class, 'json');
         $kid = $kidRepository->find($id_kid);
 
-        // dd($bookKid);
 
         // ********  CHECK ERRORS ************
 
@@ -447,8 +446,6 @@ class KidController extends AbstractController
         }
 
         // ********  CHECK if authors exists ************
-// TODO condition is not good: authors are double in database actually
-        $testArrayAuthor=[];
 
             $authors = $bookKid->getBook()->getAuthors();
             foreach ($authors as $author) {
@@ -458,28 +455,18 @@ class KidController extends AbstractController
                 
                 if ($isAuthorInBase !== []) {
                     // if exist set this one and don't let create a new author with same name
-                    // dd($isAuthorInBase);
 
                             foreach ($isAuthorInBase as $authorToSetFromBase) {
 
-                                $testArrayAuthor[]= $authorToSetFromBase;
 
                                 
                                 $bookKid->getBook()->removeAuthor($author);
                                 $bookKid->getBook()->addAuthor($authorToSetFromBase);
-                                // $em->persist($authorToSetFromBase);
-                                // $em->persist($newBookKid);
                             }
                         }
-                else{
-                    // only persist author given
-                    $testArrayAuthor []= $author;
-                    
-                    // $em->persist($author);
-                }
+               
             }
                     
-                // dd($authors);
 
 
         // ********  CHECK if ISBN exists ************
@@ -488,11 +475,9 @@ class KidController extends AbstractController
 
             $isbnExistingInBook = $bookRepository->findOneByIsbnCode($isbnGiven);
 
-// dd($isbnExistingInBook);
             if ($isbnExistingInBook !== null){
             // if exist: set book from database
 
-                // $bookKid->setKid($kid);
 
                 $bookKid-> setBook($isbnExistingInBook);
 
@@ -514,9 +499,16 @@ class KidController extends AbstractController
                     }
 
             }
-        
+                // ********  CHECK if Cover exists ************
 
+                $coverExist = $bookKid->getBook()->getCover();
 
+                if ($coverExist === null){
+
+                    $bookKid->getBook()->setCover("https://i.pinimg.com/564x/11/1b/59/111b5913903c2bfbe7f11487bb3f06f6.jpg");
+                }
+
+// dd($coverExist);
 
         // ********  SET Kid ************
 
