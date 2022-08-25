@@ -17,11 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-
-
-
-
-
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * Undocumented class
@@ -29,6 +25,13 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class UserController extends AbstractController
 {
+    private $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->passwordHasher = $passwordHasher;
+    }
+
 
     /**
      * Add a user (registration)
@@ -202,9 +205,8 @@ class UserController extends AbstractController
         )
     {
         $user = $userRepository->find($id);
-        $password = $passwordHasher->hashPassword($user, $user->getPassword());
-        
         $data = $request->getContent();
+        $password = $passwordHasher->hashPassword($user, $user->getPassword());
         $data->setPassword($password);
 
         if ($user === null )
@@ -227,14 +229,42 @@ class UserController extends AbstractController
             return $this->prepareResponse($errorsString, [], [], true, Response::HTTP_BAD_REQUEST);
         }
 
-        // on enregistre en BDD
-        // $em->persist($movie);
         $em->flush();
 
-        return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
+        return $this->prepareResponse('Mis à jour avec succès', [], [], false, Response::HTTP_OK );
     }
 
+     /**
+     * @Route("/users/delete/{id<\d+>}", name="delete_user", methods="DELETE")
+     * @return Response
+     */
+    public function delete(int $id, EntityManagerInterface $em, UserRepository $userRepository, KidRepository $kidRepository) :Response
+    {
 
+       $user = $userRepository->find($id);
+
+        if ($user === null )
+        {
+            $error = [
+                'error' => true,
+                'message' => 'No user found for Id [' . $id . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+
+        $em->remove($user);
+        
+
+        $em->flush();
+
+        $message = [
+            'error' => false,
+            'message' => "L'utilisateur supprimé avec succès",
+        ];
+
+        return $this->prepareResponse("L'utilisateur [' . $id . '] suprimé");
+    }
 
     private function prepareResponse(
         string $message, 
