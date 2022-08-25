@@ -83,7 +83,7 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
         $this->diploma = new ArrayCollection();
         $this->avatar = new ArrayCollection();
         $this->bookKids = new ArrayCollection();
-        $this->role = "ROLE_KID";
+        // $this->role = "ROLE_KID";
     }
 
     public function getId(): ?int
@@ -250,7 +250,7 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return [$this->role];
+        return [$this->role->getName()];
     }
 
     /**
