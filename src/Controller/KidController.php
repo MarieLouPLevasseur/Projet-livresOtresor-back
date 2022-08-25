@@ -448,32 +448,38 @@ class KidController extends AbstractController
 
         // ********  CHECK if authors exists ************
 // TODO condition is not good: authors are double in database actually
-        // $testArrayAuthor=[];
+        $testArrayAuthor=[];
 
             $authors = $bookKid->getBook()->getAuthors();
-
-                foreach ($authors as $author) {
-                    $nameAuthorGiven = $author->getName();
-
-                    $isAuthorInBase = $authorRepository->findAuthorByName($nameAuthorGiven);
-
-                    if ($isAuthorInBase !== []) {
-                        // if exist set this one and don't let create a new author with same name
+            foreach ($authors as $author) {
+                $nameAuthorGiven = $author->getName();
+                
+                $isAuthorInBase = $authorRepository->findAuthorByName($nameAuthorGiven);
+                
+                if ($isAuthorInBase !== []) {
+                    // if exist set this one and don't let create a new author with same name
+                    // dd($isAuthorInBase);
 
                             foreach ($isAuthorInBase as $authorToSetFromBase) {
+
+                                $testArrayAuthor[]= $authorToSetFromBase;
+
+                                
+                                $bookKid->getBook()->removeAuthor($author);
                                 $bookKid->getBook()->addAuthor($authorToSetFromBase);
-                                $em->persist($authorToSetFromBase);
+                                // $em->persist($authorToSetFromBase);
                                 // $em->persist($newBookKid);
                             }
-                    }
-                    // else{
-                    //     // only persist author given
-
-                    //     $em->persist($author);
-                    // }
+                        }
+                else{
+                    // only persist author given
+                    $testArrayAuthor []= $author;
+                    
+                    // $em->persist($author);
                 }
-            // dd($testArrayAuthor);
-
+            }
+                    
+                // dd($authors);
 
 
         // ********  CHECK if ISBN exists ************
