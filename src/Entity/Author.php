@@ -8,6 +8,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
+
 /**
  * @ORM\Entity(repositoryClass=AuthorRepository::class)
  */
@@ -23,19 +26,32 @@ class Author
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list","booksByCategory","books_infos", "books_read", "books_wish"})
+
+     * @Groups({"book_list","booksByCategory","books_infos", "books_read", "books_wish", "author_list"})
+     * @Assert\NotNull
+     * @Assert\NotBlank
+     * 
+     * 
+
      */
     private $name;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Book::class, inversedBy="authors")
+     * @ORM\ManyToMany(targetEntity=Book::class, inversedBy="authors", cascade={"persist"})
      */
     private $book;
+
+    
 
     public function __construct()
     {
         $this->book = new ArrayCollection();
     }
+
+    //  public function __toString()
+    // {
+    //     return $this->getName() ;
+    // }
 
     public function getId(): ?int
     {

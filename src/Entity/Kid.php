@@ -9,6 +9,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 
 /**
@@ -26,13 +28,19 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish"})
+
+     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "author_list"})
+     * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
+     * @Assert\Length(min=3)( message = "Le nom d'utilisateur doit contenir au moins 3 caractères")
+
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"userkids_list"})
+     * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
+     * @Assert\Length(min=5, max=20)( message = "Le mot de passe doit contenir entre 5 et 20 caractères")
      */
     private $password;
 
