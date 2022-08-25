@@ -59,7 +59,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
-     * @Assert\Length(min=5, max=20)( message = "Le mot de passe doit contenir entre 5 et 20 caractères")
+     * @Assert\Length(min=5)( message = "Le mot de passe doit contenir au moins 5 caractères")
      */
     private $password;
 

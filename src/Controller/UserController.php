@@ -166,9 +166,9 @@ class UserController extends AbstractController
     
     {
         $user = $userRepository->find($id);
-        $kidData = $request->getcontent();
+        $data = $request->getcontent();
         $role = $roleRepository->findOneByRoleName("ROLE_KID");        
-        $kidData = $serializer->deserialize($kidData, Kid::class, 'json');
+        $kidData = $serializer->deserialize($data, Kid::class, 'json');
         $password = $passwordHasher->hashPassword($user, $user->getPassword());
         $kidData->setPassword($password);
         $kidData->setRole($role);
@@ -195,7 +195,7 @@ class UserController extends AbstractController
     }
 
      /** 
-     * @Route("/users/{id}", name="update_user", methods="PATCH", requirements={"id"="\d+"})
+     * @Route("/users/{id}", name="update_user", methods="PUT", requirements={"id"="\d+"})
      * @return Response
      */
 
@@ -212,9 +212,11 @@ class UserController extends AbstractController
         
 
         $user = $userRepository->find($id);
-        $password = $passwordHasher->hashPassword($user, $user->getPassword());
+       
         $data = $request->getContent();
-       // $data->setPassword($password);
+        
+        $dataUser = $serializer->deserialize($data, User::class, 'json'); 
+      
 
         if ($user === null )
         {
@@ -224,21 +226,43 @@ class UserController extends AbstractController
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
+        
 
-        $serializer->deserialize($data, User::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $user]);
+       // $serializer->deserialize($data, User::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $user]);
+        //$errors = $validator->validate($dataUser);
 
-        $errors = $validator->validate($user);
+        // if (count($errors) > 0) {
 
-        if (count($errors) > 0) {
+        //     $errorsString = (string) $errors;
 
-            $errorsString = (string) $errors;
+        //    
+        // }
+        if($dataUser->getEmail()!== null){
+            $errors = $validator->validatePropertyValue($dataUser, $email, $dataUser->getEmail());
+            
+            if ((count($errors) > 0) ){
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+    
+                $error = [
+                    'error' => true,
+                    'message book' => $errorsString
+                ];
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+    
+            }
+        } 
+        $password = $passwordHasher->hashPassword($user, $dataUser->getPassword());
+        $user->setPassword($password);
+        //dd($user);
+        $userRepository ->add($user, true);
+      //  $em->persist($dataUser);
 
-            return $this->prepareResponse($errorsString, [], [], true, Response::HTTP_BAD_REQUEST);
-        }
-
-  
-        $em->flush();
-
+       // $em->flush();
         return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
     }
 
