@@ -39,6 +39,23 @@ class AuthorRepository extends ServiceEntityRepository
         }
     }
 
+
+    
+
+    /**
+    * @return Author[] Returns an array of Author objects
+    */
+   public function findAuthorByName($author_name): array
+   {
+       return $this->createQueryBuilder('a')
+           ->andWhere('a.name = :val')
+           ->setParameter('val', $author_name)
+           ->getQuery()
+           ->getResult()
+       ;
+   }
+    
+
     /** 
     *
     * @param int $book_id
@@ -64,6 +81,7 @@ class AuthorRepository extends ServiceEntityRepository
              return $query->getResult();
  
     }
+
 
 //    /**
 //     * @return Author[] Returns an array of Author objects
