@@ -190,12 +190,10 @@ class UserController extends AbstractController
         $this->addFlash('success', "L'enfant a bien été enregistré");
 
         return new Response("L'enfant a bien été enregistré");
-        
-
     }
 
      /** 
-     * @Route("/users/{id}", name="update_user", methods="PUT", requirements={"id"="\d+"})
+     * @Route("/users/{id<\d+>}", name="update_user", methods="PATCH")
      * @return Response
      */
 
@@ -206,18 +204,12 @@ class UserController extends AbstractController
         Request $request, 
         SerializerInterface $serializer,
         ValidatorInterface $validator,
+        RoleRepository $roleRepository,
         UserPasswordHasherInterface $passwordHasher
         )
     {
-        
-
         $user = $userRepository->find($id);
-       
-        $data = $request->getContent();
-        
-        $dataUser = $serializer->deserialize($data, User::class, 'json'); 
       
-
         if ($user === null )
         {
             $error = [
@@ -226,20 +218,19 @@ class UserController extends AbstractController
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
-        
 
-       // $serializer->deserialize($data, User::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $user]);
+        $data = $request->getContent();
+        $dataUser = $serializer->deserialize($data, User::class, 'json');
+     
+       
+   
         //$errors = $validator->validate($dataUser);
-
         // if (count($errors) > 0) {
-
-        //     $errorsString = (string) $errors;
-
-        //    
+        // $errorsString = (string) $errors;
         // }
-        if($dataUser->getEmail()!== null){
-            $errors = $validator->validatePropertyValue($dataUser, $email, $dataUser->getEmail());
-            
+        
+        if($dataUser->getEmail() == !null){
+            $errors = $validator->validatePropertyValue($dataUser, 'email', $dataUser->getEmail());
             if ((count($errors) > 0) ){
                 /*
                 * Uses a __toString method on the $errors variable which is a
@@ -247,33 +238,97 @@ class UserController extends AbstractController
                 * for debugging.
                 */
                 $errorsString = (string) $errors;
-    
                 $error = [
                     'error' => true,
-                    'message book' => $errorsString
+                    'message' => $errorsString
                 ];
+
                 return $this->json($error, Response::HTTP_BAD_REQUEST);
-    
-            }
+            }   
+            $user->setEmail($dataUser->getEmail());
         } 
-        $password = $passwordHasher->hashPassword($user, $dataUser->getPassword());
-        $user->setPassword($password);
+
+        if($dataUser->getFirstname()!== null){
+            $errors = $validator->validatePropertyValue($dataUser, 'firstname', $dataUser->getFirstname());
+            if ((count($errors) > 0) ){
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            } 
+            $user->setFirstname($dataUser->getFirstname());  
+        }
+
+        if ($dataUser->getLastname()!== null) {
+            $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
+            if ((count($errors) > 0)) {
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }
+            $user->setLastname($dataUser->getLastname());
+        }
+        if ($dataUser->getLastname()!== null) {
+            $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
+            if ((count($errors) > 0)) {
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }
+            $user->setLastname($dataUser->getLastname());
+        }
+        if ($dataUser->getPassword()!== null) {
+            $errors = $validator->validatePropertyValue($dataUser, 'password', $dataUser->getPassword());
+            if ((count($errors) > 0)) {
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }
+
+            $password = $passwordHasher->hashPassword($dataUser, $dataUser->getPassword());
+            $dataUser->setPassword($password);
+            $user->setPassword($dataUser->getPassword());
+        }
+
         //dd($user);
-        $userRepository ->add($user, true);
-      //  $em->persist($dataUser);
-
-       // $em->flush();
+        $em->persist($user);
+        $em->flush();
         return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
-    }
-
-    //api/v1/users/{id}
-    /** 
-     * @Route("/users/{id}", name="delete_user", methods="PATCH", requirements={"id"="\d+"})
-     * @return Response
-     */
-
-    public function delete(){
-
     }
 
     private function prepareResponse(
