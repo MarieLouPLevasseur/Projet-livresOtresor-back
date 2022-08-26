@@ -166,11 +166,11 @@ class UserController extends AbstractController
     
     {
         $user = $userRepository->find($id);
-        $data = $request->getcontent();
+        $kidData = $request->getcontent();
         $role = $roleRepository->findOneByRoleName("ROLE_KID");        
-        $kidData = $serializer->deserialize($data, Kid::class, 'json');
+        $kidData = $serializer->deserialize($kidData, Kid::class, 'json');
         $password = $passwordHasher->hashPassword($user, $user->getPassword());
-        $kidData->setPassword($password);
+        $kidData ->setPassword($password);
         $kidData->setRole($role);
         $kidData->setUser($user);
         $kidData->setProfileAvatar('https://bombyxplm.com/wp-content/uploads/2021/01/421-4213053_default-avatar-icon-hd-png-download.png');
@@ -190,8 +190,9 @@ class UserController extends AbstractController
         $this->addFlash('success', "L'enfant a bien été enregistré");
 
         return new Response("L'enfant a bien été enregistré");
-    }
+        
 
+    }
      /** 
      * @Route("/users/{id<\d+>}", name="update_user", methods="PATCH")
      * @return Response
