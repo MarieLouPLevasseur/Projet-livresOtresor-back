@@ -4,6 +4,7 @@ namespace App\Security;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManager;
+use App\Repository\KidRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,18 +33,21 @@ class UserAuthenticator extends AbstractAuthenticator
     private $userRepository;
     private $JWTManager;
     private $serializer;
-    private $abstractController;
+    private $kidRepository;
 
-    public function __construct(UserRepository $userRepository, JWTTokenManagerInterface $JWTManager, SerializerInterface $serializer)
+    public function __construct(UserRepository $userRepository, JWTTokenManagerInterface $JWTManager, SerializerInterface $serializer, KidRepository $kidRepository)
     {
         $this->userRepository = $userRepository;
         $this->JWTManager = $JWTManager;
         $this->serializer = $serializer;
+        $this->kidRepository = $kidRepository;
     }
     
     public function supports(Request $request): ?bool
     {
-        return ($request->getPathInfo() === '/api/v1/login/user' || $request->getPathInfo() === '/api/v1/login/kid'  && $request->isMethod('POST'));
+        
+
+        return (($request->getPathInfo() === '/api/v1/login/user' || $request->getPathInfo() === '/api/v1/login/kid')  && $request->isMethod('POST'));
     }
 
     public function authenticate(Request $request): Passport
@@ -54,20 +58,31 @@ class UserAuthenticator extends AbstractAuthenticator
 
 
         if ($request->getPathInfo() == '/api/v1/login/user') {
-            
-            $email = $parsed_json->{"email"};
-            $password = $parsed_json->{"password"};
 
-            return new Passport(new UserBadge($email), new PasswordCredentials($password));  
+            $email = $parsed_json->{"email"};
+
+            if($this->userRepository->findOneBy(['email' => $email])){
+                $password = $parsed_json->{"password"};
+
+                return new Passport(new UserBadge($email), new PasswordCredentials($password)); 
+            } 
+
+            return new Passport(new UserBadge("false"), new PasswordCredentials("false")); 
         }
    
         // Kid Connexion
         if ($request->getPathInfo() == '/api/v1/login/kid') {
             
                 $username = $parsed_json->{"username"};
-                $password = $parsed_json->{"password"};
+
             
-            return new Passport(new UserBadge($username), new PasswordCredentials($password));
+            if ($this->kidRepository->findOneBy(['username' => $username])) {
+                    $password = $parsed_json->{"password"};
+
+                return new Passport(new UserBadge($username), new PasswordCredentials($password));
+            }
+            
+            return new Passport(new UserBadge("false"), new PasswordCredentials("false")); 
 
         }
 
@@ -77,14 +92,25 @@ class UserAuthenticator extends AbstractAuthenticator
     {
 
         $user = $token->getUser();
-        // $id = $user->getId();
         $tokenJWT = $this->JWTManager->create($user);
 
         $jsonUserData = $this->serializer->serialize($user, 'json', ['groups' => 'userConnected']);
-        // dd($jsonUserData);
+        $jsonTokenData = $this->serializer->serialize($tokenJWT, 'json');
 
+
+        $finalJson = "
+            {
+            'user' : $jsonUserData ,
+            'token' : '$tokenJWT'
+            }
+            ";
+        // dd($tokenJWT);
+            // $finalResponse = "'token' : '$tokenJWT'";
+        
+        // $data = ["user"=>$jsonUserData,"token" =>$jsonTokenData];
         // return $this->json();
-        return new JsonResponse ([$user, $tokenJWT], 200);
+        // return new Response ($data, 200);
+        return new JsonResponse ($finalJson, 200,[],true);
         
     }
 
