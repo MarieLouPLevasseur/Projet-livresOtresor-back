@@ -3,31 +3,42 @@
 namespace App\Security;
 
 use App\Entity\User;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManager;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTManager;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTManager;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 
-class UserAuthenticator extends AbstractAuthenticator // implements UserInterface
+
+
+
+class UserAuthenticator extends AbstractAuthenticator 
 {
 
     private $userRepository;
+    private $JWTManager;
+    private $serializer;
+    private $abstractController;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, JWTTokenManagerInterface $JWTManager, SerializerInterface $serializer)
     {
         $this->userRepository = $userRepository;
+        $this->JWTManager = $JWTManager;
+        $this->serializer = $serializer;
     }
     
     public function supports(Request $request): ?bool
@@ -64,12 +75,22 @@ class UserAuthenticator extends AbstractAuthenticator // implements UserInterfac
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        dd("authentification ok");
+
+        $user = $token->getUser();
+        // $id = $user->getId();
+        $tokenJWT = $this->JWTManager->create($user);
+
+        $jsonUserData = $this->serializer->serialize($user, 'json', ['groups' => 'userConnected']);
+        // dd($jsonUserData);
+
+        // return $this->json();
+        return new JsonResponse ([$user, $tokenJWT], 200);
+        
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        dd("authentification failed");
+        return new JsonResponse("Authentification failed", 401);
     }
 
 }
