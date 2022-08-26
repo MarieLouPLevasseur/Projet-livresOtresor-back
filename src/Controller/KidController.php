@@ -35,8 +35,155 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
  */
 class KidController extends AbstractController
 {
-    
-   
+    /**
+     * Show element for progress bar:
+     *
+     * @Route("/{id_kid}/books/progress_bar", name="progress_bar", methods="GET")
+     * 
+     */
+    public function progressBar( 
+        int $id_kid,
+        BookKidRepository $bookKidRepository,
+        SerializerInterface $serializer,
+        AvatarRepository $avatarRepository
+        ): Response
+    {
+
+        // GET rewarding levels from Avatars "is_win" Value
+            //// actual values set [1,4,7,10,13,18,23,28];
+            // actual values set [1,4, 4,7, 7,10,13,16,19,22,25,28];
+            // TODO Ne donner que des paliers unique en valeur 
+            // TODO     OU  revoir pour que le tableau RewardArray ne puisse pas avoir 2 valeurs identiques meme si présent dans is_win
+
+        $avatarsObjects= $avatarRepository->findBy([],['is_win' => 'ASC']);
+
+        // RewardsArray:
+            // key = level (A)
+            // value = number of read book to start the level (B)
+        $rewardsArray = [];
+        foreach($avatarsObjects as $avatar){
+
+            $isWinValue = $avatar->getIsWin();
+
+            $rewardsArray []= $isWinValue;
+
+        }
+
+        // dd($rewardsArray);
+ 
+        // Get books read by "is_read" value in BookKid
+        
+        $ReadBooks = $bookKidRepository->findAllByIsRead(true, $id_kid);
+        // $totalReadBooks = count($ReadBooks);
+        $totalReadBooks = 4;
+        // dd($totalReadBooks);
+
+        // SET intermediate array where:
+            // key = number of read book to start the level (B)
+            // value = difference from total read books and amount of book needed to be read for the level (C)
+            // goal: 
+                // find all differences with goal but get rid off value higher than total read book (higher level)
+                // be able to go back up to arrayAwards and regain level (A) by setting (B) as key
+            
+        $gapArray=[]; 
+
+        foreach($rewardsArray as $reward)
+        {
+
+            $difference= ($totalReadBooks-$reward);
+
+            if ($difference == 0 || $difference>0) {
+                $gapArray[$reward]= $difference;
+            }
+            
+        }
+        // dd($gapArray);
+            // SET Final Table with minimum Gap value to find the good level
+                // key: will always be 0 since value in array will always be replace if a lower value is found
+                // value: the lower gap found (the minimum gap from total read and amount needed for level), last (C) value
+                // goal: get the minimum gap et found the current level
+        $minimumGapValue= []; 
+            
+
+        // TODO reorganise code: 
+            // TODO : SET IF 0 first (no lower level), then if > last objective in award Array (no higher level), then else do between
+        // TRUE if books read are higher then 0
+
+        
+            if (!$totalReadBooks==0) {
+
+                foreach ($gapArray as $difference) {
+
+                    $count=count($minimumGapValue);
+
+                    if ($count==0) {
+                        $minimumGapValue[]= $difference;
+                    }
+                    //if last element is lower value, replace et set in array
+                    if ($minimumGapValue[0]>=$difference) {
+                        $minimumGapValue= [];
+                        $minimumGapValue[]= $difference;
+                    }
+                }
+                
+        // SET final value found: lower (C) value 
+            // must be [0] since a single value is expected
+            $finalMinimumGap=$minimumGapValue[0];
+            // dd($finalMinimumGap);
+
+        // GET intermediate Key (B): last goal Reach
+            // back up to current amount book read to be at this level
+            $lastTargetKeyArray= array_keys($gapArray,$finalMinimumGap);
+            $lastGoalReached = $lastTargetKeyArray[0];
+            // dd($lastGoalReached);
+
+        // GET initial Key (A): current level
+
+            // récupération du niveau avec la clé intermédiaire de table pivot qui devient la valeur dans la table rewards
+            $lastlevelKeyArray = array_keys($rewardsArray, $lastGoalReached);
+            $currentLevel = $lastlevelKeyArray[0];
+            // dd($currentLevel);
+
+        // GET current level +1 : new level to reach
+            $newLevel= $currentLevel+1;
+            // dd($newLevel);
+
+        // Get new Goal : new amount of books to read
+            $newGoal = $rewardsArray[$newLevel];
+
+            }
+        else{
+            // if books are at 0: set manually since there is no lower level to get back to
+            $lastGoalReached = 0;
+            $newGoal = 1;
+            $currentLevel = 0;
+            $finalMinimumGap = 0;
+            $gapArray[0] = 0;
+            $newLevel= 1;
+
+        }
+
+        $nbBookToWinLevel= ($newGoal-$totalReadBooks);
+        
+        $isNewLevel = false;
+        if ($finalMinimumGap === 0){
+
+            $isNewLevel = true;
+        }
+        
+
+            $data = ["lastGoalReached"        => $lastGoalReached , 
+                     "currentGoal"            => $newGoal,
+                     "currentLevel"           => $currentLevel,
+                     "newLevel"               => $newLevel,
+                     "bookReadOnCurrentLevel" => $finalMinimumGap,
+                     "bookToReadToNewLevel"   => $nbBookToWinLevel,
+                     "isNewLevel"             => $isNewLevel
+    ];
+
+        return $this->json($data, 200);
+
+    }
 
      /**
      * Show all books of a category for a kid
