@@ -16,8 +16,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
-use symfony\Component\Validator\Constraints as Assert;
 
 
 
@@ -29,6 +29,14 @@ use symfony\Component\Validator\Constraints as Assert;
  */
 class UserController extends AbstractController
 {
+
+    private $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->passwordHasher = $passwordHasher;
+    }
+
 
     /**
      * Add a user (registration)
@@ -192,5 +200,163 @@ class UserController extends AbstractController
         
 
     }
+     /** 
+     * @Route("/users/{id<\d+>}", name="update_user", methods="PATCH")
+     * @return Response
+     */
 
+    public function update(
+        $id,
+        EntityManagerInterface $em, 
+        UserRepository $userRepository,
+        Request $request, 
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+        RoleRepository $roleRepository,
+        UserPasswordHasherInterface $passwordHasher
+        )
+    {
+        $user = $userRepository->find($id);
+      
+        if ($user === null )
+        {
+            $error = [
+                'error' => true,
+                'message' => 'No user found for Id [' . $id . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        $data = $request->getContent();
+        $dataUser = $serializer->deserialize($data, User::class, 'json');
+     
+       
+   
+        //$errors = $validator->validate($dataUser);
+        // if (count($errors) > 0) {
+        // $errorsString = (string) $errors;
+        // }
+        
+        if($dataUser->getEmail() == !null){
+            $errors = $validator->validatePropertyValue($dataUser, 'email', $dataUser->getEmail());
+            if ((count($errors) > 0) ){
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }   
+            $user->setEmail($dataUser->getEmail());
+        } 
+
+        if($dataUser->getFirstname()!== null){
+            $errors = $validator->validatePropertyValue($dataUser, 'firstname', $dataUser->getFirstname());
+            if ((count($errors) > 0) ){
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            } 
+            $user->setFirstname($dataUser->getFirstname());  
+        }
+
+        if ($dataUser->getLastname()!== null) {
+            $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
+            if ((count($errors) > 0)) {
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }
+            $user->setLastname($dataUser->getLastname());
+        }
+        if ($dataUser->getLastname()!== null) {
+            $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
+            if ((count($errors) > 0)) {
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }
+            $user->setLastname($dataUser->getLastname());
+        }
+        if ($dataUser->getPassword()!== null) {
+            $errors = $validator->validatePropertyValue($dataUser, 'password', $dataUser->getPassword());
+            if ((count($errors) > 0)) {
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }
+
+            $password = $passwordHasher->hashPassword($dataUser, $dataUser->getPassword());
+            $dataUser->setPassword($password);
+            $user->setPassword($dataUser->getPassword());
+        }
+
+        //dd($user);
+        $em->persist($user);
+        $em->flush();
+        return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
+    }
+
+    private function prepareResponse(
+        string $message, 
+        array $options = [], 
+        array $data = [], 
+        bool $isError = false, 
+        int $httpCode = 200, 
+        array $headers = []
+    )
+    {
+        $responseData = [
+            'error' => $isError,
+            'message' => $message,
+        ];
+
+        foreach ($data as $key => $value)
+        {
+            $responseData[$key] = $value;
+        }
+        return $this->json($responseData, $httpCode, $headers, $options);
+    }
 }
