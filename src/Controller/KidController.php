@@ -2,45 +2,41 @@
 
 namespace App\Controller;
 
+
+use App\Entity\Author;
+use App\Entity\Book;
+use App\Entity\BookKid;
+
 use App\Repository\AuthorRepository;
 use App\Repository\KidRepository;
+use App\Repository\BookRepository;
 use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
-use App\Repository\BookRepository;
 use App\Repository\DiplomaRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\HttpFoundation\Request;
+
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\Common\Annotations\AnnotationReader;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 
 /**
  * Kid class
- * @Route("/api/v1/kids", name="api_kids")
+ * @Route("/api/v1/kids", name="api_kids_")
  */
 class KidController extends AbstractController
 {
     
-    /**
-     * @Route("", name="app_kid")
-     */
-    public function list()//: Response
-    {
-
-        // return new JsonResponse($jsonCategoryList, Response::HTTP_OK, [], true);
-
-       
-    }
-
-
-
+   
 
      /**
      * Show all books of a category for a kid
@@ -167,7 +163,6 @@ class KidController extends AbstractController
     }
 
 
-    /****************************Routes coded using the prepare response method*******************************************************************/
 
     /**
      * @Route("/{id_kid}/books/{id_book}", name="show_book_details", methods="GET", requirements={"id_kid"="\d+"}, requirements={"id_book"="\d+"})
@@ -229,8 +224,132 @@ class KidController extends AbstractController
 
     }
 
+        /*************************Routes coded using the prepare response method*******************************************************************/
 
-     /*************************Routes coded using the prepare response method*******************************************************************/
+
+     /**
+     * @Route("/{id_kid}/books", name="create_book", methods="POST", requirements={"id_kid"="\d+"})
+     * @return Response
+     */
+    public function createBookKid(
+            int $id_kid,
+            Request $request,
+            SerializerInterface $serializer,
+            ValidatorInterface $validator,
+            EntityManagerInterface $em,
+            AuthorRepository $authorRepository,
+            BookRepository $bookRepository,
+            KidRepository $kidRepository,
+            BookKidRepository $bookKidRepository
+
+    )
+    
+    
+    {
+        // ********  DATAS ************
+
+
+        $data = $request->getcontent();
+        $bookKid = $serializer->deserialize($data, BookKid::class, 'json');
+        $kid = $kidRepository->find($id_kid);
+
+
+        // ********  CHECK ERRORS ************
+
+        $errorsBookKid = $validator->validate($bookKid);
+
+        if ((count($errorsBookKid) > 0) ){
+            /*
+            * Uses a __toString method on the $errors variable which is a
+            * ConstraintViolationList object. This gives us a nice string
+            * for debugging.
+            */
+            $errorsStringBook = (string) $errorsBookKid;
+
+            $error = [
+                'error' => true,
+                'message book' => $errorsStringBook
+            ];
+            return $this->json($error, Response::HTTP_BAD_REQUEST);
+
+        }
+
+        // ********  CHECK if authors exists ************
+
+            $authors = $bookKid->getBook()->getAuthors();
+            foreach ($authors as $author) {
+                $nameAuthorGiven = $author->getName();
+                
+                $isAuthorInBase = $authorRepository->findAuthorByName($nameAuthorGiven);
+                
+                if ($isAuthorInBase !== []) {
+                    // if exist set this one and don't let create a new author with same name
+
+                    foreach ($isAuthorInBase as $authorToSetFromBase) {
+                        $bookKid->getBook()->removeAuthor($author);
+                        $bookKid->getBook()->addAuthor($authorToSetFromBase);
+                    }
+                }      
+            }
+                    
+
+
+        // ********  CHECK if ISBN exists ************
+
+            $isbnGiven = $bookKid->getBook()->getIsbn();
+
+            $isbnExistingInBook = $bookRepository->findOneByIsbnCode($isbnGiven);
+
+            if ($isbnExistingInBook !== null){
+            // if exist: set book from database
+
+
+                $bookKid-> setBook($isbnExistingInBook);
+
+                // If the book already exists then the Book kid might exists too
+
+                            // ********  CHECK if BOOK KID exists ************
+
+                $bookKidExist = $bookKidRepository->findOneByKidandBook($id_kid,$isbnExistingInBook->getId());
+
+                    if($bookKidExist !== []){
+
+                        $error = [
+                            'error' => true,
+                            'message' => 'The book [' .$isbnExistingInBook->getId() . '] already exist for the kid [' . $id_kid . ']'
+                        ];
+                        return $this->json($error, Response::HTTP_CONFLICT);
+        
+        
+                    }
+
+            }
+                // ********  CHECK if Cover exists ************
+
+                $coverExist = $bookKid->getBook()->getCover();
+
+                if ($coverExist === null){
+
+                    $bookKid->getBook()->setCover("https://i.pinimg.com/564x/11/1b/59/111b5913903c2bfbe7f11487bb3f06f6.jpg");
+                }
+
+
+        // ********  SET Kid ************
+
+            $bookKid->setKid($kid);
+
+            $em->persist($bookKid);
+
+            $em->flush();
+
+            return $this->prepareResponse(
+                'The book has been created',[],[],false, 201, 
+            );
+    }
+
+    
+
+
 
       /**
      * @Route("/{id_kid}/books", name="show_book_list", methods="GET", requirements={"id"="\d+"})
