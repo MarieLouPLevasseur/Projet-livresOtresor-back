@@ -27,8 +27,12 @@ GET http://localhost:8000/api/v1/kids/177/avatars
 ### Show the avatar of a kid 
 GET http://localhost:8000/api/v1/avatars/118
 
-### Show the one disploma of a kid
-GET http://localhost:8000/api/v1/diplomas/123
+### list all the authors for one kid
+GET http://localhost:8000/api/v1/kids/194/books/authors
+
+###list all books of author for one kid
+
+GET  http://localhost:8000/api/v1/kids/121/books/authors/91
 
 ### Show all the kids of a user
 GET http://localhost:8000/api/v1/users/133/kids

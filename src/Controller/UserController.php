@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Kid;
 use App\Entity\User;
 use App\Repository\KidRepository;
 use App\Repository\RoleRepository;
@@ -54,16 +55,20 @@ class UserController extends AbstractController
 
 
 
-            if (count($errors) > 0) {
-                /*
-                * Uses a __toString method on the $errors variable which is a
-                * ConstraintViolationList object. This gives us a nice string
-                * for debugging.
-                */
-                $errorsString = (string) $errors;
+        if (count($errors) > 0) {
+            /*
+            * Uses a __toString method on the $errors variable which is a
+            * ConstraintViolationList object. This gives us a nice string
+            * for debugging.
+            */
+            $errorsStringBook = (string) $errors;
 
-                return new Response($errorsString,400,[],Response::HTTP_BAD_REQUEST);
-            }
+            $error = [
+                'error' => true,
+                'message' => $errorsStringBook
+            ];
+            return $this->json($error, Response::HTTP_BAD_REQUEST);
+        }
 
 
             $role = $roleRepository->findOneByRoleName("ROLE_USER");
@@ -75,9 +80,12 @@ class UserController extends AbstractController
           
             $em->persist($user);
             $em->flush();
-            $this->addFlash('success', "L'utilisateur a bien été enregistré");
 
-            return new Response("L'utilisateur a bien été enregistré");
+            $error = [
+                'error' => false,
+                'message' => "L'utilisateur a bien été enregistré"
+            ];
+            return $this->json($error, 201);
 
        
     }
@@ -142,5 +150,47 @@ class UserController extends AbstractController
         return $this->json($listKid, 200, [], ['groups' => 'userkids_list']);
     }
 
+    /** 
+     * @Route("/users/{id}/kids", name="create_kid", methods="POST", requirements={"id"="\d+"})
+     * @return Response
+     */
+    public function createKid( int $id, 
+    EntityManagerInterface $em, 
+    Request $request, 
+    UserRepository $userRepository, 
+    SerializerInterface $serializer,
+    RoleRepository $roleRepository,
+    UserPasswordHasherInterface $passwordHasher
+    ):Response
+    
+    {
+        $user = $userRepository->find($id);
+        $kidData = $request->getcontent();
+        $role = $roleRepository->findOneByRoleName("ROLE_KID");        
+        $kidData = $serializer->deserialize($kidData, Kid::class, 'json');
+        $password = $passwordHasher->hashPassword($user, $user->getPassword());
+        $kidData ->setPassword($password);
+        $kidData->setRole($role);
+        $kidData->setUser($user);
+        $kidData->setProfileAvatar('https://bombyxplm.com/wp-content/uploads/2021/01/421-4213053_default-avatar-icon-hd-png-download.png');
+    
+
+        if ($user === null )
+        {
+            $error = [
+                'error' => true,
+                'message' => 'No user found for Id [' . $id . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+          
+        $em->persist($kidData);
+        $em->flush();
+        $this->addFlash('success', "L'enfant a bien été enregistré");
+
+        return new Response("L'enfant a bien été enregistré");
+        
+
+    }
 
 }

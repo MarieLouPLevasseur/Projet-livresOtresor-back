@@ -6,6 +6,10 @@ use App\Repository\BookKidRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+
+
 /**
  * @ORM\Entity(repositoryClass=BookKidRepository::class)
  */
@@ -21,7 +25,7 @@ class BookKid
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     *@Groups({"booksByCategory","book_list","books_infos"})
+     * @Groups({"booksByCategory","book_list","books_infos"})
      */
     private $comment;
 
@@ -34,20 +38,27 @@ class BookKid
 
     /**
      * @ORM\Column(type="boolean")
-     *@Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish"})
+     * @Assert\Type(
+     *     type="boolean",
+     *     message="The value passed is not a valid type. Boolean expected."
+     * )
      * 
      */
     private $is_read;
 
     /**
      * @ORM\ManyToOne(targetEntity=Kid::class, inversedBy="bookKids")
-     *  @Groups({"books_read", "books_wish"})
+
+     * @Groups({"books_read", "books_wish", "author_books"})
+
      */
     private $kid;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids")
+     * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids", cascade={"persist"})
      * @Groups({"booksByCategory","books_infos", "books_read", "books_wish"})
+     * @Assert\Valid
      */
     private $book;
 
@@ -78,7 +89,7 @@ class BookKid
         return $this->comment;
     }
 
-    public function setComment(string $comment): self
+    public function setComment(?string $comment): self
     {
         $this->comment = $comment;
 
