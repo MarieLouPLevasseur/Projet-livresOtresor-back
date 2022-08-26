@@ -52,7 +52,8 @@ class UserAuthenticator extends AbstractAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        // User Connexion
+        //****  User Connexion******
+
         $data=$request->getContent();
         $parsed_json = json_decode($data);
 
@@ -61,29 +62,33 @@ class UserAuthenticator extends AbstractAuthenticator
 
             $email = $parsed_json->{"email"};
 
+            // Check the repository to be sure to get the good Entity
             if($this->userRepository->findOneBy(['email' => $email])){
+                
                 $password = $parsed_json->{"password"};
 
                 return new Passport(new UserBadge($email), new PasswordCredentials($password)); 
             } 
 
+            // if wrong user, set to false
             return new Passport(new UserBadge("false"), new PasswordCredentials("false")); 
         }
    
-        // Kid Connexion
+        //****  Kid Connexion******
+
         if ($request->getPathInfo() == '/api/v1/login/kid') {
             
                 $username = $parsed_json->{"username"};
 
-            
+            // Check the repository to be sure to get the good Entity
             if ($this->kidRepository->findOneBy(['username' => $username])) {
                     $password = $parsed_json->{"password"};
 
                 return new Passport(new UserBadge($username), new PasswordCredentials($password));
             }
-            
-            return new Passport(new UserBadge("false"), new PasswordCredentials("false")); 
 
+            // if wrong user, set to false
+            return new Passport(new UserBadge("false"), new PasswordCredentials("false")); 
         }
 
     }
@@ -95,21 +100,15 @@ class UserAuthenticator extends AbstractAuthenticator
         $tokenJWT = $this->JWTManager->create($user);
 
         $jsonUserData = $this->serializer->serialize($user, 'json', ['groups' => 'userConnected']);
-        $jsonTokenData = $this->serializer->serialize($tokenJWT, 'json');
 
 
-        $finalJson = "
+        $finalJson = '
             {
-            'user' : $jsonUserData ,
-            'token' : '$tokenJWT'
+            "user" : '.$jsonUserData.' ,
+            "token" : "'.$tokenJWT.'"
             }
-            ";
-        // dd($tokenJWT);
-            // $finalResponse = "'token' : '$tokenJWT'";
-        
-        // $data = ["user"=>$jsonUserData,"token" =>$jsonTokenData];
-        // return $this->json();
-        // return new Response ($data, 200);
+            ';
+
         return new JsonResponse ($finalJson, 200,[],true);
         
     }
