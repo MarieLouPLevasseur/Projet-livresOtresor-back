@@ -242,7 +242,9 @@ class UserController extends AbstractController
     {
 
        $user = $userRepository->find($id);
-
+       $usersKid = $user->getKid();
+    
+    
         if ($user === null )
         {
             $error = [
@@ -253,7 +255,7 @@ class UserController extends AbstractController
         }
 
 
-        $em->remove($user);
+        $em->remove($usersKid);
         
 
         $em->flush();
