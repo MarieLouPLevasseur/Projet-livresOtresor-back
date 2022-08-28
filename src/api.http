@@ -34,5 +34,9 @@ GET http://localhost:8000/api/v1/kids/194/books/authors
 
 GET  http://localhost:8000/api/v1/kids/121/books/authors/91
 
-### Show all the kids of a user
-GET http://localhost:8000/api/v1/users/133/kids
+###create kid for user
+POST http://localhost:8000/api/v1/users/121/kids
+
+###update user by id
+PATCH http://localhost:8000/api/v1/users/121
+
