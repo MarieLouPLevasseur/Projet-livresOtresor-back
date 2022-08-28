@@ -55,8 +55,6 @@ class KidController extends AbstractController
 
         $currentKid = $kidRepository->find($id_kid);
 
-
-
             if ($currentKid === null )
             {
 
@@ -92,14 +90,11 @@ class KidController extends AbstractController
         $rewardsArrayUnique = array_unique($rewardsArrayRaw);
         $rewardsArray = array_values($rewardsArrayUnique);
 
-        // dd($rewardsArray);
-
         // *** GET READ BOOKS : "is_read" value "true" in BookKid
         
         $ReadBooks = $bookKidRepository->findAllByIsRead(true, $id_kid);
         $totalReadBooks = count($ReadBooks);
         // $totalReadBooks = 46;
-        // dd($totalReadBooks);
 
         //******* */ CHECK CURRENT LEVEL: ***********
         // SET intermediate array where:
@@ -121,7 +116,6 @@ class KidController extends AbstractController
             }
             
         }
-        // dd($gapArray);
 
         // SET Final Table with minimum Gap value to find the good level
             // key: will always be 0 since value in array will always be replace if a lower value is found
@@ -144,8 +138,7 @@ class KidController extends AbstractController
                 }
             }
 
-        // dd(end($rewardsArray));
-        
+       
         // 0 BOOK READ: set manually since there is no lower level to get back to
         if ($totalReadBooks == 0) {
 
@@ -190,23 +183,19 @@ class KidController extends AbstractController
         // SET final value found: lower (C) value 
             // must be index [0] since a single value is expected
             $finalMinimumGap=$minimumGapValue[0];
-            // dd($finalMinimumGap);
 
         // GET intermediate Key (B): last goal Reach
             // back up to current amount book read to be at this level
             $lastTargetKeyArray= array_keys($gapArray,$finalMinimumGap);
             $lastGoalReached = $lastTargetKeyArray[0];
-            // dd($lastGoalReached);
 
         // GET initial Key (A): current level
 
             $lastlevelKeyArray = array_keys($rewardsArray, $lastGoalReached);
             $currentLevel = $lastlevelKeyArray[0];
-            // dd($currentLevel);
 
         // GET current level +1 : new level to reach
             $newLevel= $currentLevel+1;
-            // dd($newLevel);
 
         // Get new Goal : new amount of books to read
             $newGoal = $rewardsArray[$newLevel];
