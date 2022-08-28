@@ -69,7 +69,7 @@ class KidController extends AbstractController
             }
 
 
-        // *** GET REWARDIND LEVELS : from Avatars "is_win" Value      
+        // *** GET REWARDING LEVELS : from Avatars "is_win" Value      
 
         $avatarsObjects= $avatarRepository->findBy([],['is_win' => 'ASC']);
 
@@ -77,26 +77,28 @@ class KidController extends AbstractController
             // key = level (A)
             // value = number of read book to start the level (B)
 
-        $rewardsArray = [];
+        $rewardsArrayRaw = [];
 
             foreach($avatarsObjects as $avatar){
 
                 $isWinValue = $avatar->getIsWin();
 
-                $rewardsArray []= $isWinValue;
+                $rewardsArrayRaw []= $isWinValue;
 
             }
+       
+        // SET UNIQUE LEVELS (same value is_win may exists in database=> take them away)
 
-        // TODO Ne donner que des paliers unique en valeur 
-            // TODO     OU  revoir pour que le tableau RewardArray ne puisse pas avoir 2 valeurs identiques meme si présent dans is_win
-                // TODO : but pouvoir donné 2 récompenses à un enfant pour un meme total de livre lu sans cassé les pallier de récompenses
+        $rewardsArrayUnique = array_unique($rewardsArrayRaw);
+        $rewardsArray = array_values($rewardsArrayUnique);
+
         // dd($rewardsArray);
- 
+
         // *** GET READ BOOKS : "is_read" value "true" in BookKid
         
         $ReadBooks = $bookKidRepository->findAllByIsRead(true, $id_kid);
         $totalReadBooks = count($ReadBooks);
-        // $totalReadBooks = 45;
+        // $totalReadBooks = 46;
         // dd($totalReadBooks);
 
         //******* */ CHECK CURRENT LEVEL: ***********
