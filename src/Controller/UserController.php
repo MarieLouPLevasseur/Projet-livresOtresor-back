@@ -153,16 +153,15 @@ class UserController extends AbstractController
     UserRepository $userRepository, 
     SerializerInterface $serializer,
     RoleRepository $roleRepository,
-    UserPasswordHasherInterface $passwordHasher
+    UserPasswordHasherInterface $passwordHasher,
+    ValidatorInterface $validator
     ):Response
     
     {
         $user = $userRepository->find($id);
         $kidData = $request->getcontent();
-        $role = $roleRepository->findOneByRoleName("ROLE_KID");        
         $kidData = $serializer->deserialize($kidData, Kid::class, 'json');
-        $password = $passwordHasher->hashPassword($user, $user->getPassword());
-        $kidData ->setPassword($password);
+        $role = $roleRepository->findOneByRoleName("ROLE_KID");        
         $kidData->setRole($role);
         $kidData->setUser($user);
         $kidData->setProfileAvatar('https://bombyxplm.com/wp-content/uploads/2021/01/421-4213053_default-avatar-icon-hd-png-download.png');
@@ -176,7 +175,27 @@ class UserController extends AbstractController
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
-          
+
+        $errors = $validator->validate($kidData);
+
+        if (count($errors) > 0) {
+            /*
+            * Uses a __toString method on the $errors variable which is a
+            * ConstraintViolationList object. This gives us a nice string
+            * for debugging.
+            */
+            $errorsStringBook = (string) $errors;
+
+            $error = [
+                'error' => true,
+                'message' => $errorsStringBook
+            ];
+            return $this->json($error, Response::HTTP_BAD_REQUEST);
+        }
+
+        $password = $passwordHasher->hashPassword($kidData, $kidData->getPassword());
+        $kidData->setPassword($password);
+
         $em->persist($kidData);
         $em->flush();
         $this->addFlash('success', "L'enfant a bien été enregistré");
