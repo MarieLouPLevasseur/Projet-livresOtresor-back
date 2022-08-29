@@ -74,7 +74,6 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
                     $hashedPassword = $this->passwordHasher->hashPassword($kidObj, 'devinci');
                     $kidObj->setPassword($hashedPassword);
-                    // $kidObj->setPassword('devinci');
                     $kidObj->setRole($kidRole);
                     $kidObj->setProfileAvatar($kidProfil->getUrl());
 
@@ -86,6 +85,8 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
                 $manager->persist($kidObj);
                }
+
+            
  
         $manager->flush();
             

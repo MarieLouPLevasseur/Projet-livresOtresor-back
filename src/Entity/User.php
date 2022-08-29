@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @UniqueEntity(fields={"email"}, message="REND TON EMAIL UNIQUE")
+ * @UniqueEntity(fields={"email"}, message="email must be unique")
  * 
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -25,13 +25,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_list"})
+     * @Groups({"user_list", "userConnected"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_list"})
+     * @Groups({"user_list", "userConnected"})
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=3)( message = "Le prénom doit contenir au moins 3 caractères")
      */
@@ -39,7 +39,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_list"})
+     * @Groups({"user_list", "userConnected"})
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=2)( message = "Le prénom doit contenir au moins 2 caractères")
      */
@@ -48,7 +48,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_list"})
+     * @Groups({"user_list", "userConnected"})
      * @Assert\Email( message = "Cet email n'est pas valide")
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=5)( message = "L'email doit contenir au moins 5 caractères")
@@ -59,12 +59,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
-     * @Assert\Length(min=5, max=20)( message = "Le mot de passe doit contenir entre 5 et 20 caractères")
+     * @Assert\Length(min=5)( message = "Le mot de passe doit contenir au moins 5 caractères")
      */
     private $password;
 
     /**
      * @ORM\ManyToOne(targetEntity=Role::class, inversedBy="users")
+     * @Groups({"user_list", "userConnected"})
      */
     private $role;
 
@@ -78,7 +79,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->kid = new ArrayCollection();
-        $this->role = "ROLE_USER";
+        // $this->role = "ROLE_USER";
 
     }
 
@@ -138,6 +139,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRole() //: ?role
     {
         return $this->role;
+        // return "ROLE_USER";
     }
 
     public function setRole(?role $role): self
@@ -199,7 +201,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return [$this->role];
+        return [$this->role->getName()];
     }
 
     public function __toString()

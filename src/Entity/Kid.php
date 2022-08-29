@@ -23,16 +23,15 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish"})
+     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "userConnected"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "author_list"})
+     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "author_list", "userConnected"})
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=3)( message = "Le nom d'utilisateur doit contenir au moins 3 caractères")
-
      */
     private $username;
 
@@ -47,7 +46,7 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list","books_infos"})
+     * @Groups({"book_list","books_infos", "userConnected"})
      */
     private $profile_avatar;
 
@@ -63,6 +62,7 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=Role::class, inversedBy="kids")
+     * @Groups({"userConnected"})
      */
     private $role;
 
@@ -84,7 +84,7 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
         $this->diploma = new ArrayCollection();
         $this->avatar = new ArrayCollection();
         $this->bookKids = new ArrayCollection();
-        $this->role = "ROLE_KID";
+        // $this->role = "ROLE_KID";
     }
 
     public function getId(): ?int
@@ -251,7 +251,7 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return [$this->role];
+        return [$this->role->getName()];
     }
 
     /**

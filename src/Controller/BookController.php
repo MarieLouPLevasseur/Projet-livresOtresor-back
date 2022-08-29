@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
 
@@ -21,8 +22,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class BookController extends AbstractController
 {
     /**
-     * @Route("/books", name="book_
-     * list", methods="GET")
+     * @Route("/books", name="book_list", methods="GET")
+     * 
      * @return Response
      */
     public function list(BookRepository $bookRepository): Response
@@ -89,3 +90,5 @@ class BookController extends AbstractController
         return $this->json($responseData, $httpCode, $headers, $options);
     }
 }
+
+

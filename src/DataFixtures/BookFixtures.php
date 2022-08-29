@@ -29,8 +29,11 @@ class BookFixtures extends Fixture implements DependentFixtureInterface
         $faker = \Faker\Factory::create();
 
         // BOOKS
-            $nbBooks = 30;
+            $nbBooks = 130;
 
+            $allCategories= $manager->getRepository(Category::class)->findAll();
+            $allKids= $manager->getRepository(Kid::class)->findAll();
+          
 
             for ($i = 0; $i < $nbBooks; $i++) {
                 $bookObj = new Book();
@@ -39,41 +42,32 @@ class BookFixtures extends Fixture implements DependentFixtureInterface
                 $bookObj->setTitle("title #:".$i." ".$faker->text());
                 $bookObj->setDescription($faker->text());
                 $bookObj->setPublisher("Editeur #:".$i." ".$faker->sentence(5));
+                $bookObj->setCover("https://i.pinimg.com/564x/11/1b/59/111b5913903c2bfbe7f11487bb3f06f6.jpg");
 
-                // set author
-                $authorObj = new Author();
-                $authorObj->setName($faker->name());
-                $bookObj->addAuthor($authorObj);
-                $manager->persist($authorObj);           
-
-                $manager->persist($bookObj);
-            }
-            $manager->flush();
-
-
-        //BOOK_KIDS
-            $allCategories= $manager->getRepository(Category::class)->findAll();
-            $allKids= $manager->getRepository(Kid::class)->findAll();
-            $allBooks= $manager->getRepository(Book::class)->findAll();
-
-
-            $nbBooksKids = 35;
-
-                for ($i = 0; $i < $nbBooks; $i++) {
+                    // set author
+                    $authorObj = new Author();
+                    $authorObj->setName($faker->name());
+                    $bookObj->addAuthor($authorObj);
+                
+                
+                    // set Book_kids
                     $bookKidObj = new BookKid();
                     $bookKidObj->setIsRead(mt_rand(0,1));
                     $bookKidObj->setKid($faker->randomElement($allKids));
-                    $bookKidObj->setBook($faker->randomElement($allBooks));
+                    $bookObj->addBookKid($bookKidObj);
 
-                    $manager->persist($bookKidObj);
-                }
-            
+
+                $manager->persist($authorObj);     
+                $manager->persist($bookKidObj);
+                $manager->persist($bookObj);
+            }
+        
             $manager->flush();
-
+              
 
             // options of the kid
               $allBookKid= $manager->getRepository(BookKid::class)->findAll();
-                // dd($allBookKid);
+
                 for ($i=0; $i<20; $i++){
                     $randomBookKid = $faker->randomElement($allBookKid);
                     $randomBookKid->setComment($faker->text());
@@ -82,7 +76,62 @@ class BookFixtures extends Fixture implements DependentFixtureInterface
                     
                     $manager->persist($randomBookKid);
             }
+
             
+            //  FOR 3 kids : set many books for tests
+
+            $allBooks= $manager->getRepository(Book::class)->findAll();    
+
+                // 10 books read
+                $KidOne = $faker->randomElement($allKids);
+
+                for ($i = 0 ; $i<10; $i++){
+
+                    $bookKidObj = new BookKid();
+                    $bookKidObj->setIsRead(1);
+                    $bookKidObj->setKid($KidOne);
+                    $bookKidObj->setBook($faker->randomElement($allBooks));
+                    $bookKidObj->setComment($faker->text());
+                    $bookKidObj->setRating($faker->randomDigit(0,5));
+                    $bookKidObj->setCategory($faker->randomElement($allCategories));
+
+                    $manager->persist($bookKidObj);
+
+                }
+
+            // 20 books read
+                $KidTwo = $faker->randomElement($allKids);
+
+                for ($i = 0 ; $i<20; $i++){
+
+                    $bookKidObj = new BookKid();
+                    $bookKidObj->setIsRead(1);
+                    $bookKidObj->setKid($KidTwo);
+                    $bookKidObj->setBook($faker->randomElement($allBooks));
+                    $bookKidObj->setComment($faker->text());
+                    $bookKidObj->setRating($faker->randomDigit(0,5));
+                    $bookKidObj->setCategory($faker->randomElement($allCategories));
+
+                    $manager->persist($bookKidObj);
+
+            }
+
+            // 60 books read
+                $KidThree = $faker->randomElement($allKids);
+
+                for ($i = 0 ; $i<60; $i++){
+
+                    $bookKidObj = new BookKid();
+                    $bookKidObj->setIsRead(1);
+                    $bookKidObj->setKid($KidThree);
+                    $bookKidObj->setBook($faker->randomElement($allBooks));
+                    $bookKidObj->setComment($faker->text());
+                    $bookKidObj->setRating($faker->randomDigit(0,5));
+                    $bookKidObj->setCategory($faker->randomElement($allCategories));
+
+                    $manager->persist($bookKidObj);
+
+                }
 
 
         $manager->flush();

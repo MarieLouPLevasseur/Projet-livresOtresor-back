@@ -8,11 +8,13 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class AvatarController extends AbstractController
 {
     /**
      * @Route("/api/v1/avatars/{id}", name="api_avatars", requirements={"id_kid"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function show(
     int $id,
