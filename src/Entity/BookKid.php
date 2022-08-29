@@ -32,32 +32,25 @@ class BookKid
     /**
      * @ORM\Column(type="integer", nullable=true)
      * @Groups({"booksByCategory","book_list","books_infos", "books_read"})
-     * 
      */
     private $rating;
 
     /**
      * @ORM\Column(type="boolean")
      * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish"})
-     * @Assert\Type(
-     *     type="boolean",
-     *     message="The value passed is not a valid type. Boolean expected."
-     * )
-     * 
+     * @Assert\Type(type="boolean",message="The value passed is not a valid type. Boolean expected.")
      */
     private $is_read;
 
     /**
      * @ORM\ManyToOne(targetEntity=Kid::class, inversedBy="bookKids")
-
      * @Groups({"books_read", "books_wish", "author_books"})
-
      */
     private $kid;
 
     /**
      * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids", cascade={"persist"})
-     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish"})
+     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish", "author_list"})
      * @Assert\Valid
      */
     private $book;
@@ -70,7 +63,6 @@ class BookKid
 
     /**
      * @ORM\Column(type="datetime")
-     * 
      */
     private $updated_at;
 
@@ -92,7 +84,6 @@ class BookKid
     public function setComment(?string $comment): self
     {
         $this->comment = $comment;
-
         return $this;
     }
 
@@ -104,7 +95,6 @@ class BookKid
     public function setRating(?int $rating): self
     {
         $this->rating = $rating;
-
         return $this;
     }
 
@@ -116,7 +106,6 @@ class BookKid
     public function setIsRead(bool $is_read): self
     {
         $this->is_read = $is_read;
-
         return $this;
     }
 
@@ -140,7 +129,6 @@ class BookKid
     public function setBook(?book $book): self
     {
         $this->book = $book;
-
         return $this;
     }
 
@@ -152,7 +140,6 @@ class BookKid
     public function setCategory(?Category $category): self
     {
         $this->category = $category;
-
         return $this;
     }
 
@@ -164,7 +151,6 @@ class BookKid
     public function setUpdatedAt(\DateTimeInterface $updated_at): self
     {
         $this->updated_at = $updated_at;
-
         return $this;
     }
 }

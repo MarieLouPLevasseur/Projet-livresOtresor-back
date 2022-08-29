@@ -2,11 +2,7 @@
 
 namespace App\Controller;
 
-
-use App\Entity\Author;
-use App\Entity\Book;
 use App\Entity\BookKid;
-
 use App\Repository\AuthorRepository;
 use App\Repository\KidRepository;
 use App\Repository\BookRepository;
@@ -14,23 +10,15 @@ use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
 use App\Repository\DiplomaRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
-
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
-use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Kid class
@@ -39,7 +27,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class KidController extends AbstractController
 {
     /**
-     * Show element for progress bar:
+     * Show element for progress bar
      *
      * @Route("/{id_kid}/books/progress_bar", name="progress_bar", methods="GET")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
@@ -47,12 +35,10 @@ class KidController extends AbstractController
     public function progressBar( 
         int $id_kid,
         BookKidRepository $bookKidRepository,
-        SerializerInterface $serializer,
         AvatarRepository $avatarRepository,
         KidRepository $kidRepository
         ): Response
     {
-
 
         // *** CHECK if KID EXISTS ******
 
@@ -68,7 +54,6 @@ class KidController extends AbstractController
 
                 return $this->json($error, Response::HTTP_NOT_FOUND); 
             }
-
 
         // *** GET REWARDING LEVELS : from Avatars "is_win" Value      
 
@@ -212,6 +197,8 @@ class KidController extends AbstractController
 
                     $isNewLevel = true;
                 }
+            
+            $completion = (($finalMinimumGap/($finalMinimumGap+$nbBookToWinLevel))*100);
         
 
             $data = ["lastGoalReached"        => $lastGoalReached , 
@@ -221,42 +208,39 @@ class KidController extends AbstractController
                      "bookReadOnCurrentLevel" => $finalMinimumGap,
                      "bookToReadToNewLevel"   => $nbBookToWinLevel,
                      "isNewLevel"             => $isNewLevel,
-                     "totalBooksReadByKids"   => $totalReadBooks
-    ];
+                     "totalBooksReadByKids"   => $totalReadBooks,
+                     "completion"             => $completion
+            ];
 
         return $this->json($data, 200);
 
     }
 
      /**
-     * Show all books of a category for a kid
+     * List all books of a category for a kid
+     * 
      * @Route("/{id_kid}/category/{id_cat}/books", name="show_category_books", methods="GET", requirements={"id_kid"="\d+"}, requirements={"id_cat"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function showBooksbyCategory(
+    public function listBooksbyCategory(
         int $id_kid,
         int $id_cat,
         BookKidRepository $bookKidRepository,
         SerializerInterface $serializer
-       )//: Response
+       )
     {
-
-        // $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
         $allBooksByCategory = $bookKidRepository->findAllByKidAndCategory($id_kid, $id_cat);
 
-        // $normalizer = new ObjectNormalizer($classMetadataFactory);
-        // $serializer = new Serializer([$normalizer]);
-
-       
         $jsonBooksCategoryList = $serializer->serialize($allBooksByCategory, 'json',['groups' => 'booksByCategory']);
-
 
         return new JsonResponse($jsonBooksCategoryList, Response::HTTP_OK, [],true);
     }
 
+
     /**
      * Show all avatars of a kid
+     * 
      * @Route("/{id_kid}/avatars", name="show_avatars", methods="GET", requirements={"id_kid"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
@@ -269,8 +253,6 @@ class KidController extends AbstractController
        ): Response
     {
         $currentKid = $kidRepository->find($id_kid);
-
-
 
         if ($currentKid === null )
         {
@@ -305,6 +287,7 @@ class KidController extends AbstractController
 
      /**
      * Show all diplomas of a kid
+     * 
      * @Route("/{id_kid}/diplomas", name="show_diplomas", methods="GET", requirements={"id_kid"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
@@ -353,8 +336,9 @@ class KidController extends AbstractController
     }
 
 
-
     /**
+     * Show details for a book
+     * 
      * @Route("/{id_kid}/books/{id_book}", name="show_book_details", methods="GET", requirements={"id_kid"="\d+"}, requirements={"id_book"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
@@ -367,8 +351,6 @@ class KidController extends AbstractController
         BookRepository $bookRepository,
         SerializerInterface $serializer
         ): Response
-
-        
     {
 
         $currentkid = $kidRepository->find($id_kid);
@@ -417,8 +399,9 @@ class KidController extends AbstractController
 
         /*************************Routes coded using the prepare response method*******************************************************************/
 
-
      /**
+     * Create a book
+     * 
      * @Route("/{id_kid}/books", name="create_book", methods="POST", requirements={"id_kid"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
@@ -433,10 +416,8 @@ class KidController extends AbstractController
             BookRepository $bookRepository,
             KidRepository $kidRepository,
             BookKidRepository $bookKidRepository
+    )  
 
-    )
-    
-    
     {
         // ********  DATAS ************
 
@@ -483,8 +464,7 @@ class KidController extends AbstractController
                     }
                 }      
             }
-                    
-
+                
 
         // ********  CHECK if ISBN exists ************
 
@@ -539,17 +519,14 @@ class KidController extends AbstractController
             );
     }
 
-    
-
-
-
-      /**
+     /**
+     * List all books for a kid
+     * 
      * @Route("/{id_kid}/books", name="show_book_list", methods="GET", requirements={"id"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
-    public function showBookOfOneKid( int $id_kid, KidRepository $kidRepository, BookRepository $bookRepository): Response
-
+    public function listAllBookOfOneKid( int $id_kid, KidRepository $kidRepository, BookRepository $bookRepository): Response
     {
         $kid = $kidRepository->find($id_kid);
 
@@ -565,8 +542,6 @@ class KidController extends AbstractController
 
         $bookKid = $kid->getBookKids();
 
-        //$jsonBooksKidList = $serializer->serialize($bookskids, 'json',['groups' => 'booksKid']);
-
         return $this->prepareResponse(
             'OK',
             ['groups' => 'books_infos'],
@@ -576,12 +551,14 @@ class KidController extends AbstractController
 
 
     /**
+     * List all books read for a kid
+     * 
      * @Route("/{id_kid}/books/read", name="show_books_read", methods="GET", requirements={"id"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
-
-    public function showBookRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository){
+    public function listBookRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository)
+    {
 
         $currentKid = $kidRepository->find($id_kid);
 
@@ -602,19 +579,18 @@ class KidController extends AbstractController
                 ['groups' => 'books_read'],
                 ['data' => $currentReadbooks ]
             );
-        }
+    }
 
-
-
-    
 
     /**
+     * List all books wished for a kid
+     * 
      * @Route("/{id_kid}/books/wish", name="show_book_wish_list", methods="GET", requirements={"id"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
-
-    public function WishToRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository){
+    public function listBookWishToRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository)
+    {
 
         $currentKid = $kidRepository->find($id_kid);
 
@@ -635,49 +611,55 @@ class KidController extends AbstractController
                 ['groups' => 'books_wish'],
                 ['data' => $currentBooksWish ]
             );
-        }
-
-
+    }
 
      /**
+     * List all authors names
+     * 
      * @Route("/{id_kid}/books/authors", name="show_author_list", methods="GET", requirements={"id"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
-
-    public function authorList(int $id_kid, kidRepository $kidRepository, AuthorRepository $authors): Response
+    public function listAuthors(int $id_kid, kidRepository $kidRepository, AuthorRepository $authors, SerializerInterface $serializer): Response
     {
         $kid = $kidRepository->find($id_kid);
-        $bookKid = $kid->getBookKids();
-
-
+        $allBookKid = $kid->getBookKids();
 
         if ($kid === null )
         {
-
             $error = [
                 'error' => true,
                 'message' => 'No kid found for Id [' . $id_kid . ']'
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
+ 
+        $allBooks = [];
+        foreach ($allBookKid as $bookKid){
 
-        
-        return $this->prepareResponse(
-            'OK',
-            ['groups' => 'author_list'],
-            ['data' => $bookKid]
-        );
+            $book = $bookKid->getBook();
+            $allBooks [] = $book;
+        }
+
+        $allAuthors = [];
+        foreach($allBooks as $currentBook){
+            $author = $currentBook->getAuthors();
+            $allAuthors []= $author;
+        }
+
+        $jsonBookKid = $serializer->serialize($allAuthors, 'json',['groups' => 'author_list'] );
+        return new JsonResponse($jsonBookKid, Response::HTTP_OK, [],true);
     }
 
 
      /**
-     * @Route("/{id_kid}/books/authors/{author_id}", name="show_books_of_one_author", methods="GET")
+     * List all books of an author for a kid
+     * 
+     * @Route("/{id_kid}/books/authors/{author_id}", name="show_books_of_one_author", methods="GET", requirements={"id_kid"="\d+", "author_id"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
-
-    public function authorBookList(
+    public function listAllBooksbyAuthor(
         int $id_kid,
         int $author_id,
         kidRepository $kidRepository,
@@ -690,9 +672,7 @@ class KidController extends AbstractController
         $kid = $kidRepository->find($id_kid);
         $authors = $authorsRepository->find($author_id);
 
-        $book_id = $bookRepository->findAll();
-
-   
+        $book_id = $bookRepository->findAll();   
 
         $booksAuthors = $authors->getBook();
 
@@ -704,7 +684,6 @@ class KidController extends AbstractController
             $bookkidArray [] = $bookkid;
         }
 
-
         if ($kid === null )
         {
 
@@ -714,16 +693,12 @@ class KidController extends AbstractController
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
-
-
         
         return $this->prepareResponse(
             'OK',  
             ['groups' => 'books_infos'],
             ['data' => $bookkidArray]
-        );
-
-        
+        ); 
     }
 
    

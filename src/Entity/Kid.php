@@ -83,7 +83,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
         $this->diploma = new ArrayCollection();
         $this->avatar = new ArrayCollection();
         $this->bookKids = new ArrayCollection();
-        // $this->role = "ROLE_KID";
     }
 
     public function getId(): ?int
@@ -99,7 +98,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUsername(string $username): self
     {
         $this->username = $username;
-
         return $this;
     }
 
@@ -111,7 +109,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): self
     {
         $this->password = $password;
-
         return $this;
     }
 
@@ -123,7 +120,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     public function setProfileAvatar(string $profile_avatar): self
     {
         $this->profile_avatar = $profile_avatar;
-
         return $this;
     }
 
@@ -140,14 +136,12 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
         if (!$this->diploma->contains($diploma)) {
             $this->diploma[] = $diploma;
         }
-
         return $this;
     }
 
     public function removeDiploma(diploma $diploma): self
     {
         $this->diploma->removeElement($diploma);
-
         return $this;
     }
 
@@ -164,14 +158,12 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
         if (!$this->avatar->contains($avatar)) {
             $this->avatar[] = $avatar;
         }
-
         return $this;
     }
 
     public function removeAvatar(avatar $avatar): self
     {
         $this->avatar->removeElement($avatar);
-
         return $this;
     }
 
@@ -183,7 +175,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRole(?role $role): self
     {
         $this->role = $role;
-
         return $this;
     }
 
@@ -195,7 +186,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUser(?User $user): self
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -213,7 +203,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
             $this->bookKids[] = $bookKid;
             $bookKid->setKid($this);
         }
-
         return $this;
     }
 
@@ -225,13 +214,12 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
                 $bookKid->setKid(null);
             }
         }
-
         return $this;
     }
+
     /**
      * Returning a salt is only needed, if you are not using a modern
      * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
-     *
      * @see UserInterface
      */
     public function getSalt(): ?string
@@ -255,7 +243,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * A visual identifier that represents this user.
-     *
      * @see UserInterface
      */
     public function getUserIdentifier(): string

@@ -39,6 +39,11 @@ class DiplomaRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * Find a diploma by is_Win Value
+     * @param int $value is_win value
+     * @return  mixed
+     */
     public function findAllByIsWinValue($value)
    {
        return $this->createQueryBuilder('d')
@@ -48,29 +53,4 @@ class DiplomaRepository extends ServiceEntityRepository
            ->getResult()
        ;
    }
-
-//    /**
-//     * @return Diploma[] Returns an array of Diploma objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('d.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Diploma
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }
