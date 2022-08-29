@@ -31,7 +31,7 @@ class BookKid
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"booksByCategory","book_list","books_infos", "books_read"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "last_book_read"})
      */
     private $rating;
 
@@ -50,7 +50,7 @@ class BookKid
 
     /**
      * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids", cascade={"persist"})
-     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish", "author_list"})
+     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish", "author_list","last_book_read"})
      * @Assert\Valid
      */
     private $book;
@@ -63,6 +63,7 @@ class BookKid
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"last_book_read"})
      */
     private $updated_at;
 
@@ -143,9 +144,12 @@ class BookKid
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    // public function getUpdatedAt():  ?\DateTimeInterface
+    public function getUpdatedAt(): ?string
     {
-        return $this->updated_at;
+        // return $this->updated_at;
+        return $this->updated_at->format('Y-m-d H:i:s');
+
     }
 
     public function setUpdatedAt(\DateTimeInterface $updated_at): self
