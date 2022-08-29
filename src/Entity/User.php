@@ -10,7 +10,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
-
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -70,7 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $role;
 
     /**
-     * @ORM\OneToMany(targetEntity=Kid::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Kid::class, mappedBy="user", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="kid_id", referencedColumnName="id", nullable=false)
      * @Groups({"userkids_list"})
      */

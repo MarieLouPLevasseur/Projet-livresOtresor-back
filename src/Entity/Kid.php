@@ -10,12 +10,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-
-
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=KidRepository::class)
+ * @UniqueEntity(fields={"username"}, message="Ce nom d'utilisateur est déjà utilisé")
  */
+
 class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
@@ -28,13 +29,14 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "userConnected"})
+     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "author_list", "userConnected"})
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=3)( message = "Le nom d'utilisateur doit contenir au moins 3 caractères")
      */
     private $username;
 
     /**
+     * 
      * @ORM\Column(type="string", length=255)
      * @Groups({"userkids_list"})
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
@@ -70,7 +72,7 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     private $user;
 
     /**
-     * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="kid", fetch="EAGER")
+     * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="kid", fetch="EAGER", cascade={"persist", "remove"})
      * @Groups({"book_list"})
      */
     private $bookKids;

@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Avatar;
 use App\Entity\Kid;
 use App\Entity\User;
+use App\Repository\AvatarRepository;
 use App\Repository\KidRepository;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
@@ -17,7 +19,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\VarDumper\Cloner\Data;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
 /**
@@ -25,6 +29,13 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 class UserController extends AbstractController
 {
+    private $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->passwordHasher = $passwordHasher;
+    }
+
 
     private $passwordHasher;
 
@@ -150,6 +161,7 @@ class UserController extends AbstractController
      * @return Response
      */
     public function createKid( int $id, 
+
         EntityManagerInterface $em, 
         Request $request, 
         UserRepository $userRepository, 
@@ -158,6 +170,7 @@ class UserController extends AbstractController
         UserPasswordHasherInterface $passwordHasher,
         ValidatorInterface $validator
         ):Response
+
     
     {
         $user = $userRepository->find($id);
@@ -166,8 +179,11 @@ class UserController extends AbstractController
         $role = $roleRepository->findOneByRoleName("ROLE_KID");        
         $kidData->setRole($role);
         $kidData->setUser($user);
-        $kidData->setProfileAvatar('https://bombyxplm.com/wp-content/uploads/2021/01/421-4213053_default-avatar-icon-hd-png-download.png');
-    
+
+        $avatar = $avatarRepository->findOneByIsWinValue(0);
+        //dd($avatar);
+        $kidData->setProfileAvatar($avatar->getUrl()); 
+       
         if ($user === null )
         {
             $error = [
@@ -199,9 +215,9 @@ class UserController extends AbstractController
 
         $em->persist($kidData);
         $em->flush();
-        $this->addFlash('success', "L'enfant a bien été enregistré");
 
-        return new Response("L'enfant a bien été enregistré");
+        return $this->json("L'enfant a bien été enregistré", Response::HTTP_OK);        
+
     }
 
 
@@ -224,7 +240,11 @@ class UserController extends AbstractController
         )
     {
         $user = $userRepository->find($id);
-      
+
+        $data = $request->getContent();
+        $password = $passwordHasher->hashPassword($user, $user->getPassword());
+        $data->setPassword($password);
+
         if ($user === null )
         {
             $error = [
@@ -313,10 +333,32 @@ class UserController extends AbstractController
             $user->setPassword($dataUser->getPassword());
         }
 
-        $em->persist($user);
         $em->flush();
-        return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
 
+        return $this->prepareResponse('Mis à jour avec succès', [], [], false, Response::HTTP_OK );
+    }
+
+     /**
+     * @Route("/users/delete/{id<\d+>}", name="delete_user", methods="DELETE")
+     * @return Response
+     */
+    public function delete(int $id, EntityManagerInterface $em, UserRepository $userRepository) :Response
+    {
+
+       $user = $userRepository->find($id);
+        if ($user === null )
+        {
+            $error = [
+                'error' => true,
+                'message' => 'No user found for Id [' . $id . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        $em->remove($user);
+        $em->flush();
+
+        return $this->prepareResponse("L'utilisateur supprimé avec succès");
     }
 
 
