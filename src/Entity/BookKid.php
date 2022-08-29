@@ -148,7 +148,7 @@ class BookKid
     public function getUpdatedAt(): ?string
     {
         // return $this->updated_at;
-        return $this->updated_at->format('Y-m-d H:i:s');
+        return $this->updated_at->format('d/m/Y');
 
     }
 
