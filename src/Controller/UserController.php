@@ -34,7 +34,7 @@ class UserController extends AbstractController
     /**
      * Add a user (registration)
      *
-     * @Route("/users", name="create", methods="POST")
+     * @Route("/registration", name="create", methods="POST")
      */
     public function addUser( 
         Request $request,
