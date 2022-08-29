@@ -541,6 +541,7 @@ class KidController extends AbstractController
       /**
      * @Route("/{id_kid}/books", name="show_book_list", methods="GET", requirements={"id"="\d+"})
      * @return Response
+     * esponse
      */
     public function showBookOfOneKid( int $id_kid, KidRepository $kidRepository, BookRepository $bookRepository): Response
 
