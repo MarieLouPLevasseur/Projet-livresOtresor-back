@@ -2,30 +2,23 @@
 
 namespace App\Controller;
 
-use App\Repository\BookKidRepository;
 use App\Repository\BookRepository;
-use App\Repository\KidRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-
-
 
 /**
- * Undocumented class
+ * List all books
+ * 
  *  @Route("/api/v1", name="api_book")
  */
 class BookController extends AbstractController
 {
     /**
-     * @Route("/books", name="book_
-     * list", methods="GET")
+     * @Route("/books", name="book_list", methods="GET")
      * @return Response
      */
-    public function list(BookRepository $bookRepository): Response
+    public function listAllBooks(BookRepository $bookRepository): Response
     {
 
         $books = $bookRepository->findAll();
@@ -36,37 +29,6 @@ class BookController extends AbstractController
             ['data' => $books]
         );
     }
-
-
-    /**
-     * @Route("/kid/{id_kid}/book/wish", name="show", methods="GET", requirements={"id"="\d+"})
-     * @return Response
-     */
-
-    public function WishToRead(int $id_kid, kidRepository $kidRepository, BookKidRepository $bookKidRepository){
-
-        $currentKid = $kidRepository->find($id_kid);
-    
-        if ($currentKid === null )
-            {
-                
-                $error = [
-                    'error' => true,
-                    'message' => 'No kid found for Id [' . $id_kid . ']'
-                ];
-                return $this->json($error, Response::HTTP_NOT_FOUND);
-            }
-        
-            $currentBooksWish = $bookKidRepository->findAllByIsRead(false, $id_kid);
-    
-            return $this->prepareResponse(
-                'OK',
-                ['groups' => 'books_wish'],
-                ['data' => $currentBooksWish ]
-            );
-        }
-
-
 
     private function prepareResponse(
         string $message, 
@@ -89,3 +51,5 @@ class BookController extends AbstractController
         return $this->json($responseData, $httpCode, $headers, $options);
     }
 }
+
+

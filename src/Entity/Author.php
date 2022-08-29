@@ -30,9 +30,6 @@ class Author
      * @Groups({"book_list","booksByCategory","books_infos", "books_read", "books_wish", "author_list"})
      * @Assert\NotNull
      * @Assert\NotBlank
-     * 
-     * 
-
      */
     private $name;
 
@@ -41,17 +38,10 @@ class Author
      */
     private $book;
 
-    
-
     public function __construct()
     {
         $this->book = new ArrayCollection();
     }
-
-    //  public function __toString()
-    // {
-    //     return $this->getName() ;
-    // }
 
     public function getId(): ?int
     {

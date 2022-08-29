@@ -51,5 +51,42 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # - { path: ^/admin, roles: ROLE_USER }
+        - { path: ^/api/v1/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/registration, roles: PUBLIC_ACCESS }
+
+        - { path: ^/api/v1, roles: IS_AUTHENTICATED_FULLY }
+
+        # public : /api/v1/users
+
+        # IS_AUTHENTICATED_FULLY:
+            #  /api/v1/categories
+            # /api/v1/kids/{id}/books
+            # /api/v1/kids/{id}/books/read
+            # /api/v1/kids/{id}/books/wish
+            # /api/v1/kids/{id}/category/{id}/books
+            # /api/v1/kids/{id}/avatars
+            # /api/v1/kids/{id}/diplomas
+            # /api/v1/kids/{id}/books CREATE
+            # /api/v1/kids/{id}/books/progress_bar
+            # /api/v1/kids/{id}/books/{id} GET
+            # /api/v1/kids/{id}/books/last_read --> pas encore fait
+            # /api/v1/avatars/{id}
+            # /api/v1/diplomas/{id}
+            # /api/v1/kids/{id}/bookkids/{id} DELETE --> pas encore fait
+            # /api/v1/kids/{id}/bookkids/{id} PATCH  --> pas encore fait
+
+        # user : 
+            
+            # /api/v1/users/{id} GET
+            # /api/v1/users/{id} UPDATE 
+            # /api/v1/users/{id} DELETE --> pas encore fait
+            # /api/v1/users/{id}/kids GET
+            # /api/v1/users/{id}/kids CREATE
+            
+            # /api/v1/users/{id}/kids/{id} UPDATE --> pas encore fait 
+            # /api/v1/users/{id}/kids/{id} DELETE --> pas encore fait
+
+    role_hierarchy:
+        ROLE_USER: ROLE_USER
+        ROLE_KID: ROLE_KID

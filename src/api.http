@@ -38,5 +38,9 @@ GET  http://localhost:8000/api/v1/kids/121/books/authors/91
 POST http://localhost:8000/api/v1/users/121/kids
 
 ###update user by id
-PATCH http://localhost:8000/api/v1/users/121
+
+PATCH http://localhost:8000/api/v1/users/122
+
+### delete user 
+DELETE http://localhost:8000/api/v1/users/122
 

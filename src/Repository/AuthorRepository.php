@@ -40,9 +40,10 @@ class AuthorRepository extends ServiceEntityRepository
     }
 
 
-    
-
     /**
+    * Find an Author by name
+    * 
+    * @param array $author_name 
     * @return Author[] Returns an array of Author objects
     */
    public function findAuthorByName($author_name): array
@@ -57,16 +58,17 @@ class AuthorRepository extends ServiceEntityRepository
     
 
     /** 
+    *Find Book_Kid by Kid and Book
     *
     * @param int $book_id
     * @param int $author_id
-    * 
+    * @return mixed
     */
     public function findOneByKidandBook($kid_id, $book_id)
     {
              $entityManager = $this->getEntityManager();
              $query = $entityManager->createQuery(
-                 // ! les alias sont obligatoire ici
+
                 'SELECT bk, 
                  FROM App\Entity\BookKid bk
                  JOIN bk.kid k
@@ -74,37 +76,10 @@ class AuthorRepository extends ServiceEntityRepository
                  JOIN bk.author a
                  WHERE k.id = :kid_id AND b.id = :book_id'
              )
-             // ->setParameter('kid_id', $kid_id, 'category_id', $category_id);
+
              ->setParameters(array('kid_id'=> $kid_id, 'book_id' => $book_id));
  
-             // returns an array of Product objects
              return $query->getResult();
  
     }
-
-
-//    /**
-//     * @return Author[] Returns an array of Author objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Author
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

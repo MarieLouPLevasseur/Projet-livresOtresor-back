@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Kid;
 use App\Entity\User;
+use App\Repository\AvatarRepository;
 use App\Repository\KidRepository;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
@@ -14,22 +15,15 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-
-
-
-
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
 /**
- * Undocumented class
  *  @Route("/api/v1", name="api_user")
  */
 class UserController extends AbstractController
 {
-
     private $passwordHasher;
 
     public function __construct(UserPasswordHasherInterface $passwordHasher)
@@ -37,12 +31,10 @@ class UserController extends AbstractController
         $this->passwordHasher = $passwordHasher;
     }
 
-
     /**
      * Add a user (registration)
      *
-     * @Route("/users", name="create", methods="POST")
-     * 
+     * @Route("/registration", name="create", methods="POST")
      */
     public function addUser( 
         Request $request,
@@ -62,7 +54,6 @@ class UserController extends AbstractController
         $errors = $validator->validate($user);
 
 
-
         if (count($errors) > 0) {
             /*
             * Uses a __toString method on the $errors variable which is a
@@ -77,7 +68,6 @@ class UserController extends AbstractController
             ];
             return $this->json($error, Response::HTTP_BAD_REQUEST);
         }
-
 
             $role = $roleRepository->findOneByRoleName("ROLE_USER");
             $user->setRole($role);
@@ -94,26 +84,14 @@ class UserController extends AbstractController
                 'message' => "L'utilisateur a bien été enregistré"
             ];
             return $this->json($error, 201);
-
-       
     }
 
-    /**
-     * list all users
-     *
-     * @Route("/users", name="list", methods="GET")
-     * @return Response
-     */
-    public function list(UserRepository $userRepository): Response
-    {
-
-        $users = $userRepository->findAll();
-        
-        return $this->json($users, 200, [], ['groups' => 'user_list']);
-    }
 
     /**
+     * Show datas of a user
+     * 
      * @Route("/users/{id}", name="show", methods="GET", requirements={"id"="\d+"})
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function show(int $id, UserRepository $userRepository) :Response
@@ -134,13 +112,15 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_list']);
     }
 
+
     /**
-     * list all kids by user
+     * List all kids by user
      *
      * @Route("/users/{id}/kids", name="listkids", methods="GET", requirements={"id"="\d+"})
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
-    public function listkids( int $id, UserRepository $userRepository, KidRepository $kidRepository): Response
+    public function listKids( int $id, UserRepository $userRepository, KidRepository $kidRepository): Response
     {
         $user = $userRepository->find($id);
 
@@ -158,19 +138,26 @@ class UserController extends AbstractController
         return $this->json($listKid, 200, [], ['groups' => 'userkids_list']);
     }
 
+
     /** 
+     * Create a Kid
+     * 
      * @Route("/users/{id}/kids", name="create_kid", methods="POST", requirements={"id"="\d+"})
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function createKid( int $id, 
-    EntityManagerInterface $em, 
-    Request $request, 
-    UserRepository $userRepository, 
-    SerializerInterface $serializer,
-    RoleRepository $roleRepository,
-    UserPasswordHasherInterface $passwordHasher,
-    ValidatorInterface $validator
-    ):Response
+
+        EntityManagerInterface $em, 
+        Request $request, 
+        UserRepository $userRepository, 
+        SerializerInterface $serializer,
+        RoleRepository $roleRepository,
+        UserPasswordHasherInterface $passwordHasher,
+        ValidatorInterface $validator,
+        AvatarRepository $avatarRepository
+        ):Response
+
     
     {
         $user = $userRepository->find($id);
@@ -179,9 +166,10 @@ class UserController extends AbstractController
         $role = $roleRepository->findOneByRoleName("ROLE_KID");        
         $kidData->setRole($role);
         $kidData->setUser($user);
-        $kidData->setProfileAvatar('https://bombyxplm.com/wp-content/uploads/2021/01/421-4213053_default-avatar-icon-hd-png-download.png');
-    
 
+        $avatar = $avatarRepository->findOneByIsWinValue(0);
+        $kidData->setProfileAvatar($avatar->getUrl()); 
+       
         if ($user === null )
         {
             $error = [
@@ -194,11 +182,7 @@ class UserController extends AbstractController
         $errors = $validator->validate($kidData);
 
         if (count($errors) > 0) {
-            /*
-            * Uses a __toString method on the $errors variable which is a
-            * ConstraintViolationList object. This gives us a nice string
-            * for debugging.
-            */
+          
             $errorsStringBook = (string) $errors;
 
             $error = [
@@ -213,14 +197,17 @@ class UserController extends AbstractController
 
         $em->persist($kidData);
         $em->flush();
-        $this->addFlash('success', "L'enfant a bien été enregistré");
 
-        return new Response("L'enfant a bien été enregistré");
-        
+        return $this->json("L'enfant a bien été enregistré", Response::HTTP_OK);        
 
     }
+
+
      /** 
-     * @Route("/users/{id<\d+>}", name="update_user", methods="PATCH")
+     * Update a user
+     * 
+     * @Route("/users/{id}", name="update_user", methods="PATCH", requirements={"id"="\d+"})
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
 
@@ -231,12 +218,11 @@ class UserController extends AbstractController
         Request $request, 
         SerializerInterface $serializer,
         ValidatorInterface $validator,
-        RoleRepository $roleRepository,
         UserPasswordHasherInterface $passwordHasher
         )
     {
         $user = $userRepository->find($id);
-      
+
         if ($user === null )
         {
             $error = [
@@ -248,22 +234,12 @@ class UserController extends AbstractController
 
         $data = $request->getContent();
         $dataUser = $serializer->deserialize($data, User::class, 'json');
-     
-       
-   
-        //$errors = $validator->validate($dataUser);
-        // if (count($errors) > 0) {
-        // $errorsString = (string) $errors;
-        // }
-        
+
+
         if($dataUser->getEmail() == !null){
             $errors = $validator->validatePropertyValue($dataUser, 'email', $dataUser->getEmail());
             if ((count($errors) > 0) ){
-                /*
-                * Uses a __toString method on the $errors variable which is a
-                * ConstraintViolationList object. This gives us a nice string
-                * for debugging.
-                */
+               
                 $errorsString = (string) $errors;
                 $error = [
                     'error' => true,
@@ -278,11 +254,7 @@ class UserController extends AbstractController
         if($dataUser->getFirstname()!== null){
             $errors = $validator->validatePropertyValue($dataUser, 'firstname', $dataUser->getFirstname());
             if ((count($errors) > 0) ){
-                /*
-                * Uses a __toString method on the $errors variable which is a
-                * ConstraintViolationList object. This gives us a nice string
-                * for debugging.
-                */
+               
                 $errorsString = (string) $errors;
                 $error = [
                     'error' => true,
@@ -297,11 +269,7 @@ class UserController extends AbstractController
         if ($dataUser->getLastname()!== null) {
             $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
             if ((count($errors) > 0)) {
-                /*
-                * Uses a __toString method on the $errors variable which is a
-                * ConstraintViolationList object. This gives us a nice string
-                * for debugging.
-                */
+               
                 $errorsString = (string) $errors;
                 $error = [
                     'error' => true,
@@ -315,11 +283,7 @@ class UserController extends AbstractController
         if ($dataUser->getLastname()!== null) {
             $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
             if ((count($errors) > 0)) {
-                /*
-                * Uses a __toString method on the $errors variable which is a
-                * ConstraintViolationList object. This gives us a nice string
-                * for debugging.
-                */
+
                 $errorsString = (string) $errors;
                 $error = [
                     'error' => true,
@@ -333,11 +297,7 @@ class UserController extends AbstractController
         if ($dataUser->getPassword()!== null) {
             $errors = $validator->validatePropertyValue($dataUser, 'password', $dataUser->getPassword());
             if ((count($errors) > 0)) {
-                /*
-                * Uses a __toString method on the $errors variable which is a
-                * ConstraintViolationList object. This gives us a nice string
-                * for debugging.
-                */
+ 
                 $errorsString = (string) $errors;
                 $error = [
                     'error' => true,
@@ -352,12 +312,45 @@ class UserController extends AbstractController
             $user->setPassword($dataUser->getPassword());
         }
 
-        //dd($user);
         $em->persist($user);
         $em->flush();
         return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
     }
 
+     /**
+     * @Route("/users/delete/{id<\d+>}", name="delete_user", methods="DELETE")
+     * @return Response
+     */
+    public function delete(int $id, EntityManagerInterface $em, UserRepository $userRepository) :Response
+    {
+
+       $user = $userRepository->find($id);
+        if ($user === null )
+        {
+            $error = [
+                'error' => true,
+                'message' => 'No user found for Id [' . $id . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        $em->remove($user);
+        $em->flush();
+
+        return $this->prepareResponse("L'utilisateur supprimé avec succès");
+    }
+
+
+    /**
+     * Manage Error message
+     * @param string $message  Message to return
+     * @param array  $options  
+     * @param array  $data     List of object concern    
+     * @param bool   $isError  If there is error or not
+     * @param int    $httpCode The response status code
+     * @param array  $headers  An array of reponse headers
+     * 
+     */
     private function prepareResponse(
         string $message, 
         array $options = [], 

@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
-use App\Entity\BookKid;
 use App\Repository\CategoryRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * Categories class
@@ -17,11 +17,13 @@ use Symfony\Component\Serializer\SerializerInterface;
 class CategoryController extends AbstractController
 {
     /**
-     * List all category
+     * List all categories
+     * 
      * @Route("", name="categorylist", methods="GET")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
-    public function categoryName(CategoryRepository $categoryRepository, SerializerInterface $serializer): Response
+    public function listAllCategories(CategoryRepository $categoryRepository, SerializerInterface $serializer): Response
     {
         $categoryList = $categoryRepository->findall();
         $jsonCategoryList = $serializer->serialize($categoryList, 'json',['groups' => 'category']);

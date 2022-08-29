@@ -67,7 +67,6 @@ class Avatar
     public function setIsWin(int $is_win): self
     {
         $this->is_win = $is_win;
-
         return $this;
     }
 
