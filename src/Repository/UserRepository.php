@@ -39,6 +39,31 @@ class UserRepository extends ServiceEntityRepository
         }
     }
 
+
+    /**
+     * @param [type] $user_id
+     * @param [type] $kid_id
+     * @param [type] $bookKid_id
+     */
+    public function findAllUsersKids($user_id, $kid_id) //: ?BookKid
+   {
+
+            $entityManager = $this->getEntityManager();
+            $query = $entityManager->createQuery(
+                // ! les alias sont obligatoire ici
+               'SELECT u, k
+                FROM App\Entity\Kid k
+                JOIN k.user u
+                WHERE k.id = :kid_id AND u.id = :user_id
+                '
+            )
+            // ->setParameter('kid_id', $kid_id, 'category_id', $category_id);
+            ->setParameters(array('kid_id'=> $kid_id, 'user_id' => $user_id));
+
+            // returns an array of Product objects
+            return $query->getResult();      
+   }
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */
