@@ -57,7 +57,7 @@ class BookKid
 
     /**
      * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids", cascade={"persist"})
-     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish"})
+     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish", "author_list"})
      * @Assert\Valid
      */
     private $book;

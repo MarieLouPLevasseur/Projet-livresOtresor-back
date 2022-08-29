@@ -30,9 +30,6 @@ class Author
      * @Groups({"book_list","booksByCategory","books_infos", "books_read", "books_wish", "author_list"})
      * @Assert\NotNull
      * @Assert\NotBlank
-     * 
-     * 
-
      */
     private $name;
 

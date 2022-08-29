@@ -56,11 +56,6 @@ security:
 
         - { path: ^/api/v1, roles: IS_AUTHENTICATED_FULLY }
 
-
-
-
-
-
         # public : /api/v1/users
 
         # IS_AUTHENTICATED_FULLY:
@@ -91,12 +86,6 @@ security:
             # /api/v1/users/{id}/kids UPDATE
             # /api/v1/users/{id}/kids/{id} UPDATE
             # /api/v1/users/{id}/kids/{id} DELETE
-
-
-
-
-
-
 
     role_hierarchy:
         ROLE_USER: ROLE_USER

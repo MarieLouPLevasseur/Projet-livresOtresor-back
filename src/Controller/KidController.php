@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Kid class
@@ -618,10 +618,16 @@ class KidController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
-    public function listAuthors(int $id_kid, kidRepository $kidRepository, AuthorRepository $authors): Response
+    public function listAuthors(int $id_kid, kidRepository $kidRepository, AuthorRepository $authors, SerializerInterface $serializer): Response
     {
         $kid = $kidRepository->find($id_kid);
-        $bookKid = $kid->getBookKids();
+
+        // $authors = $kid->getBookKids()->books()->getAuthors();
+
+        // dd($authors);
+
+        $allBookKid = $kid->getBookKids();
+        // dd($allBookKid);
 
         if ($kid === null )
         {
@@ -632,13 +638,47 @@ class KidController extends AbstractController
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
+        
+        // $jsonBookShow = $serializer->serialize($currentBookKid, 'json',['groups' => 'books_infos']);
 
         
-        return $this->prepareResponse(
-            'OK',
-            ['groups' => 'author_list'],
-            ['data' => $bookKid]
-        );
+
+        $allBooks = [];
+        foreach ($allBookKid as $bookKid){
+
+            $book = $bookKid->getBook();
+            $allBooks [] = $book;
+        }
+        // dd($allBooks);
+
+        $allAuthors = [];
+        foreach($allBooks as $currentBook){
+            $author = $currentBook->getAuthors();
+            $allAuthors []= $author;
+        }
+
+        // dd($allAuthors);
+
+        // $finalAuthorsName = [];
+        // foreach ($allAuthors as $author) {
+        //     $authorName = $author->getName();
+        //     $finalAuthorsName [] = $authorName;
+        // }
+        // dd($finalAuthorsName);
+
+
+
+        // $jsonBookKid = $serializer->serialize($allBookKid, 'json',['groups' => 'author_list'] );
+        $jsonBookKid = $serializer->serialize($allAuthors, 'json',['groups' => 'author_list'] );
+
+        // return $this->json($jsonBookKid, 200);
+        return new JsonResponse($jsonBookKid, Response::HTTP_OK, [],true);
+        
+        // return $this->prepareResponse(
+        //     'OK',
+        //     ['groups' => 'author_list'],
+        //     ['data' => $allBookKid]
+        // );
     }
 
 
