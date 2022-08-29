@@ -198,8 +198,7 @@ class KidController extends AbstractController
                     $isNewLevel = true;
                 }
             
-            // $completion = (($finalMinimumGap/($finalMinimumGap+$nbBookToWinLevel))*100);
-            $completion = floor(((1/3)*100));
+            $completion = (($finalMinimumGap/($finalMinimumGap+$nbBookToWinLevel))*100);
         
 
             $data = ["lastGoalReached"        => $lastGoalReached , 
