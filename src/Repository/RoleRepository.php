@@ -39,6 +39,11 @@ class RoleRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * Find a Role
+     * @param string $value name of the role (ROLE_")
+     * @return Role
+     */
     public function findOneByRoleName($value): ?Role
     {
         return $this->createQueryBuilder('r')
@@ -48,28 +53,4 @@ class RoleRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
-//    /**
-//     * @return Role[] Returns an array of Role objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Role
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

@@ -39,10 +39,10 @@ class AvatarRepository extends ServiceEntityRepository
         }
     }
     /**
-     * find an avatar by a specific win value
+     * Find Only an avatar by a specific Win value
      *
      * @param [type] $value
-     * @return void
+     * @return mixed
      */
     public function findOneByIsWinValue($value): ?Avatar
     {
@@ -53,7 +53,13 @@ class AvatarRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
-
+    
+    /**
+     * Find All avatars by is Win value
+     *
+     * @param int $value Is_win Value
+     * @return mixed
+     */
     public function findAllByIsWinValue($value)
    {
        return $this->createQueryBuilder('a')
@@ -63,31 +69,4 @@ class AvatarRepository extends ServiceEntityRepository
            ->getResult()
        ;
    }
-
-   
-
-//    /**
-//     * @return Avatar[] Returns an array of Avatar objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Avatar
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

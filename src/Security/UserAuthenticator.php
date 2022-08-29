@@ -45,8 +45,6 @@ class UserAuthenticator extends AbstractAuthenticator
     
     public function supports(Request $request): ?bool
     {
-        
-
         return (($request->getPathInfo() === '/api/v1/login/user' || $request->getPathInfo() === '/api/v1/login/kid')  && $request->isMethod('POST'));
     }
 

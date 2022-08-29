@@ -18,12 +18,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class CategoryController extends AbstractController
 {
     /**
-     * List all category
+     * List all categories
+     * 
      * @Route("", name="categorylist", methods="GET")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
-    public function categoryName(CategoryRepository $categoryRepository, SerializerInterface $serializer): Response
+    public function listAllCategories(CategoryRepository $categoryRepository, SerializerInterface $serializer): Response
     {
         $categoryList = $categoryRepository->findall();
         $jsonCategoryList = $serializer->serialize($categoryList, 'json',['groups' => 'category']);

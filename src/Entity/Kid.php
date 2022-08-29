@@ -29,7 +29,7 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=255)
 
-     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "author_list", "userConnected"})
+     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "userConnected"})
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=3)( message = "Le nom d'utilisateur doit contenir au moins 3 caractères")
 

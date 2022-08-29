@@ -66,7 +66,6 @@ class Book
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"books_infos"})
      */
     private $created_at;
 
