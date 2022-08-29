@@ -206,9 +206,9 @@ class UserController extends AbstractController
 
 
      /** 
-     * Update a Kid
+     * Update a user
      * 
-     * @Route("/users/{id<\d+>}", name="update_user", methods="PATCH")
+     * @Route("/users/{id}", name="update_user", methods="PATCH", requirements={"id"="\d+"})
      * @IsGranted("ROLE_USER")
      * @return Response
      */

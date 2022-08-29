@@ -43,10 +43,6 @@ class Role
         $this->kids = new ArrayCollection();
         $this->users = new ArrayCollection();
     }
-    // public function __toString()
-    // {
-    //     return $this->getName();
-    // }
 
     public function getId(): ?int
     {
@@ -61,7 +57,6 @@ class Role
     public function setName(string $name): self
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -79,7 +74,6 @@ class Role
             $this->kids[] = $kid;
             $kid->setRole($this);
         }
-
         return $this;
     }
 
@@ -91,7 +85,6 @@ class Role
                 $kid->setRole(null);
             }
         }
-
         return $this;
     }
 
@@ -109,7 +102,6 @@ class Role
             $this->users[] = $user;
             $user->setRole($this);
         }
-
         return $this;
     }
 
@@ -121,7 +113,6 @@ class Role
                 $user->setRole(null);
             }
         }
-
         return $this;
     }
 }

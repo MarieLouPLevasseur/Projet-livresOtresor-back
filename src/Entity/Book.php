@@ -70,19 +70,15 @@ class Book
     private $created_at;
 
     /**
-
      * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book", cascade={"persist"})
      * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "author_list"})
      * @Assert\Valid
-
      */
     private $authors;
 
     /**
      * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="book", cascade={"persist"})
      * @Groups({"book_list"})
-     * 
-     * 
      */
     private $bookKids;
 
@@ -97,7 +93,6 @@ class Book
         $this->kids = new ArrayCollection();
         $this->bookKids = new ArrayCollection();
         $this->created_at = new \DateTime();
-        
     }
 
     public function getId(): ?int
@@ -113,7 +108,6 @@ class Book
     public function setIsbn(int $isbn): self
     {
         $this->isbn = $isbn;
-
         return $this;
     }
 
@@ -125,7 +119,6 @@ class Book
     public function setTitle(string $title): self
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -137,7 +130,6 @@ class Book
     public function setDescription(string $description): self
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -149,7 +141,6 @@ class Book
     public function setPublisher(?string $publisher): self
     {
         $this->publisher = $publisher;
-
         return $this;
     }
 
@@ -161,7 +152,6 @@ class Book
     public function setCreatedAt(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
-
         return $this;
     }
 
@@ -179,7 +169,6 @@ class Book
             $this->authors[] = $author;
             $author->addBook($this);
         }
-
         return $this;
     }
 
@@ -188,7 +177,6 @@ class Book
         if ($this->authors->removeElement($author)) {
             $author->removeBook($this);
         }
-
         return $this;
     }
 
@@ -206,7 +194,6 @@ class Book
             $this->bookKids[] = $bookKid;
             $bookKid->setBook($this);
         }
-
         return $this;
     }
 

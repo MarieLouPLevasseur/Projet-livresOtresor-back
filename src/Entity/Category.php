@@ -26,7 +26,6 @@ class Category
      * @ORM\Column(type="string", length=255)
      * @Groups({"category"})
      * @Groups({"booksByCategory"})
-     * 
      */
     private $name;
 
@@ -53,7 +52,6 @@ class Category
     public function setName(string $name): self
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -71,7 +69,6 @@ class Category
             $this->bookKids[] = $bookKid;
             $bookKid->setCategory($this);
         }
-
         return $this;
     }
 
@@ -83,7 +80,6 @@ class Category
                 $bookKid->setCategory(null);
             }
         }
-
         return $this;
     }
 }

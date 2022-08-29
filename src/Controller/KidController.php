@@ -197,6 +197,9 @@ class KidController extends AbstractController
 
                     $isNewLevel = true;
                 }
+            
+            // $completion = (($finalMinimumGap/($finalMinimumGap+$nbBookToWinLevel))*100);
+            $completion = floor(((1/3)*100));
         
 
             $data = ["lastGoalReached"        => $lastGoalReached , 
@@ -206,7 +209,8 @@ class KidController extends AbstractController
                      "bookReadOnCurrentLevel" => $finalMinimumGap,
                      "bookToReadToNewLevel"   => $nbBookToWinLevel,
                      "isNewLevel"             => $isNewLevel,
-                     "totalBooksReadByKids"   => $totalReadBooks
+                     "totalBooksReadByKids"   => $totalReadBooks,
+                     "completion"             => $completion
             ];
 
         return $this->json($data, 200);
@@ -610,7 +614,6 @@ class KidController extends AbstractController
             );
     }
 
-    // !REVOIR LE CODE ERREUR DE SERIALISATION ***************
      /**
      * List all authors names
      * 
@@ -621,35 +624,23 @@ class KidController extends AbstractController
     public function listAuthors(int $id_kid, kidRepository $kidRepository, AuthorRepository $authors, SerializerInterface $serializer): Response
     {
         $kid = $kidRepository->find($id_kid);
-
-        // $authors = $kid->getBookKids()->books()->getAuthors();
-
-        // dd($authors);
-
         $allBookKid = $kid->getBookKids();
-        // dd($allBookKid);
 
         if ($kid === null )
         {
-
             $error = [
                 'error' => true,
                 'message' => 'No kid found for Id [' . $id_kid . ']'
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
-        
-        // $jsonBookShow = $serializer->serialize($currentBookKid, 'json',['groups' => 'books_infos']);
-
-        
-
+ 
         $allBooks = [];
         foreach ($allBookKid as $bookKid){
 
             $book = $bookKid->getBook();
             $allBooks [] = $book;
         }
-        // dd($allBooks);
 
         $allAuthors = [];
         foreach($allBooks as $currentBook){
@@ -657,28 +648,8 @@ class KidController extends AbstractController
             $allAuthors []= $author;
         }
 
-        // dd($allAuthors);
-
-        // $finalAuthorsName = [];
-        // foreach ($allAuthors as $author) {
-        //     $authorName = $author->getName();
-        //     $finalAuthorsName [] = $authorName;
-        // }
-        // dd($finalAuthorsName);
-
-
-
-        // $jsonBookKid = $serializer->serialize($allBookKid, 'json',['groups' => 'author_list'] );
         $jsonBookKid = $serializer->serialize($allAuthors, 'json',['groups' => 'author_list'] );
-
-        // return $this->json($jsonBookKid, 200);
         return new JsonResponse($jsonBookKid, Response::HTTP_OK, [],true);
-        
-        // return $this->prepareResponse(
-        //     'OK',
-        //     ['groups' => 'author_list'],
-        //     ['data' => $allBookKid]
-        // );
     }
 
 
