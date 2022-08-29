@@ -2,18 +2,10 @@
 
 namespace App\Controller;
 
-use App\Repository\BookKidRepository;
 use App\Repository\BookRepository;
-use App\Repository\KidRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-
-
 
 /**
  * List all books

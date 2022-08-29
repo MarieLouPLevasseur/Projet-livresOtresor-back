@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Avatar;
 use App\Entity\Kid;
 use App\Entity\User;
 use App\Repository\AvatarRepository;
@@ -13,14 +12,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\VarDumper\Cloner\Data;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
@@ -35,15 +30,6 @@ class UserController extends AbstractController
     {
         $this->passwordHasher = $passwordHasher;
     }
-
-
-    private $passwordHasher;
-
-    public function __construct(UserPasswordHasherInterface $passwordHasher)
-    {
-        $this->passwordHasher = $passwordHasher;
-    }
-
 
     /**
      * Add a user (registration)
@@ -168,7 +154,8 @@ class UserController extends AbstractController
         SerializerInterface $serializer,
         RoleRepository $roleRepository,
         UserPasswordHasherInterface $passwordHasher,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        AvatarRepository $avatarRepository
         ):Response
 
     
@@ -181,7 +168,6 @@ class UserController extends AbstractController
         $kidData->setUser($user);
 
         $avatar = $avatarRepository->findOneByIsWinValue(0);
-        //dd($avatar);
         $kidData->setProfileAvatar($avatar->getUrl()); 
        
         if ($user === null )
@@ -196,11 +182,7 @@ class UserController extends AbstractController
         $errors = $validator->validate($kidData);
 
         if (count($errors) > 0) {
-            /*
-            * Uses a __toString method on the $errors variable which is a
-            * ConstraintViolationList object. This gives us a nice string
-            * for debugging.
-            */
+          
             $errorsStringBook = (string) $errors;
 
             $error = [
@@ -241,10 +223,6 @@ class UserController extends AbstractController
     {
         $user = $userRepository->find($id);
 
-        $data = $request->getContent();
-        $password = $passwordHasher->hashPassword($user, $user->getPassword());
-        $data->setPassword($password);
-
         if ($user === null )
         {
             $error = [
@@ -256,11 +234,12 @@ class UserController extends AbstractController
 
         $data = $request->getContent();
         $dataUser = $serializer->deserialize($data, User::class, 'json');
-        
+
+
         if($dataUser->getEmail() == !null){
             $errors = $validator->validatePropertyValue($dataUser, 'email', $dataUser->getEmail());
             if ((count($errors) > 0) ){
-                
+               
                 $errorsString = (string) $errors;
                 $error = [
                     'error' => true,
@@ -275,7 +254,7 @@ class UserController extends AbstractController
         if($dataUser->getFirstname()!== null){
             $errors = $validator->validatePropertyValue($dataUser, 'firstname', $dataUser->getFirstname());
             if ((count($errors) > 0) ){
-
+               
                 $errorsString = (string) $errors;
                 $error = [
                     'error' => true,
@@ -290,7 +269,7 @@ class UserController extends AbstractController
         if ($dataUser->getLastname()!== null) {
             $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
             if ((count($errors) > 0)) {
-
+               
                 $errorsString = (string) $errors;
                 $error = [
                     'error' => true,
@@ -318,7 +297,7 @@ class UserController extends AbstractController
         if ($dataUser->getPassword()!== null) {
             $errors = $validator->validatePropertyValue($dataUser, 'password', $dataUser->getPassword());
             if ((count($errors) > 0)) {
-
+ 
                 $errorsString = (string) $errors;
                 $error = [
                     'error' => true,
@@ -333,9 +312,9 @@ class UserController extends AbstractController
             $user->setPassword($dataUser->getPassword());
         }
 
+        $em->persist($user);
         $em->flush();
-
-        return $this->prepareResponse('Mis à jour avec succès', [], [], false, Response::HTTP_OK );
+        return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
     }
 
      /**
