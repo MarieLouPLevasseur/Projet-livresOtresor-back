@@ -166,7 +166,6 @@ class UserController extends AbstractController
         $kidData->setUser($user);
         $kidData->setProfileAvatar('https://bombyxplm.com/wp-content/uploads/2021/01/421-4213053_default-avatar-icon-hd-png-download.png');
     
-
         if ($user === null )
         {
             $error = [
