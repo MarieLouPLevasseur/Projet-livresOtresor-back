@@ -29,6 +29,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+
+
 /**
  * Kid class
  * @Route("/api/v1/kids", name="api_kids_")
@@ -39,7 +42,7 @@ class KidController extends AbstractController
      * Show element for progress bar:
      *
      * @Route("/{id_kid}/books/progress_bar", name="progress_bar", methods="GET")
-     * 
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function progressBar( 
         int $id_kid,
@@ -228,7 +231,7 @@ class KidController extends AbstractController
      /**
      * Show all books of a category for a kid
      * @Route("/{id_kid}/category/{id_cat}/books", name="show_category_books", methods="GET", requirements={"id_kid"="\d+"}, requirements={"id_cat"="\d+"})
-     * 
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function showBooksbyCategory(
         int $id_kid,
@@ -255,7 +258,7 @@ class KidController extends AbstractController
     /**
      * Show all avatars of a kid
      * @Route("/{id_kid}/avatars", name="show_avatars", methods="GET", requirements={"id_kid"="\d+"})
-     * 
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function showAllAvatars(
         int $id_kid,
@@ -303,7 +306,7 @@ class KidController extends AbstractController
      /**
      * Show all diplomas of a kid
      * @Route("/{id_kid}/diplomas", name="show_diplomas", methods="GET", requirements={"id_kid"="\d+"})
-     * 
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function showAllDiplomas(
         int $id_kid,
@@ -353,6 +356,7 @@ class KidController extends AbstractController
 
     /**
      * @Route("/{id_kid}/books/{id_book}", name="show_book_details", methods="GET", requirements={"id_kid"="\d+"}, requirements={"id_book"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
     public function showOneBookDetails( 
@@ -416,6 +420,7 @@ class KidController extends AbstractController
 
      /**
      * @Route("/{id_kid}/books", name="create_book", methods="POST", requirements={"id_kid"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
     public function createBookKid(
@@ -540,8 +545,8 @@ class KidController extends AbstractController
 
       /**
      * @Route("/{id_kid}/books", name="show_book_list", methods="GET", requirements={"id"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
-     * esponse
      */
     public function showBookOfOneKid( int $id_kid, KidRepository $kidRepository, BookRepository $bookRepository): Response
 
@@ -572,6 +577,7 @@ class KidController extends AbstractController
 
     /**
      * @Route("/{id_kid}/books/read", name="show_books_read", methods="GET", requirements={"id"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
 
@@ -604,6 +610,7 @@ class KidController extends AbstractController
 
     /**
      * @Route("/{id_kid}/books/wish", name="show_book_wish_list", methods="GET", requirements={"id"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
 
@@ -634,6 +641,7 @@ class KidController extends AbstractController
 
      /**
      * @Route("/{id_kid}/books/authors", name="show_author_list", methods="GET", requirements={"id"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
 
@@ -662,10 +670,10 @@ class KidController extends AbstractController
         );
     }
 
-    //api/v1/kids/194/books/authors/91
 
      /**
      * @Route("/{id_kid}/books/authors/{author_id}", name="show_books_of_one_author", methods="GET")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
 

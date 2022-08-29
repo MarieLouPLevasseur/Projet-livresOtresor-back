@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * Categories class
@@ -19,6 +20,7 @@ class CategoryController extends AbstractController
     /**
      * List all category
      * @Route("", name="categorylist", methods="GET")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
     public function categoryName(CategoryRepository $categoryRepository, SerializerInterface $serializer): Response

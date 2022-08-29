@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class AuthUserController extends AbstractController
 {
@@ -14,17 +15,8 @@ class AuthUserController extends AbstractController
      */
     public function userLogin(AuthenticationUtils $authenticationUtils)//: Response
     {
-        // if ($this->getUser()) {
-        //     return $this->redirectToRoute('target_path');
-        // }
+        // all manage by UserAuthenticator
 
-        // get the login error if there is one
-        // $error = $authenticationUtils->getLastAuthenticationError();
-        // last username entered by the user
-        // $lastUsername = $authenticationUtils->getLastUsername();
-
-        // return $this->json("coucou user", 200);
-        // return $this->render('security/user-login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
 
     /**

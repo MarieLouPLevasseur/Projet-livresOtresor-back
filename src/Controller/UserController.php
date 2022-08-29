@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
 
@@ -99,7 +100,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * list all users
+     * list all users (penser à delete)
      *
      * @Route("/users", name="list", methods="GET")
      * @return Response
@@ -114,6 +115,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users/{id}", name="show", methods="GET", requirements={"id"="\d+"})
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function show(int $id, UserRepository $userRepository) :Response
@@ -138,6 +140,7 @@ class UserController extends AbstractController
      * list all kids by user
      *
      * @Route("/users/{id}/kids", name="listkids", methods="GET", requirements={"id"="\d+"})
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function listkids( int $id, UserRepository $userRepository, KidRepository $kidRepository): Response
@@ -160,6 +163,7 @@ class UserController extends AbstractController
 
     /** 
      * @Route("/users/{id}/kids", name="create_kid", methods="POST", requirements={"id"="\d+"})
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function createKid( int $id, 
@@ -221,6 +225,7 @@ class UserController extends AbstractController
     }
      /** 
      * @Route("/users/{id<\d+>}", name="update_user", methods="PATCH")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
 
