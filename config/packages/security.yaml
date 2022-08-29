@@ -1,47 +1,103 @@
 security:
     enable_authenticator_manager: true
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
-    password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    encoders:
+        App\Entity\User:
+            algorithm: auto
+        App\Entity\Kid:
+            algorithm: auto
+
     providers:
-        # users_in_memory: { memory: null }
         app_user_provider:
             entity:
                 class: App\Entity\User
                 property: email
-
+        app_kid_provider:
+            entity:
+                class: App\Entity\Kid
+                property: username
 
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        main:
+
+        main: 
             lazy: true
-            # provider: users_in_memory
+            custom_authenticator: App\Security\UserAuthenticator
+
+        kid_secured_area:
+            pattern:   ^/api/v1/login
+            provider: app_kid_provider
+            json_login:
+                login_path: /api/v1/login/kid
+                check_path: app_login_kid
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+            logout:
+                path: app_logout
+
+        user_secured_area:
+            pattern:   ^/
             provider: app_user_provider
-
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
+            json_login:
+                login_path: /api/v1/login/user
+                check_path: app_login_user
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            logout:
+                path: app_logout
+                
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # - { path: ^/admin, roles: ROLE_USER }
+        - { path: ^/api/v1/login, roles: PUBLIC_ACCESS }
 
-when@test:
-    security:
-        password_hashers:
-            # By default, password hashers are resource intensive and take time. This is
-            # important to generate secure password hashes. In tests however, secure hashes
-            # are not important, waste resources and increase test times. The following
-            # reduces the work factor to the lowest possible values.
-            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-                algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+        - { path: ^/api/v1, roles: IS_AUTHENTICATED_FULLY }
+
+
+
+
+
+
+        # public : /api/v1/users
+
+        # IS_AUTHENTICATED_FULLY:
+            #  /api/v1/categories
+            # /api/v1/kids/{id}/books
+            # /api/v1/kids/{id}/books/read
+            # /api/v1/kids/{id}/books/wish
+            # /api/v1/kids/{id}/category/{id}/books
+
+            # /api/v1/kids/{id} ???
+
+            # /api/v1/kids/{id}/avatars
+            # /api/v1/kids/{id}/diplomas
+            # /api/v1/kids/{id}/books CREATE
+            # /api/v1/kids/{id}/books/progress_bar
+            # /api/v1/kids/{id}/books/{id} GET
+            # /api/v1/kids/{id}/books/last_read
+            # /api/v1/avatars/{id}
+            # /api/v1/diplomass/{id}
+
+        # user : 
+            # /api/v1/kids/{id}/bookkids/{id} DELETE
+            # /api/v1/kids/{id}/bookkids/{id} PATCH
+            # /api/v1/users/{id} GET
+            # /api/v1/users/{id} DELETE
+            # /api/v1/users/{id}/kids GET
+            # /api/v1/users/{id}/kids CREATE
+            # /api/v1/users/{id}/kids UPDATE
+            # /api/v1/users/{id}/kids/{id} UPDATE
+            # /api/v1/users/{id}/kids/{id} DELETE
+
+
+
+
+
+
+
+    role_hierarchy:
+        ROLE_USER: ROLE_USER
+        ROLE_KID: ROLE_KID
