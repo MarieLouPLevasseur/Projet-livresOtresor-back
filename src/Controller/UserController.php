@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Avatar;
 use App\Entity\Kid;
 use App\Entity\User;
+use App\Repository\AvatarRepository;
 use App\Repository\KidRepository;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
@@ -173,7 +175,8 @@ class UserController extends AbstractController
     SerializerInterface $serializer,
     RoleRepository $roleRepository,
     UserPasswordHasherInterface $passwordHasher,
-    ValidatorInterface $validator
+    ValidatorInterface $validator,
+    AvatarRepository $avatarRepository
     ):Response
     
     {
@@ -183,9 +186,11 @@ class UserController extends AbstractController
         $role = $roleRepository->findOneByRoleName("ROLE_KID");        
         $kidData->setRole($role);
         $kidData->setUser($user);
-        $kidData->setProfileAvatar('https://bombyxplm.com/wp-content/uploads/2021/01/421-4213053_default-avatar-icon-hd-png-download.png');
-    
-
+        $avatar = $avatarRepository->findOneByIsWinValue(0);
+        //dd($avatar);
+        $kidData->setProfileAvatar($avatar->getUrl()); 
+       
+        
         if ($user === null )
         {
             $error = [
@@ -217,11 +222,8 @@ class UserController extends AbstractController
 
         $em->persist($kidData);
         $em->flush();
-        $this->addFlash('success', "L'enfant a bien été enregistré");
 
-        return new Response("L'enfant a bien été enregistré");
-        
-
+        return $this->json("L'enfant a bien été enregistré", Response::HTTP_OK);        
     }
      /** 
      * @Route("/users/{id<\d+>}", name="update_user", methods="PATCH")
