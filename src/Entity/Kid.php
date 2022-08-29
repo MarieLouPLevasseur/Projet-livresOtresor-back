@@ -69,8 +69,7 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     private $user;
 
     /**
-
-     * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="kid", fetch="EAGER")
+     * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="kid", fetch="EAGER", cascade={"persist", "remove"})
      * @Groups({"book_list"})
      */
     private $bookKids;

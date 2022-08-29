@@ -238,13 +238,10 @@ class UserController extends AbstractController
      * @Route("/users/delete/{id<\d+>}", name="delete_user", methods="DELETE")
      * @return Response
      */
-    public function delete(int $id, EntityManagerInterface $em, UserRepository $userRepository, KidRepository $kidRepository) :Response
+    public function delete(int $id, EntityManagerInterface $em, UserRepository $userRepository) :Response
     {
 
        $user = $userRepository->find($id);
-       $usersKid = $user->getKid();
-    
-    
         if ($user === null )
         {
             $error = [
@@ -254,18 +251,10 @@ class UserController extends AbstractController
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
 
-
-        $em->remove($usersKid);
-        
-
+        $em->remove($user);
         $em->flush();
 
-        $message = [
-            'error' => false,
-            'message' => "L'utilisateur supprimé avec succès",
-        ];
-
-        return $this->prepareResponse("L'utilisateur [' . $id . '] suprimé");
+        return $this->prepareResponse("L'utilisateur supprimé avec succès");
     }
 
     private function prepareResponse(
