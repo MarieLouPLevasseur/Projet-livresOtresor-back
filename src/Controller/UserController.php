@@ -343,6 +343,7 @@ class UserController extends AbstractController
 
     /** 
      * @Route("/users/{user_id}/kids/{kid_id}", name="delete_kid", methods="Delete")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
 
@@ -374,7 +375,7 @@ class UserController extends AbstractController
                return $this->json($error, Response::HTTP_NOT_FOUND);
            }
 
-           
+
             if ($kid->getUser() !== $user){
 
                 $error = [
