@@ -337,8 +337,62 @@ class UserController extends AbstractController
         $em->remove($user);
         $em->flush();
 
-        return $this->prepareResponse("L'utilisateur supprimé avec succès");
+        return $this->prepareResponse("L'utilisateur supprimé avec succès",[] ,[], false, Response::HTTP_OK);
     }
+
+
+    /** 
+     * @Route("/users/{user_id}/kids/{kid_id}", name="delete_kid", methods="Delete")
+     * @return Response
+     */
+
+    public function deleteKid(
+        $user_id, $kid_id,
+        EntityManagerInterface $em, 
+        UserRepository $userRepository,
+        KidRepository $kidRepository
+        )
+        {
+            $user = $userRepository->find($user_id);
+            $kid = $kidRepository->find($kid_id);
+           // dd($user);
+           if ($user === null )
+           {
+               $error = [
+                   'error' => true,
+                   'message' => 'No user found for Id [' . $user_id . ']'
+               ];
+               return $this->json($error, Response::HTTP_NOT_FOUND);
+           }
+           
+               if ($kid === null )
+           {
+               $error = [
+                   'error' => true,
+                   'message' => 'No kid found for Id [' . $kid_id . ']'
+               ];
+               return $this->json($error, Response::HTTP_NOT_FOUND);
+           }
+
+           
+            if ($kid->getUser() !== $user){
+
+                $error = [
+                    'error'=> true,
+                    'message'=> "can't delete this kid"
+
+                ];
+
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
+
+
+
+        $em->remove($kid);
+        $em->flush();
+        return $this->prepareResponse("L'enfant a été supprimé avec succès", [] ,[], false, Response::HTTP_OK);
+
+        }
 
     /**
      * Manage Error message
