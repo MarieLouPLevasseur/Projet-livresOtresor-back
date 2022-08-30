@@ -32,8 +32,13 @@ class BookKid
     /**
      * @ORM\Column(type="float", nullable=true)
      * @Groups({"booksByCategory","book_list","books_infos", "books_read", "last_book_read"})
+     * @Assert\Range(
+     *      min = 0,
+     *      max = 5,
+     *      notInRangeMessage = "You must be between {{ min }} and {{ max }}")
      */
     private $rating;
+
 
     /**
      * @ORM\Column(type="boolean")
@@ -56,8 +61,9 @@ class BookKid
     private $book;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="bookKids")
+     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="bookKids", cascade={"persist"})
      * @Groups({"booksByCategory"})
+     * 
      */
     private $category;
 
