@@ -319,25 +319,27 @@ class UserController extends AbstractController
 
      /**
      * @Route("/users/delete/{id<\d+>}", name="delete_user", methods="DELETE")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function delete(int $id, EntityManagerInterface $em, UserRepository $userRepository) :Response
     {
 
        $user = $userRepository->find($id);
+
         if ($user === null )
         {
             $error = [
                 'error' => true,
                 'message' => 'No user found for Id [' . $id . ']'
             ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
+            return $this->json($error, Response::HTTP_BAD_REQUEST);
         }
 
         $em->remove($user);
         $em->flush();
 
-        return $this->prepareResponse("L'utilisateur supprimé avec succès");
+        return $this->prepareResponse("L'utilisateur supprimé avec succès", [] ,[], false, Response::HTTP_OK);
     }
 
     /** 
@@ -349,18 +351,24 @@ class UserController extends AbstractController
         $user_id, $kid_id,
         EntityManagerInterface $em, 
         UserRepository $userRepository,
-        KidRepository $kidRepository,
-        Request $request, 
-        SerializerInterface $serializer,
-        ValidatorInterface $validator,
-        RoleRepository $roleRepository,
-        UserPasswordHasherInterface $passwordHasher
+        KidRepository $kidRepository
         )
         {
             $user = $userRepository->find($user_id);
             $kid = $kidRepository->find($kid_id);
 
-            if ($user === null )
+            if ($kid->getUser() !== $user){
+
+                $error = [
+                    'error'=> true,
+                    'message'=> "can't delete this kid"
+
+                ];
+
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
+
+        if ($user === null )
         {
             $error = [
                 'error' => true,
@@ -372,18 +380,16 @@ class UserController extends AbstractController
         {
             $error = [
                 'error' => true,
-                'message' => 'No user found for Id [' . $kid_id . ']'
+                'message' => 'No kid found for Id [' . $kid_id . ']'
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
 
         $em->remove($kid);
         $em->flush();
-
-        return $this->prepareResponse("L'enfant supprimé avec succès");
+        return $this->prepareResponse("L'enfant a été supprimé avec succès", [] ,[], false, Response::HTTP_OK);
 
         }
-
 
     /**
      * Manage Error message
