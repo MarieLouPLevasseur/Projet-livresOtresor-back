@@ -33,7 +33,7 @@ class KidController extends AbstractController
      /**
      * Update a Book
      *
-     * @Route("/{id_kid}/bookkids/{id_bookKid}", name="update_book", methods="POST", requirements={"id_kid"="\d+"}, requirements={"id_bookKid"="\d+"})
+     * @Route("/{id_kid}/bookkids/{id_bookKid}", name="update_book", methods="PATCH", requirements={"id_kid"="\d+"}, requirements={"id_bookKid"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function updateBook( 
