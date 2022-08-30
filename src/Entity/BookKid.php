@@ -30,7 +30,7 @@ class BookKid
     private $comment;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="float", nullable=true)
      * @Groups({"booksByCategory","book_list","books_infos", "books_read", "last_book_read"})
      */
     private $rating;
@@ -88,12 +88,12 @@ class BookKid
         return $this;
     }
 
-    public function getRating(): ?int
+    public function getRating(): ?float
     {
         return $this->rating;
     }
 
-    public function setRating(?int $rating): self
+    public function setRating(?float $rating): self
     {
         $this->rating = $rating;
         return $this;
