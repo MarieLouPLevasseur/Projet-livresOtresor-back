@@ -2,25 +2,26 @@
 
 namespace App\Controller;
 
+use App\Entity\Kid;
 use App\Entity\BookKid;
-use App\Repository\AuthorRepository;
+use Doctrine\ORM\EntityManager;
 use App\Repository\KidRepository;
 use App\Repository\BookRepository;
+use App\Repository\AuthorRepository;
 use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
-use App\Repository\CategoryRepository;
 use App\Repository\DiplomaRepository;
-use Doctrine\ORM\EntityManager;
+use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\MakerBundle\Validator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bundle\MakerBundle\Validator;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * Kid class
@@ -28,7 +29,59 @@ use Symfony\Bundle\MakerBundle\Validator;
  */
 class KidController extends AbstractController
 {
+     /** 
+     * Update a kid avatar only
+     * 
+     * @Route("/{id}/avatar", name="update_kid_avatar", methods="PATCH", requirements={"id"="\d+"})
+     * @IsGranted("ROLE_USER")
+     * @return Response
+     */
 
+    public function updateAvatar(
+        int $id,
+        EntityManagerInterface $em, 
+        KidRepository $kidRepository,
+        Request $request, 
+        SerializerInterface $serializer,
+        ValidatorInterface $validator
+        )
+    {
+
+        // dd("route");
+        $kid = $kidRepository->find($id);
+
+        if ($kid === null )
+        {
+            $error = [
+                'error' => true,
+                'message' => 'No kid found for Id [' . $id . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        $data = $request->getContent();
+        $dataKid = $serializer->deserialize($data, Kid::class, 'json');
+
+
+        if($dataKid->getProfileAvatar() == !null){
+            $errors = $validator->validatePropertyValue($dataKid, 'profile_avatar', $dataKid->getProfileAvatar());
+            if ((count($errors) > 0) ){
+               
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }   
+            $kid->setProfileAvatar($dataKid->getProfileAvatar());
+        } 
+
+        $em->persist($kid);
+        $em->flush();
+        return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
+    }
 
      /**
      * Update a Book
@@ -52,8 +105,6 @@ class KidController extends AbstractController
             $data = $request->getContent();
             $dataKid = $serializer->deserialize($data, BookKid::class, 'json');
             
-
-
             // CHECK KID
 
                 $kid = $kidRepository->find($id_kid);
@@ -185,6 +236,8 @@ class KidController extends AbstractController
 
             return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
         }
+
+        
 
 
       /**
