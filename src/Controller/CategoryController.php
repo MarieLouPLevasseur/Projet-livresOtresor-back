@@ -12,14 +12,14 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * Categories class
- * @Route("/api/v1/categories", name="api_category")
+ * @Route("/api/v1/categories")
  */
 class CategoryController extends AbstractController
 {
     /**
      * List all categories
      * 
-     * @Route("", name="categorylist", methods="GET")
+     * @Route("", name="api_category_list", methods="GET")
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */

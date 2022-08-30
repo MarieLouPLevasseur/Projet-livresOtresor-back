@@ -30,10 +30,15 @@ class BookKid
     private $comment;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="float", nullable=true)
      * @Groups({"booksByCategory","book_list","books_infos", "books_read", "last_book_read"})
+     * @Assert\Range(
+     *      min = 0,
+     *      max = 5,
+     *      notInRangeMessage = "You must be between {{ min }} and {{ max }}")
      */
     private $rating;
+
 
     /**
      * @ORM\Column(type="boolean")
@@ -56,8 +61,9 @@ class BookKid
     private $book;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="bookKids")
+     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="bookKids", cascade={"persist"})
      * @Groups({"booksByCategory"})
+     * 
      */
     private $category;
 
@@ -88,21 +94,26 @@ class BookKid
         return $this;
     }
 
-    public function getRating(): ?int
+    public function getRating(): ?float
     {
         return $this->rating;
     }
 
-    public function setRating(?int $rating): self
+    public function setRating(?float $rating): self
     {
         $this->rating = $rating;
         return $this;
     }
-
-    public function isIsRead(): ?bool
+     
+    public function getIsRead()
     {
         return $this->is_read;
     }
+
+    // public function isIsRead(): ?bool
+    // {
+    //     return $this->is_read;
+    // }
 
     public function setIsRead(bool $is_read): self
     {
@@ -157,4 +168,6 @@ class BookKid
         $this->updated_at = $updated_at;
         return $this;
     }
+
+   
 }
