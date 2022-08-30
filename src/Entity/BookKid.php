@@ -98,11 +98,16 @@ class BookKid
         $this->rating = $rating;
         return $this;
     }
-
-    public function isIsRead(): ?bool
+     
+    public function getIsRead()
     {
         return $this->is_read;
     }
+
+    // public function isIsRead(): ?bool
+    // {
+    //     return $this->is_read;
+    // }
 
     public function setIsRead(bool $is_read): self
     {
@@ -157,4 +162,6 @@ class BookKid
         $this->updated_at = $updated_at;
         return $this;
     }
+
+   
 }

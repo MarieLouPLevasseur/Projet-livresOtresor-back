@@ -9,6 +9,7 @@ use App\Repository\BookRepository;
 use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
 use App\Repository\DiplomaRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +19,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\MakerBundle\Validator;
 
 /**
  * Kid class
@@ -25,6 +27,110 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
  */
 class KidController extends AbstractController
 {
+
+
+     /**
+     * Update a Book
+     *
+     * @Route("/{id_kid}/bookkids/{id_bookKid}", name="update_book", methods="POST", requirements={"id_kid"="\d+"}, requirements={"id_bookKid"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     */
+    public function updateBook( 
+        int $id_kid,
+        int $id_bookKid,
+        BookKidRepository $bookKidRepository,
+        KidRepository $kidRepository,
+        SerializerInterface $serializer,
+        Request $request,
+        ValidatorInterface $validator,
+        EntityManagerInterface $em
+        ): Response
+        {
+            
+            $kid = $kidRepository->find($id_kid);
+            $currentBookKid = $bookKidRepository->find($id_bookKid);
+
+            // dd($currentBookKid);
+
+            if ($kid === null )
+            {
+                $error = [
+                    'error' => true,
+                    'message' => 'No user found for Id [' . $id_kid . ']'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
+
+            if ($currentBookKid === null )
+            {
+                $error = [
+                    'error' => true,
+                    'message' => 'No user found for Id [' . $id_bookKid . ']'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
+
+
+            $data = $request->getContent();
+            $dataKid = $serializer->deserialize($data, BookKid::class, 'json');
+
+            if($dataKid->getRating() !== null){
+                
+                $errors = $validator->validatePropertyValue($dataKid, 'rating', $dataKid->getRating());
+                if ((count($errors) > 0) ){
+                    
+                    $errorsString = (string) $errors;
+                    $error = [
+                        'error' => true,
+                        'message' => $errorsString
+                    ];
+    
+                    return $this->json($error, Response::HTTP_BAD_REQUEST);
+                }  
+                 
+                $currentBookKid->setRating($dataKid->getRating());
+            
+            } 
+
+            if($dataKid->getComment() !== null){
+                
+                $errors = $validator->validatePropertyValue($dataKid, 'comment', $dataKid->getComment());
+                if ((count($errors) > 0) ){
+                    
+                    $errorsString = (string) $errors;
+                    $error = [
+                        'error' => true,
+                        'message' => $errorsString
+                    ];
+    
+                    return $this->json($error, Response::HTTP_BAD_REQUEST);
+                }   
+                $currentBookKid->setComment($dataKid->getComment());
+            } 
+            
+            if($dataKid->getIsRead() !== null){
+                
+                $errors = $validator->validatePropertyValue($dataKid, 'is_read', $dataKid->getIsRead());
+                if ((count($errors) > 0) ){
+                    
+                    $errorsString = (string) $errors;
+                    $error = [
+                        'error' => true,
+                        'message' => $errorsString
+                    ];
+    
+                    return $this->json($error, Response::HTTP_BAD_REQUEST);
+                }   
+                $currentBookKid->setIsRead($dataKid->getIsRead());
+            } 
+
+            $em->persist($currentBookKid);
+            $em->flush();
+
+            return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
+        }
+
+
       /**
      * Show last book modified for a kid
      *
