@@ -25,7 +25,7 @@ class Book
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
 
-     * @Groups({"booksByCategory","book_list", "books_read", "books_wish" , "books_infos"})
+     * @Groups({"booksByCategory","book_list", "books_read", "books_wish" , "books_infos", "last_book_read"})
      */
     private $id;
     
@@ -42,7 +42,7 @@ class Book
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"booksByCategory","book_list","books_infos","books_read", "books_wish"})
+     * @Groups({"booksByCategory","book_list","books_infos","books_read", "books_wish", "last_book_read"})
      * @Assert\NotNull
      * @Assert\NotBlank
      * @Assert\Length(min=2)
@@ -51,7 +51,7 @@ class Book
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "last_book_read"})
      * @Assert\NotNull
      * @Assert\NotBlank
      * @Assert\Length(min=10)
@@ -84,6 +84,7 @@ class Book
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"book_list","last_book_read"})
      */
     private $cover;
 

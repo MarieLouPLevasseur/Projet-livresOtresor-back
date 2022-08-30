@@ -25,6 +25,40 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
  */
 class KidController extends AbstractController
 {
+      /**
+     * Show last book modified for a kid
+     *
+     * @Route("/{id_kid}/books/last_read", name="last_book_read", methods="GET", requirements={"id_kid"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     */
+    public function showLastReadBook( 
+        int $id_kid,
+        BookKidRepository $bookKidRepository,
+        KidRepository $kidRepository
+        ): Response
+    {
+
+        $currentkid = $kidRepository->find($id_kid);
+
+        if ($currentkid === null )
+        {
+            $error = [
+                'error' => true,
+                'message' => 'No kid found for Id [' . $id_kid . ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        $mostRecentBook= $bookKidRepository->findBy(["kid"=>$id_kid], ['updated_at' => 'DESC'],1);
+
+        return $this->prepareResponse(
+            'OK',
+            ['groups' => 'last_book_read'],
+            ['data' => $mostRecentBook ]
+        );
+
+    }
+
     /**
      * Show element for progress bar
      *
@@ -197,7 +231,7 @@ class KidController extends AbstractController
                     $isNewLevel = true;
                 }
             
-            $completion = (($finalMinimumGap/($finalMinimumGap+$nbBookToWinLevel))*100);
+            $completion = floor((($finalMinimumGap/($finalMinimumGap+$nbBookToWinLevel))*100));
         
 
             $data = ["lastGoalReached"        => $lastGoalReached , 
