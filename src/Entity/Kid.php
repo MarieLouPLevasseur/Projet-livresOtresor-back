@@ -14,7 +14,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=KidRepository::class)
- * @UniqueEntity(fields={"username"}, message="Ce nom d'utilisateur est déjà utilisé")
+ * @UniqueEntity(fields={"username"}, message="Merci de choisir un autre pseudonyme")
  */
 
 class Kid implements UserInterface, PasswordAuthenticatedUserInterface

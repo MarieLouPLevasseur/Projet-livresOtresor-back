@@ -202,6 +202,117 @@ class UserController extends AbstractController
 
     }
 
+    /** 
+     * Update a kid
+     * 
+     * @Route("/users/{id_user}/kids/{id_kid}", name="update_kid", methods="PATCH", requirements={"id_user"="\d+", "id_kid"="\d+"})
+     * @IsGranted("ROLE_USER")
+     * @return Response
+     */
+    public function updateKid(
+        int $id_user,
+        int $id_kid,
+        EntityManagerInterface $em, 
+        UserRepository $userRepository,
+        Request $request, 
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+        KidRepository $kidRepository,
+        UserPasswordHasherInterface $passwordHasher
+        )
+    {
+        $user = $userRepository->find($id_user);
+        $kid = $kidRepository->find($id_kid);
+
+        // CHECK USER exists
+        
+            if ($user === null )
+            {
+                $error = [
+                    'error' => true,
+                    'message' => 'No user found for Id [' . $id_user . ']'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
+
+        // CHECK KID exists
+
+            if ($kid === null )
+            {
+                $error = [
+                    'error' => true,
+                    'message' => 'No kid found for Id [' . $id_kid . ']'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
+
+        $data = $request->getContent();
+        $dataKid = $serializer->deserialize($data, Kid::class, 'json');
+
+        // ******** CHECK USERNAME *********
+
+
+        if($dataKid->getUsername() !== null){
+
+            // CHECK USERNAME already exists
+
+            $nameGiven = $dataKid->getUsername();
+            $nameAlreadyExist = $kidRepository->findBy(["username"=>$nameGiven]);
+
+            if($nameAlreadyExist !== []){
+
+                $error = [
+                    'error' => true,
+                    'message' => "This username can't be used"
+                ];
+
+                return $this->json($error, Response::HTTP_CONFLICT);
+            }
+
+            // CHECK datas given
+
+            $errors = $validator->validatePropertyValue($dataKid, 'username', $dataKid->getUsername());
+            if ((count($errors) > 0) ){
+               
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }   
+
+            // set
+            $kid->setUsername($dataKid->getUsername());
+        } 
+        
+        //***** CHECK PASSWORD *******
+
+        if ($dataKid->getPassword()!== null) {
+
+            $errors = $validator->validatePropertyValue($dataKid, 'password', $dataKid->getPassword());
+            if ((count($errors) > 0)) {
+ 
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }
+
+            $password = $passwordHasher->hashPassword($dataKid, $dataKid->getPassword());
+            $dataKid->setPassword($password);
+            $kid->setPassword($dataKid->getPassword());
+        }
+
+        $em->persist($kid);
+        $em->flush();
+        return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
+    }
+
 
      /** 
      * Update a user
