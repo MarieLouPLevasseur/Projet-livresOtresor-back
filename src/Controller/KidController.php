@@ -8,7 +8,9 @@ use App\Repository\KidRepository;
 use App\Repository\BookRepository;
 use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
+use App\Repository\CategoryRepository;
 use App\Repository\DiplomaRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +20,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\MakerBundle\Validator;
 
 /**
  * Kid class
@@ -25,6 +28,165 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
  */
 class KidController extends AbstractController
 {
+
+
+     /**
+     * Update a Book
+     *
+     * @Route("/{id_kid}/bookkids/{id_bookKid}", name="update_book", methods="POST", requirements={"id_kid"="\d+"}, requirements={"id_bookKid"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     */
+    public function updateBook( 
+        int $id_kid,
+        int $id_bookKid,
+        BookKidRepository $bookKidRepository,
+        KidRepository $kidRepository,
+        SerializerInterface $serializer,
+        Request $request,
+        ValidatorInterface $validator,
+        CategoryRepository $categoryRepository,
+        EntityManagerInterface $em
+        ): Response
+        {
+
+            $data = $request->getContent();
+            $dataKid = $serializer->deserialize($data, BookKid::class, 'json');
+            
+
+
+            // CHECK KID
+
+                $kid = $kidRepository->find($id_kid);
+
+                    if ($kid === null )
+                    {
+                        $error = [
+                            'error' => true,
+                            'message' => 'No kid found for Id [' . $id_kid . ']'
+                        ];
+                        return $this->json($error, Response::HTTP_NOT_FOUND);
+                    }
+
+            // CHECK BOOK_KID
+
+                $currentBookKid = $bookKidRepository->find($id_bookKid);
+
+                    if ($currentBookKid === null )
+                    {
+                        $error = [
+                            'error' => true,
+                            'message' => 'No bookkid found for Id [' . $id_bookKid . ']'
+                        ];
+                        return $this->json($error, Response::HTTP_NOT_FOUND);
+                    }   
+
+
+            // CHECK CATEGORY
+            
+                $parsed_json = json_decode($data);
+
+                // vérifier si catégorie existe dans le json donné
+                    // si c'est différent de null on explore la chose
+                    if ($dataKid->getCategory() !== null) {
+                        // s'il existe : 
+                            // on vérifie si la catégorie existe bien
+                        $categoryID = $parsed_json->{"category"}->{"id"};
+                        $categoryGiven= $categoryRepository->find($categoryID);
+                      
+                        
+                        if ($categoryGiven === null) {
+                            $error = [
+                                'error' => true,
+                                'message' => 'No category not found ]'
+                            ];
+                            return $this->json($error, Response::HTTP_NOT_FOUND);
+                        }
+
+                        // vérifier si les données entrantes sont valides
+
+
+                        $errors = $validator->validatePropertyValue($dataKid, 'category', $dataKid->getCategory());
+                        
+                        if ((count($errors) > 0) ){
+                            
+                            $errorsString = (string) $errors;
+                            $error = [
+                                'error' => true,
+                                'message' => $errorsString
+                            ];
+            
+                            return $this->json($error, Response::HTTP_BAD_REQUEST);
+                        }   
+    
+                        $currentBookKid->setCategory($categoryGiven);
+
+
+                    }
+                    // sinon on le laisse errer dans les limbes
+                 
+            // CHECK RATING if given
+
+                if($dataKid->getRating() !== null){
+                    
+                    $errors = $validator->validatePropertyValue($dataKid, 'rating', $dataKid->getRating());
+                    if ((count($errors) > 0) ){
+                        
+                        $errorsString = (string) $errors;
+                        $error = [
+                            'error' => true,
+                            'message' => $errorsString
+                        ];
+        
+                        return $this->json($error, Response::HTTP_BAD_REQUEST);
+                    }  
+                    
+                    $currentBookKid->setRating($dataKid->getRating());
+                
+                } 
+            // CHECK COMMENT if given
+
+                if($dataKid->getComment() !== null){
+                    
+                    $errors = $validator->validatePropertyValue($dataKid, 'comment', $dataKid->getComment());
+                    if ((count($errors) > 0) ){
+                        
+                        $errorsString = (string) $errors;
+                        $error = [
+                            'error' => true,
+                            'message' => $errorsString
+                        ];
+        
+                        return $this->json($error, Response::HTTP_BAD_REQUEST);
+                    }   
+                    $currentBookKid->setComment($dataKid->getComment());
+                } 
+                
+            // CHECK IS_READ if given
+
+                if($dataKid->getIsRead() !== null){
+                    
+                    $errors = $validator->validatePropertyValue($dataKid, 'is_read', $dataKid->getIsRead());
+                    if ((count($errors) > 0) ){
+                        
+                        $errorsString = (string) $errors;
+                        $error = [
+                            'error' => true,
+                            'message' => $errorsString
+                        ];
+        
+                        return $this->json($error, Response::HTTP_BAD_REQUEST);
+                    }   
+                    $currentBookKid->setIsRead($dataKid->getIsRead());
+                }   
+                
+
+            $em->persist($currentBookKid);
+            $em->flush();
+
+            return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
+        }
+
+
       /**
      * Show last book modified for a kid
      *
