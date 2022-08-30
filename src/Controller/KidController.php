@@ -178,26 +178,6 @@ class KidController extends AbstractController
                     }   
                     $currentBookKid->setIsRead($dataKid->getIsRead());
                 }   
-
-            // CHECK CATEGORY if given
-            
-                // if($categoryGiven !== ""){
-                   
-
-                //     $errors = $validator->validatePropertyValue($dataKid, 'category', $dataKid->getCategory());
-                //     if ((count($errors) > 0) ){
-                        
-                //         $errorsString = (string) $errors;
-                //         $error = [
-                //             'error' => true,
-                //             'message' => $errorsString
-                //         ];
-        
-                //         return $this->json($error, Response::HTTP_BAD_REQUEST);
-                //     }   
-
-                //     $currentBookKid->setCategory($categoryGiven);
-                // } 
                 
 
             $em->persist($currentBookKid);
