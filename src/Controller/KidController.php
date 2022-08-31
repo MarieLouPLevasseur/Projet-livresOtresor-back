@@ -890,6 +890,7 @@ class KidController extends AbstractController
 
      /**
      * @Route("/{id_kid}/bookkids/{id_bookKid}", name="delete_book", methods="DELETE", requirements={"id_kid"="\d+", "id_bookKid"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
    
