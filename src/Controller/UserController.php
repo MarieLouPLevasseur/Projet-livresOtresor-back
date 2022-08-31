@@ -16,6 +16,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\VarDumper\Cloner\Data;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
@@ -314,6 +316,7 @@ class UserController extends AbstractController
     }
 
 
+
      /** 
      * Update a user
      * 
@@ -321,7 +324,6 @@ class UserController extends AbstractController
      * @IsGranted("ROLE_USER")
      * @return Response
      */
-
     public function update(
         $id,
         EntityManagerInterface $em, 
@@ -401,6 +403,7 @@ class UserController extends AbstractController
                     'message' => $errorsString
                 ];
 
+
                 return $this->json($error, Response::HTTP_BAD_REQUEST);
             }
             $user->setLastname($dataUser->getLastname());
@@ -427,6 +430,8 @@ class UserController extends AbstractController
         $em->flush();
         return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
     }
+
+
 
      /**
      * @Route("/users/delete/{id<\d+>}", name="delete_user", methods="DELETE")
