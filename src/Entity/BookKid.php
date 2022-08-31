@@ -19,7 +19,7 @@ class BookKid
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"book_list", "book_list", "books_infos", "books_read", "books_wish"})
+     * @Groups({"book_list", "book_list", "books_infos", "books_read", "books_wish", "last_book_read", "booksByCategory"})
      */
     private $id;
 
@@ -31,7 +31,7 @@ class BookKid
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "last_book_read"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read","books_wish", "last_book_read"})
      * @Assert\Range(
      *      min = 0,
      *      max = 5,
@@ -110,10 +110,6 @@ class BookKid
         return $this->is_read;
     }
 
-    // public function isIsRead(): ?bool
-    // {
-    //     return $this->is_read;
-    // }
 
     public function setIsRead(bool $is_read): self
     {

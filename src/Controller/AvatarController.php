@@ -28,12 +28,12 @@ class AvatarController extends AbstractController
 
         if ($avatar === null )
         {
-        $error = [
-            'error' => true,
-            'message' => 'No avatar found for Id [' . $id . ']'
-        ];
+            $error = [
+                'error' => true,
+                'message' => 'No avatar found for Id [' . $id . ']'
+            ];
 
-        return $this->json($error, Response::HTTP_NOT_FOUND); // page 404
+                return $this->json($error, Response::HTTP_NOT_FOUND); // page 404
         }
     
         $jsonAvatarsShow = $serializer->serialize($avatar, 'json',['groups' => 'KidAvatar']);

@@ -38,7 +38,7 @@ class UserController extends AbstractController
      *
      * @Route("/registration", name="create", methods="POST")
      */
-    public function addUser( 
+    public function createUser( 
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
         SerializerInterface $serializer,
@@ -52,23 +52,15 @@ class UserController extends AbstractController
         
         $user = $serializer->deserialize($data, User::class, 'json');
 
+        // CHECK datas given
 
         $errors = $validator->validate($user);
 
 
         if (count($errors) > 0) {
-            /*
-            * Uses a __toString method on the $errors variable which is a
-            * ConstraintViolationList object. This gives us a nice string
-            * for debugging.
-            */
-            $errorsStringBook = (string) $errors;
+           
+            return $this->ErrorMessageNotValid($errors);
 
-            $error = [
-                'error' => true,
-                'message' => $errorsStringBook
-            ];
-            return $this->json($error, Response::HTTP_BAD_REQUEST);
         }
 
             $role = $roleRepository->findOneByRoleName("ROLE_USER");
@@ -81,11 +73,11 @@ class UserController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            $error = [
+            $message = [
                 'error' => false,
                 'message' => "L'utilisateur a bien été enregistré"
             ];
-            return $this->json($error, 201);
+            return $this->json($message, 201);
     }
 
 
@@ -100,17 +92,16 @@ class UserController extends AbstractController
     {
  
         $user = $userRepository->find($id);
+
+        // CHECK USER exists
+
         if ($user === null )
         {
 
-            // if the user doesn't  exist, display an error message.
+            return $this->ErrorMessageNotFound("The user not found for id: ", $id);
 
-            $error = [
-                'error' => true,
-                'message' => 'No user found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
         }
+
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_list']);
     }
 
@@ -126,13 +117,12 @@ class UserController extends AbstractController
     {
         $user = $userRepository->find($id);
 
+        // CHECK USER exists
+
         if ($user === null )
         {
-            $error = [
-                'error' => true,
-                'message' => 'No user found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
+            return $this->ErrorMessageNotFound("The user not found for id: ", $id);
+
         }
 
         $listKid = $user->getKid();
@@ -172,26 +162,22 @@ class UserController extends AbstractController
         $avatar = $avatarRepository->findOneByIsWinValue(0);
         $kidData->setProfileAvatar($avatar->getUrl()); 
        
+        // CHECK USER exists
+
         if ($user === null )
         {
-            $error = [
-                'error' => true,
-                'message' => 'No user found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
+            return $this->ErrorMessageNotFound("The user not found for id: ", $id);
+
         }
+
+        // CHECK datas given
 
         $errors = $validator->validate($kidData);
 
         if (count($errors) > 0) {
           
-            $errorsStringBook = (string) $errors;
+            return $this->ErrorMessageNotValid($errors);
 
-            $error = [
-                'error' => true,
-                'message' => $errorsStringBook
-            ];
-            return $this->json($error, Response::HTTP_BAD_REQUEST);
         }
 
         $password = $passwordHasher->hashPassword($kidData, $kidData->getPassword());
@@ -200,7 +186,13 @@ class UserController extends AbstractController
         $em->persist($kidData);
         $em->flush();
 
-        return $this->json("L'enfant a bien été enregistré", Response::HTTP_OK);        
+        $message = [
+            'error' => false,
+            'message' => "L'enfant a bien été enregistré"
+        ];
+
+
+        return $this->json($message, Response::HTTP_OK);        
 
     }
 
@@ -230,22 +222,16 @@ class UserController extends AbstractController
         
             if ($user === null )
             {
-                $error = [
-                    'error' => true,
-                    'message' => 'No user found for Id [' . $id_user . ']'
-                ];
-                return $this->json($error, Response::HTTP_NOT_FOUND);
+                return $this->ErrorMessageNotFound("The user not found for id: ", $id_user);
+
             }
 
         // CHECK KID exists
 
             if ($kid === null )
             {
-                $error = [
-                    'error' => true,
-                    'message' => 'No kid found for Id [' . $id_kid . ']'
-                ];
-                return $this->json($error, Response::HTTP_NOT_FOUND);
+                return $this->ErrorMessageNotFound("The Kid not found for id: ", $id_kid);
+
             }
 
         $data = $request->getContent();
@@ -276,13 +262,8 @@ class UserController extends AbstractController
             $errors = $validator->validatePropertyValue($dataKid, 'username', $dataKid->getUsername());
             if ((count($errors) > 0) ){
                
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+                return $this->ErrorMessageNotValid($errors);
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
             }   
 
             // set
@@ -296,13 +277,8 @@ class UserController extends AbstractController
             $errors = $validator->validatePropertyValue($dataKid, 'password', $dataKid->getPassword());
             if ((count($errors) > 0)) {
  
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+                return $this->ErrorMessageNotValid($errors);
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
             }
 
             $password = $passwordHasher->hashPassword($dataKid, $dataKid->getPassword());
@@ -312,7 +288,8 @@ class UserController extends AbstractController
 
         $em->persist($kid);
         $em->flush();
-        return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
+
+        return $this->prepareResponse('Successfully updated', [], [], false, Response::HTTP_OK );
     }
 
 
@@ -324,7 +301,7 @@ class UserController extends AbstractController
      * @IsGranted("ROLE_USER")
      * @return Response
      */
-    public function update(
+    public function updateUser(
         $id,
         EntityManagerInterface $em, 
         UserRepository $userRepository,
@@ -336,89 +313,60 @@ class UserController extends AbstractController
     {
         $user = $userRepository->find($id);
 
+        // CHECK USER exists
+
         if ($user === null )
         {
-            $error = [
-                'error' => true,
-                'message' => 'No user found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
+            return $this->ErrorMessageNotFound("The user not found for id: ", $id);
+
         }
 
         $data = $request->getContent();
         $dataUser = $serializer->deserialize($data, User::class, 'json');
 
+        // CHECK EMAIL if given
 
         if($dataUser->getEmail() == !null){
             $errors = $validator->validatePropertyValue($dataUser, 'email', $dataUser->getEmail());
             if ((count($errors) > 0) ){
-               
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+                
+                return $this->ErrorMessageNotValid($errors);
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
             }   
             $user->setEmail($dataUser->getEmail());
         } 
 
+        // CHECK FIRSTNAME if given
+
         if($dataUser->getFirstname()!== null){
             $errors = $validator->validatePropertyValue($dataUser, 'firstname', $dataUser->getFirstname());
             if ((count($errors) > 0) ){
-               
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
+                return $this->ErrorMessageNotValid($errors);
             } 
             $user->setFirstname($dataUser->getFirstname());  
         }
 
+        // CHECK LASTNAME if given
+
         if ($dataUser->getLastname()!== null) {
             $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
             if ((count($errors) > 0)) {
                
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+                return $this->ErrorMessageNotValid($errors);
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
             }
             $user->setLastname($dataUser->getLastname());
         }
-        if ($dataUser->getLastname()!== null) {
-            $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
-            if ((count($errors) > 0)) {
 
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+        // CHECK PASSWORD if given
 
-
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
-            }
-            $user->setLastname($dataUser->getLastname());
-        }
         if ($dataUser->getPassword()!== null) {
             $errors = $validator->validatePropertyValue($dataUser, 'password', $dataUser->getPassword());
             if ((count($errors) > 0)) {
  
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+                return $this->ErrorMessageNotValid($errors);
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
             }
 
             $password = $passwordHasher->hashPassword($dataUser, $dataUser->getPassword());
@@ -428,32 +376,33 @@ class UserController extends AbstractController
 
         $em->persist($user);
         $em->flush();
+
         return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
     }
 
 
 
      /**
-     * @Route("/users/delete/{id<\d+>}", name="delete_user", methods="DELETE")
+     * @Route("/users/delete/{id}", name="delete_user", methods="DELETE"), requirements={"id"="\d+"}
      * @return Response
      */
     public function delete(int $id, EntityManagerInterface $em, UserRepository $userRepository) :Response
     {
 
        $user = $userRepository->find($id);
-        if ($user === null )
-        {
-            $error = [
-                'error' => true,
-                'message' => 'No user found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
-        }
+
+        // CHECK USER exists
+
+            if ($user === null )
+            {
+                return $this->ErrorMessageNotFound("The user not found for id: ", $id);
+
+            }
 
         $em->remove($user);
         $em->flush();
 
-        return $this->prepareResponse("L'utilisateur supprimé avec succès",[] ,[], false, Response::HTTP_OK);
+        return $this->prepareResponse("The User has been deleted successfully",[] ,[], false, Response::HTTP_OK);
     }
 
 
@@ -472,25 +421,24 @@ class UserController extends AbstractController
         {
             $user = $userRepository->find($user_id);
             $kid = $kidRepository->find($kid_id);
-           // dd($user);
+
+        // CHECK USER exists
+
            if ($user === null )
            {
-               $error = [
-                   'error' => true,
-                   'message' => 'No user found for Id [' . $user_id . ']'
-               ];
-               return $this->json($error, Response::HTTP_NOT_FOUND);
-           }
-           
-               if ($kid === null )
-           {
-               $error = [
-                   'error' => true,
-                   'message' => 'No kid found for Id [' . $kid_id . ']'
-               ];
-               return $this->json($error, Response::HTTP_NOT_FOUND);
+            return $this->ErrorMessageNotFound("The user not found for id: ", $user_id);
+
            }
 
+        // CHECK KID exists
+
+               if ($kid === null )
+           {
+               return $this->ErrorMessageNotFound("The kid not found for id: ", $kid_id);
+               
+           }
+     
+        // CHECK if this kid belongs to this User
 
             if ($kid->getUser() !== $user){
 
@@ -507,9 +455,54 @@ class UserController extends AbstractController
 
         $em->remove($kid);
         $em->flush();
-        return $this->prepareResponse("L'enfant a été supprimé avec succès", [] ,[], false, Response::HTTP_OK);
+
+        return $this->prepareResponse("The kid was succesfully deleted", [] ,[], false, Response::HTTP_OK);
 
         }
+
+        
+
+    /**
+     * Sent error message if not valid
+     * @param mixed $errors errors found during validation
+     * 
+     */
+    private function ErrorMessageNotValid($errors){
+
+        if ((count($errors) > 0)) {
+
+             /*
+            * Uses a __toString method on the $errors variable which is a
+            * ConstraintViolationList object. This gives us a nice string
+            * for debugging.
+            */
+ 
+            $errorsString = (string) $errors;
+            $error = [
+                'error' => true,
+                'message' => $errorsString
+            ];
+
+            return $this->json($error, Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Send error message if not found
+     * @param string $message error message to send if not found
+     * @param int $id id
+     */
+    private function ErrorMessageNotFound( $messageError, $id){
+        
+
+        
+            $error = [
+                'error' => true,
+                'message' => $messageError."[" . $id . "]"
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);         
+
+    }
 
     /**
      * Manage Error message

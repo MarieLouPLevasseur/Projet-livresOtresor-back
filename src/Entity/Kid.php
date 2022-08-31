@@ -47,6 +47,8 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"book_list","books_infos", "userConnected"})
+     * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
+     * @Assert\Length(min=10)
      */
     private $profile_avatar;
 
