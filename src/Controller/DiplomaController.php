@@ -28,12 +28,12 @@ class DiplomaController extends AbstractController
 
         if ($diploma === null )
         {
-        $error = [
-            'error' => true,
-            'message' => 'No diploma found for Id [' . $id . ']'
-        ];
+            $error = [
+                'error' => true,
+                'message' => 'No diploma found for Id [' . $id . ']'
+            ];
 
-        return $this->json($error, Response::HTTP_NOT_FOUND); // page 404
+                return $this->json($error, Response::HTTP_NOT_FOUND); // page 404
         }
     
         $jsonDiplomasShow = $serializer->serialize($diploma, 'json',['groups' => 'KidDiploma']);

@@ -38,7 +38,7 @@ class UserController extends AbstractController
      *
      * @Route("/registration", name="create", methods="POST")
      */
-    public function addUser( 
+    public function createUser( 
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
         SerializerInterface $serializer,
@@ -52,6 +52,7 @@ class UserController extends AbstractController
         
         $user = $serializer->deserialize($data, User::class, 'json');
 
+        // CHECK datas given
 
         $errors = $validator->validate($user);
 
@@ -100,10 +101,11 @@ class UserController extends AbstractController
     {
  
         $user = $userRepository->find($id);
+
+        // CHECK USER exists
+
         if ($user === null )
         {
-
-            // if the user doesn't  exist, display an error message.
 
             $error = [
                 'error' => true,
@@ -111,6 +113,7 @@ class UserController extends AbstractController
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
+
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_list']);
     }
 
@@ -125,6 +128,8 @@ class UserController extends AbstractController
     public function listKids( int $id, UserRepository $userRepository, KidRepository $kidRepository): Response
     {
         $user = $userRepository->find($id);
+
+        // CHECK USER exists
 
         if ($user === null )
         {
@@ -172,6 +177,8 @@ class UserController extends AbstractController
         $avatar = $avatarRepository->findOneByIsWinValue(0);
         $kidData->setProfileAvatar($avatar->getUrl()); 
        
+        // CHECK USER exists
+
         if ($user === null )
         {
             $error = [
@@ -180,6 +187,8 @@ class UserController extends AbstractController
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
+
+        // CHECK datas given
 
         $errors = $validator->validate($kidData);
 
@@ -312,7 +321,8 @@ class UserController extends AbstractController
 
         $em->persist($kid);
         $em->flush();
-        return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
+
+        return $this->prepareResponse('Successfully updated', [], [], false, Response::HTTP_OK );
     }
 
 
@@ -324,7 +334,7 @@ class UserController extends AbstractController
      * @IsGranted("ROLE_USER")
      * @return Response
      */
-    public function update(
+    public function updateUser(
         $id,
         EntityManagerInterface $em, 
         UserRepository $userRepository,
@@ -335,6 +345,8 @@ class UserController extends AbstractController
         )
     {
         $user = $userRepository->find($id);
+
+        // CHECK USER exists
 
         if ($user === null )
         {
@@ -348,6 +360,7 @@ class UserController extends AbstractController
         $data = $request->getContent();
         $dataUser = $serializer->deserialize($data, User::class, 'json');
 
+        // CHECK EMAIL if given
 
         if($dataUser->getEmail() == !null){
             $errors = $validator->validatePropertyValue($dataUser, 'email', $dataUser->getEmail());
@@ -364,6 +377,8 @@ class UserController extends AbstractController
             $user->setEmail($dataUser->getEmail());
         } 
 
+        // CHECK FIRSTNAME if given
+
         if($dataUser->getFirstname()!== null){
             $errors = $validator->validatePropertyValue($dataUser, 'firstname', $dataUser->getFirstname());
             if ((count($errors) > 0) ){
@@ -379,6 +394,8 @@ class UserController extends AbstractController
             $user->setFirstname($dataUser->getFirstname());  
         }
 
+        // CHECK LASTNAME if given
+
         if ($dataUser->getLastname()!== null) {
             $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
             if ((count($errors) > 0)) {
@@ -393,21 +410,9 @@ class UserController extends AbstractController
             }
             $user->setLastname($dataUser->getLastname());
         }
-        if ($dataUser->getLastname()!== null) {
-            $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
-            if ((count($errors) > 0)) {
 
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+        // CHECK PASSWORD if given
 
-
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
-            }
-            $user->setLastname($dataUser->getLastname());
-        }
         if ($dataUser->getPassword()!== null) {
             $errors = $validator->validatePropertyValue($dataUser, 'password', $dataUser->getPassword());
             if ((count($errors) > 0)) {
@@ -428,27 +433,31 @@ class UserController extends AbstractController
 
         $em->persist($user);
         $em->flush();
+
         return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
     }
 
 
 
      /**
-     * @Route("/users/delete/{id<\d+>}", name="delete_user", methods="DELETE")
+     * @Route("/users/delete/{id}", name="delete_user", methods="DELETE"), requirements={"id"="\d+"}
      * @return Response
      */
     public function delete(int $id, EntityManagerInterface $em, UserRepository $userRepository) :Response
     {
 
        $user = $userRepository->find($id);
-        if ($user === null )
-        {
-            $error = [
-                'error' => true,
-                'message' => 'No user found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
-        }
+
+        // CHECK USER exists
+
+            if ($user === null )
+            {
+                $error = [
+                    'error' => true,
+                    'message' => 'No user found for Id [' . $id . ']'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
 
         $em->remove($user);
         $em->flush();
@@ -472,7 +481,9 @@ class UserController extends AbstractController
         {
             $user = $userRepository->find($user_id);
             $kid = $kidRepository->find($kid_id);
-           // dd($user);
+
+        // CHECK USER exists
+
            if ($user === null )
            {
                $error = [
@@ -481,7 +492,9 @@ class UserController extends AbstractController
                ];
                return $this->json($error, Response::HTTP_NOT_FOUND);
            }
-           
+
+        // CHECK KID exists
+
                if ($kid === null )
            {
                $error = [
@@ -491,6 +504,7 @@ class UserController extends AbstractController
                return $this->json($error, Response::HTTP_NOT_FOUND);
            }
 
+        // CHECK if this kid belongs to this User
 
             if ($kid->getUser() !== $user){
 
@@ -507,6 +521,7 @@ class UserController extends AbstractController
 
         $em->remove($kid);
         $em->flush();
+        
         return $this->prepareResponse("L'enfant a été supprimé avec succès", [] ,[], false, Response::HTTP_OK);
 
         }

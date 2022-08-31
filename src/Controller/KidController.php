@@ -25,7 +25,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
 /**
@@ -52,21 +51,23 @@ class KidController extends AbstractController
         )
     {
 
-        // dd("route");
         $kid = $kidRepository->find($id);
 
-        if ($kid === null )
-        {
-            $error = [
-                'error' => true,
-                'message' => 'No kid found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
-        }
+        // CHECK KID exists
+            if ($kid === null )
+            {
+                $error = [
+                    'error' => true,
+                    'message' => 'No kid found for Id [' . $id . ']'
+                ];
+
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
 
         $data = $request->getContent();
         $dataKid = $serializer->deserialize($data, Kid::class, 'json');
 
+        // CHECK datas given
 
         if($dataKid->getProfileAvatar() == !null){
             $errors = $validator->validatePropertyValue($dataKid, 'profile_avatar', $dataKid->getProfileAvatar());
@@ -85,6 +86,7 @@ class KidController extends AbstractController
 
         $em->persist($kid);
         $em->flush();
+
         return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
     }
 
@@ -141,15 +143,15 @@ class KidController extends AbstractController
             
                 $parsed_json = json_decode($data);
 
-                // vérifier si catégorie existe dans le json donné
-                    // si c'est différent de null on explore la chose
+                // Check if category exists in given json
+
                     if ($dataKid->getCategory() !== null) {
-                        // s'il existe : 
-                            // on vérifie si la catégorie existe bien
+                        
                         $categoryID = $parsed_json->{"category"}->{"id"};
                         $categoryGiven= $categoryRepository->find($categoryID);
-                      
                         
+                        
+                        // if exist in json: check if exists in database
                         if ($categoryGiven === null) {
                             $error = [
                                 'error' => true,
@@ -158,8 +160,7 @@ class KidController extends AbstractController
                             return $this->json($error, Response::HTTP_NOT_FOUND);
                         }
 
-                        // vérifier si les données entrantes sont valides
-
+                        // Check datas given
 
                         $errors = $validator->validatePropertyValue($dataKid, 'category', $dataKid->getCategory());
                         
@@ -178,7 +179,6 @@ class KidController extends AbstractController
 
 
                     }
-                    // sinon on le laisse errer dans les limbes
                  
             // CHECK RATING if given
 
@@ -245,7 +245,7 @@ class KidController extends AbstractController
         
 
 
-      /**
+     /**
      * Show last book modified for a kid
      *
      * @Route("/{id_kid}/books/last_read", name="last_book_read", methods="GET", requirements={"id_kid"="\d+"})
@@ -260,14 +260,16 @@ class KidController extends AbstractController
 
         $currentkid = $kidRepository->find($id_kid);
 
-        if ($currentkid === null )
-        {
-            $error = [
-                'error' => true,
-                'message' => 'No kid found for Id [' . $id_kid . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
-        }
+        // CHECK KID
+
+            if ($currentkid === null )
+            {
+                $error = [
+                    'error' => true,
+                    'message' => 'No kid found for Id [' . $id_kid . ']'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
 
         $mostRecentBook= $bookKidRepository->findBy(["kid"=>$id_kid], ['updated_at' => 'DESC'],1);
 
@@ -335,9 +337,8 @@ class KidController extends AbstractController
         
         $ReadBooks = $bookKidRepository->findAllByIsRead(true, $id_kid);
         $totalReadBooks = count($ReadBooks);
-        // $totalReadBooks = 46;
 
-        //******* */ CHECK CURRENT LEVEL: ***********
+        //******** CHECK CURRENT LEVEL: ***********
         // SET intermediate array where:
             // key = number of read books to start the level (B)
             // value = difference from total read books and amount of book needed to be read for the level (C)
@@ -394,7 +395,7 @@ class KidController extends AbstractController
         // BOOKS READ HIGHER THAN LAST REWARD : set manually since there is no higher level to compare to
         else if ($totalReadBooks >= end($rewardsArray)){
 
-            // ! SET FALSE DATA TO GIVE to front to set a false progress bar really high ??
+            // ! SET FALSE DATA TO GIVE to front to set a false progress bar really high 
             // $finalMinimumGap=$minimumGapValue[0];
 
             // $lastTargetKeyArray= array_keys($gapArray,$finalMinimumGap);
@@ -410,7 +411,7 @@ class KidController extends AbstractController
 
             // $nbBookToWinLevel= ($newGoal-$totalReadBooks);
 
-            // ! OR SEND ERROR to write a message if hit ??
+            // ! OR SEND ERROR to write a message if hit 
 
             $error = ["error"   => true,
                       "message" => "there is no more level actually available",
@@ -507,16 +508,16 @@ class KidController extends AbstractController
     {
         $currentKid = $kidRepository->find($id_kid);
 
-        if ($currentKid === null )
-        {
+            if ($currentKid === null )
+            {
 
-            $error = [
-                'error' => true,
-                'message' => 'No Kid found for Id [' . $id_kid . ']'
-            ];
+                $error = [
+                    'error' => true,
+                    'message' => 'No Kid found for Id [' . $id_kid . ']'
+                ];
 
-            return $this->json($error, Response::HTTP_NOT_FOUND); 
-        }
+                return $this->json($error, Response::HTTP_NOT_FOUND); 
+            }
 
         // count books
 
@@ -526,10 +527,10 @@ class KidController extends AbstractController
         // check if totalBooksRead < or = to 'is_win' and set those
         $currentAvatarsWon = $avatarRepository->findAllByIsWinValue($totalBooksRead);
 
-        foreach($currentAvatarsWon as $avatar){
+            foreach($currentAvatarsWon as $avatar){
 
-            $currentKid->addAvatar($avatar);
-        }
+                $currentKid->addAvatar($avatar);
+            }
 
         $currentKidAvatars = $currentKid->getAvatar();      
         $jsonAvatarsList = $serializer->serialize($currentKidAvatars, 'json',['groups' => 'KidAvatar']);
@@ -576,10 +577,10 @@ class KidController extends AbstractController
         // check if totalBooks < or = to 'is_win' and set those
         $currentDiplomasWon = $diplomaRepository->findAllByIsWinValue($totalBooksRead);
 
-        foreach($currentDiplomasWon as $diploma){
+            foreach($currentDiplomasWon as $diploma){
 
-            $currentKid->addDiploma($diploma);
-        }
+                $currentKid->addDiploma($diploma);
+            }
 
         $currentDiplomas = $currentKid->getDiploma();      
         $jsonDiplomasList = $serializer->serialize($currentDiplomas, 'json',['groups' => 'KidDiploma']);
@@ -613,35 +614,35 @@ class KidController extends AbstractController
         $currentBookKid = $bookKidRepository->findOneByKidandBook($id_kid, $id_book);
 
         // catch errors
-        if ($currentkid === null )
-        {
-            
-            $error = [
-                'error' => true,
-                'message' => 'No kid found for Id [' . $id_kid . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
-        }
+            if ($currentkid === null )
+            {
+                
+                $error = [
+                    'error' => true,
+                    'message' => 'No kid found for Id [' . $id_kid . ']'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
 
-        if ($currentBook === null )
-        {
-            
-            $error = [
-                'error' => true,
-                'message' => 'No book found for Id [' . $id_book . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
-        }
+            if ($currentBook === null )
+            {
+                
+                $error = [
+                    'error' => true,
+                    'message' => 'No book found for Id [' . $id_book . ']'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
 
-        if ($currentBookKid === [] )
-        {
-            
-            $error = [
-                'error' => true,
-                'message' => 'No book found for this request'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
-        }
+            if ($currentBookKid === [] )
+            {
+                
+                $error = [
+                    'error' => true,
+                    'message' => 'No book found for this request'
+                ];
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
 
    
         $jsonBookShow = $serializer->serialize($currentBookKid, 'json',['groups' => 'books_infos']);
@@ -692,10 +693,10 @@ class KidController extends AbstractController
             */
             $errorsStringBook = (string) $errorsBookKid;
 
-            $error = [
-                'error' => true,
-                'message book' => $errorsStringBook
-            ];
+                $error = [
+                    'error' => true,
+                    'message book' => $errorsStringBook
+                ];
             return $this->json($error, Response::HTTP_BAD_REQUEST);
 
         }
@@ -784,6 +785,8 @@ class KidController extends AbstractController
     {
         $kid = $kidRepository->find($id_kid);
 
+        // CHECK KID exists
+
         if ($kid === null )
         {
 
@@ -816,6 +819,8 @@ class KidController extends AbstractController
 
         $currentKid = $kidRepository->find($id_kid);
 
+        // CHECK KID exists
+
         if ($currentKid === null )
             {
 
@@ -826,7 +831,7 @@ class KidController extends AbstractController
                 return $this->json($error, Response::HTTP_NOT_FOUND);
             }
 
-            $currentReadbooks = $bookKidRepository->findAllByIsRead(true, $id_kid);
+        $currentReadbooks = $bookKidRepository->findAllByIsRead(true, $id_kid);
 
             return $this->prepareResponse(
                 'OK',
@@ -848,6 +853,8 @@ class KidController extends AbstractController
 
         $currentKid = $kidRepository->find($id_kid);
 
+        // CHECK KID exists
+
         if ($currentKid === null )
             {
 
@@ -858,7 +865,7 @@ class KidController extends AbstractController
                 return $this->json($error, Response::HTTP_NOT_FOUND);
             }
 
-            $currentBooksWish = $bookKidRepository->findAllByIsRead(false, $id_kid);
+        $currentBooksWish = $bookKidRepository->findAllByIsRead(false, $id_kid);
 
             return $this->prepareResponse(
                 'OK',
@@ -879,6 +886,8 @@ class KidController extends AbstractController
         $kid = $kidRepository->find($id_kid);
         $allBookKid = $kid->getBookKids();
 
+        // CHECK KID exists
+
         if ($kid === null )
         {
             $error = [
@@ -889,19 +898,20 @@ class KidController extends AbstractController
         }
  
         $allBooks = [];
-        foreach ($allBookKid as $bookKid){
+            foreach ($allBookKid as $bookKid){
 
-            $book = $bookKid->getBook();
-            $allBooks [] = $book;
-        }
+                $book = $bookKid->getBook();
+                $allBooks [] = $book;
+            }
 
         $allAuthors = [];
-        foreach($allBooks as $currentBook){
-            $author = $currentBook->getAuthors();
-            $allAuthors []= $author;
-        }
+            foreach($allBooks as $currentBook){
+                $author = $currentBook->getAuthors();
+                $allAuthors []= $author;
+            }
 
         $jsonBookKid = $serializer->serialize($allAuthors, 'json',['groups' => 'author_list'] );
+
         return new JsonResponse($jsonBookKid, Response::HTTP_OK, [],true);
     }
 
@@ -924,51 +934,8 @@ class KidController extends AbstractController
         ): Response
     {
         $kid = $kidRepository->find($id_kid);
-        $authors = $authorsRepository->find($author_id);
 
-        $book_id = $bookRepository->findAll();   
-
-        $booksAuthors = $authors->getBook();
-
-        $bookkidArray=[];
-        foreach ($booksAuthors as $book){
-
-            $bookkid = $bookKidRepository->findOneByKidandBook($id_kid, $book->getId());
-
-            $bookkidArray [] = $bookkid;
-        }
-
-        if ($kid === null )
-        {
-
-            $error = [
-                'error' => true,
-                'message' => 'No books found for Id [' . $book_id. ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
-        }
-        
-        return $this->prepareResponse(
-            'OK',  
-            ['groups' => 'books_infos'],
-            ['data' => $bookkidArray]
-        ); 
-    }
-
-
-
-     /**
-     * @Route("/{id_kid}/bookkids/{id_bookKid}", name="delete_book", methods="DELETE", requirements={"id_kid"="\d+", "id_bookKid"="\d+"})
-     * @return Response
-     */
-   
-     public function deleteBooks(int $id_kid, int $id_bookKid ,BookKidRepository $bookKidRepository, EntityManagerInterface $em, KidRepository $kidRepository){
-
-        $kid = $kidRepository->find($id_kid);
-        $bookKid = $bookKidRepository->find($id_bookKid);
-
-        
-        
+         // CHECK KID exists
 
         if ($kid === null )
         {
@@ -979,7 +946,62 @@ class KidController extends AbstractController
             ];
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
+
+        $authors = $authorsRepository->find($author_id);
+
+         // CHECK AUTHOR exists
+
+        if ($authors === null )
+        {
+
+            $error = [
+                'error' => true,
+                'message' => 'No author found for Id [' . $author_id. ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        $booksAuthors = $authors->getBook();
+
+        $bookkidArray=[];
+            foreach ($booksAuthors as $book){
+
+                $bookkid = $bookKidRepository->findOneByKidandBook($id_kid, $book->getId());
+
+                $bookkidArray [] = $bookkid;
+            }       
         
+        return $this->prepareResponse(
+            'OK',  
+            ['groups' => 'books_infos'],
+            ['data' => $bookkidArray]
+        ); 
+    }
+
+     /**
+     * @Route("/{id_kid}/bookkids/{id_bookKid}", name="delete_book", methods="DELETE", requirements={"id_kid"="\d+", "id_bookKid"="\d+"})
+     * @return Response
+     */
+   
+     public function deleteBooks(int $id_kid, int $id_bookKid ,BookKidRepository $bookKidRepository, EntityManagerInterface $em, KidRepository $kidRepository){
+
+        $kid = $kidRepository->find($id_kid);
+        $bookKid = $bookKidRepository->find($id_bookKid);
+   
+        // CHECK KID exists
+
+        if ($kid === null )
+        {
+
+            $error = [
+                'error' => true,
+                'message' => 'No kid found for Id [' . $id_kid. ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        // CHECK BOOKKID exists
+
         if ($bookKid === null )
         {
 
@@ -990,35 +1012,30 @@ class KidController extends AbstractController
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
 
-        // dd($kid->getBookKids());
         $currentBookKid = $kid->getBookKids();
         
         $arrayBookkid = [];
 
-        foreach($currentBookKid as $bookkid){
-            $arrayBookkid [] = $bookkid;
-        }
+            foreach($currentBookKid as $bookkid){
+                $arrayBookkid [] = $bookkid;
+            }
 
-        if (!in_array($bookKid, $arrayBookkid)){
+            if (!in_array($bookKid, $arrayBookkid)){
 
-            $error = [
-                'error'=> true,
-                'message'=> "The book is not own by this kid. Can't delete this book."
+                $error = [
+                    'error'=> true,
+                    'message'=> "The book is not own by this kid. Can't delete this book."
+                ];
 
-            ];
-
-            return $this->json($error, Response::HTTP_NOT_FOUND);
-        }
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
 
         $em->remove($bookKid);
         $em->flush();
 
-        // return $this->json("the book has been remove successfully", 200);
         return $this->prepareResponse("the book has been remove successfully",[],[],false,200);
 
     }
-
-
 
      
     private function prepareResponse(
@@ -1035,10 +1052,11 @@ class KidController extends AbstractController
             'message' => $message,
         ];
 
-        foreach ($data as $key => $value)
-        {
-            $responseData[$key] = $value;
-        }
+            foreach ($data as $key => $value)
+            {
+                $responseData[$key] = $value;
+            }
+
         return $this->json($responseData, $httpCode, $headers, $options);
     }
 

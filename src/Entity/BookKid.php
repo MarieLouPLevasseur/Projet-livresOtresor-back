@@ -110,10 +110,6 @@ class BookKid
         return $this->is_read;
     }
 
-    // public function isIsRead(): ?bool
-    // {
-    //     return $this->is_read;
-    // }
 
     public function setIsRead(bool $is_read): self
     {
