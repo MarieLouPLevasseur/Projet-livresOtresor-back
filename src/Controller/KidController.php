@@ -12,7 +12,8 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Common\Annotations\AnnotationReader;
-
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -20,6 +21,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * Kid class
@@ -411,7 +413,72 @@ class KidController extends AbstractController
         
     }
 
+
+
+     /**
+     * @Route("/{id_kid}/bookkids/{id_bookKid}", name="delete_book", methods="DELETE", requirements={"id_kid"="\d+", "id_bookKid"="\d+"})
+     * @return Response
+     */
    
+     public function deleteBooks(int $id_kid, int $id_bookKid ,BookKidRepository $bookKidRepository, EntityManagerInterface $em, KidRepository $kidRepository){
+
+        $kid = $kidRepository->find($id_kid);
+        $bookKid = $bookKidRepository->find($id_bookKid);
+
+        
+        
+
+        if ($kid === null )
+        {
+
+            $error = [
+                'error' => true,
+                'message' => 'No kid found for Id [' . $id_kid. ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+        
+        if ($bookKid === null )
+        {
+
+            $error = [
+                'error' => true,
+                'message' => 'No book found for Id [' . $id_bookKid. ']'
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        // dd($kid->getBookKids());
+        $currentBookKid = $kid->getBookKids();
+        
+        $arrayBookkid = [];
+
+        foreach($currentBookKid as $bookkid){
+            $arrayBookkid [] = $bookkid;
+        }
+
+        if (!in_array($bookKid, $arrayBookkid)){
+
+            $error = [
+                'error'=> true,
+                'message'=> "The book is not own by this kid. Can't delete this book."
+
+            ];
+
+            return $this->json($error, Response::HTTP_NOT_FOUND);
+        }
+
+        $em->remove($bookKid);
+        $em->flush();
+
+        // return $this->json("the book has been remove successfully", 200);
+        return $this->prepareResponse("the book has been remove successfully",[],[],false,200);
+
+    }
+
+
+
+     
     private function prepareResponse(
         string $message, 
         array $options = [], 

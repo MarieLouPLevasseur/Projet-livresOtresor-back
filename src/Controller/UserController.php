@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\VarDumper\Cloner\Data;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * Undocumented class
@@ -189,11 +190,13 @@ class UserController extends AbstractController
 
     }
 
-     /** 
+    /** 
+     * Update a user
+     * 
      * @Route("/users/{id}", name="update_user", methods="PATCH", requirements={"id"="\d+"})
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
-
     public function update(
         $id,
         EntityManagerInterface $em, 
@@ -205,9 +208,6 @@ class UserController extends AbstractController
         )
     {
         $user = $userRepository->find($id);
-        $data = $request->getContent();
-        $password = $passwordHasher->hashPassword($user, $user->getPassword());
-        $data->setPassword($password);
 
         if ($user === null )
         {
@@ -218,21 +218,92 @@ class UserController extends AbstractController
             return $this->json($error, Response::HTTP_NOT_FOUND);
         }
 
-        $serializer->deserialize($data, User::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $user]);
+        $data = $request->getContent();
+        $dataUser = $serializer->deserialize($data, User::class, 'json');
 
-        $errors = $validator->validate($user);
 
-        if (count($errors) > 0) {
+        if($dataUser->getEmail() == !null){
+            $errors = $validator->validatePropertyValue($dataUser, 'email', $dataUser->getEmail());
+            if ((count($errors) > 0) ){
+               
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
 
-            $errorsString = (string) $errors;
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }   
+            $user->setEmail($dataUser->getEmail());
+        } 
 
-            return $this->prepareResponse($errorsString, [], [], true, Response::HTTP_BAD_REQUEST);
+        if($dataUser->getFirstname()!== null){
+            $errors = $validator->validatePropertyValue($dataUser, 'firstname', $dataUser->getFirstname());
+            if ((count($errors) > 0) ){
+               
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            } 
+            $user->setFirstname($dataUser->getFirstname());  
         }
 
-        $em->flush();
+        if ($dataUser->getLastname()!== null) {
+            $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
+            if ((count($errors) > 0)) {
+               
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
 
-        return $this->prepareResponse('Mis à jour avec succès', [], [], false, Response::HTTP_OK );
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }
+            $user->setLastname($dataUser->getLastname());
+        }
+        if ($dataUser->getLastname()!== null) {
+            $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
+            if ((count($errors) > 0)) {
+
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }
+            $user->setLastname($dataUser->getLastname());
+        }
+        if ($dataUser->getPassword()!== null) {
+            $errors = $validator->validatePropertyValue($dataUser, 'password', $dataUser->getPassword());
+            if ((count($errors) > 0)) {
+ 
+                $errorsString = (string) $errors;
+                $error = [
+                    'error' => true,
+                    'message' => $errorsString
+                ];
+
+                return $this->json($error, Response::HTTP_BAD_REQUEST);
+            }
+
+            $password = $passwordHasher->hashPassword($dataUser, $dataUser->getPassword());
+            $dataUser->setPassword($password);
+            $user->setPassword($dataUser->getPassword());
+        }
+
+        $em->persist($user);
+        $em->flush();
+        return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
     }
+
+
 
      /**
      * @Route("/users/delete/{id<\d+>}", name="delete_user", methods="DELETE")
