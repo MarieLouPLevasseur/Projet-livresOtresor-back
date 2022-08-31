@@ -107,11 +107,8 @@ class UserController extends AbstractController
         if ($user === null )
         {
 
-            $error = [
-                'error' => true,
-                'message' => 'No user found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
+            return $this->ErrorMessageNotFound("The user not found for id: ", $id);
+
         }
 
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_list']);
@@ -133,11 +130,8 @@ class UserController extends AbstractController
 
         if ($user === null )
         {
-            $error = [
-                'error' => true,
-                'message' => 'No user found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
+            return $this->ErrorMessageNotFound("The user not found for id: ", $id);
+
         }
 
         $listKid = $user->getKid();
@@ -181,11 +175,8 @@ class UserController extends AbstractController
 
         if ($user === null )
         {
-            $error = [
-                'error' => true,
-                'message' => 'No user found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
+            return $this->ErrorMessageNotFound("The user not found for id: ", $id);
+
         }
 
         // CHECK datas given
@@ -239,22 +230,16 @@ class UserController extends AbstractController
         
             if ($user === null )
             {
-                $error = [
-                    'error' => true,
-                    'message' => 'No user found for Id [' . $id_user . ']'
-                ];
-                return $this->json($error, Response::HTTP_NOT_FOUND);
+                return $this->ErrorMessageNotFound("The user not found for id: ", $id_user);
+
             }
 
         // CHECK KID exists
 
             if ($kid === null )
             {
-                $error = [
-                    'error' => true,
-                    'message' => 'No kid found for Id [' . $id_kid . ']'
-                ];
-                return $this->json($error, Response::HTTP_NOT_FOUND);
+                return $this->ErrorMessageNotFound("The Kid not found for id: ", $id_kid);
+
             }
 
         $data = $request->getContent();
@@ -350,11 +335,8 @@ class UserController extends AbstractController
 
         if ($user === null )
         {
-            $error = [
-                'error' => true,
-                'message' => 'No user found for Id [' . $id . ']'
-            ];
-            return $this->json($error, Response::HTTP_NOT_FOUND);
+            return $this->ErrorMessageNotFound("The user not found for id: ", $id);
+
         }
 
         $data = $request->getContent();
@@ -452,11 +434,8 @@ class UserController extends AbstractController
 
             if ($user === null )
             {
-                $error = [
-                    'error' => true,
-                    'message' => 'No user found for Id [' . $id . ']'
-                ];
-                return $this->json($error, Response::HTTP_NOT_FOUND);
+                return $this->ErrorMessageNotFound("The user not found for id: ", $id);
+
             }
 
         $em->remove($user);
@@ -486,24 +465,18 @@ class UserController extends AbstractController
 
            if ($user === null )
            {
-               $error = [
-                   'error' => true,
-                   'message' => 'No user found for Id [' . $user_id . ']'
-               ];
-               return $this->json($error, Response::HTTP_NOT_FOUND);
+            return $this->ErrorMessageNotFound("The user not found for id: ", $user_id);
+
            }
 
         // CHECK KID exists
 
                if ($kid === null )
            {
-               $error = [
-                   'error' => true,
-                   'message' => 'No kid found for Id [' . $kid_id . ']'
-               ];
-               return $this->json($error, Response::HTTP_NOT_FOUND);
+               return $this->ErrorMessageNotFound("The kid not found for id: ", $kid_id);
+               
            }
-
+     
         // CHECK if this kid belongs to this User
 
             if ($kid->getUser() !== $user){
@@ -521,10 +494,26 @@ class UserController extends AbstractController
 
         $em->remove($kid);
         $em->flush();
-        
+
         return $this->prepareResponse("L'enfant a été supprimé avec succès", [] ,[], false, Response::HTTP_OK);
 
         }
+
+    /**
+     * Send error message if not found
+     * @param string $message error message to send if not found
+     * @param int $id id
+     */
+    private function ErrorMessageNotFound( $messageError, $id){
+
+        
+            $error = [
+                'error' => true,
+                'message' => $messageError."[" . $id . "]"
+            ];
+            return $this->json($error, Response::HTTP_NOT_FOUND);         
+
+    }
 
     /**
      * Manage Error message
