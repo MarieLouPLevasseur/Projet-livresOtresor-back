@@ -6,6 +6,7 @@ use App\Repository\RoleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=RoleRepository::class)
@@ -21,6 +22,7 @@ class Role
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user_list", "userConnected"})
      */
     private $name;
 
@@ -55,7 +57,6 @@ class Role
     public function setName(string $name): self
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -73,7 +74,6 @@ class Role
             $this->kids[] = $kid;
             $kid->setRole($this);
         }
-
         return $this;
     }
 
@@ -85,7 +85,6 @@ class Role
                 $kid->setRole(null);
             }
         }
-
         return $this;
     }
 
@@ -103,7 +102,6 @@ class Role
             $this->users[] = $user;
             $user->setRole($this);
         }
-
         return $this;
     }
 
@@ -115,7 +113,6 @@ class Role
                 $user->setRole(null);
             }
         }
-
         return $this;
     }
 }

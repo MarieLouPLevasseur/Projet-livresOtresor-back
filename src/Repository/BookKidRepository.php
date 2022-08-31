@@ -41,14 +41,13 @@ class BookKidRepository extends ServiceEntityRepository
 
 
     /**
+     *Find all Book_kid by Kid and category
      * 
-     *
-
-     * @param [type] $kid_id
-     * @param [type] $category_id
-     * 
+     * @param int $kid_id
+     * @param int $category_id
+     * @return mixed
      */
-    public function findAllByKidAndCategory($kid_id,$category_id) //: ?BookKid
+    public function findAllByKidAndCategory($kid_id,$category_id) 
    {
 
             $entityManager = $this->getEntityManager();
@@ -62,53 +61,49 @@ class BookKidRepository extends ServiceEntityRepository
                 WHERE k.id = :kid_id AND c.id = :category_id
                 '
             )
-            // ->setParameter('kid_id', $kid_id, 'category_id', $category_id);
+          
             ->setParameters(array('kid_id'=> $kid_id, 'category_id' => $category_id));
 
-            // returns an array of Product objects
             return $query->getResult();      
    }
 
    /**
-    * Find all book of a kid : by read or not read
+    * Find all books of a kid : by read or not read
     *
-    * @param boolean $is_read_value
+    * @param boolean $is_read_value 
     * @param int $kid_id
-    * 
+    * @return  mixed
     */
    public function findAllByIsRead($is_read_value, $kid_id)//:BookKid
    {
             $entityManager = $this->getEntityManager();
             $query = $entityManager->createQuery(
-                // ! les alias sont obligatoire ici
+                
                 'SELECT bk, k
                 FROM App\Entity\BookKid bk
                 JOIN bk.kid k
                 WHERE k.id = :kid_id AND bk.is_read = :is_read_value
                 '
             )
-            // ->setParameter('kid_id', $kid_id, 'category_id', $category_id);
             ->setParameters(array('kid_id'=> $kid_id, 'is_read_value' => $is_read_value));
 
-            // returns an array of Product objects
             return $query->getResult();
    }
 
-   
-   
    
    /**
        * Find One book_kid by: kid and book 
        *
        * @param int $book_id
        * @param int $kid_id
+       * @return  mixed
        * 
        */
        public function findOneByKidandBook($kid_id, $book_id)
        {
                 $entityManager = $this->getEntityManager();
                 $query = $entityManager->createQuery(
-                    // ! les alias sont obligatoire ici
+                    
                     'SELECT bk, k
                     FROM App\Entity\BookKid bk
                     JOIN bk.kid k
@@ -116,36 +111,11 @@ class BookKidRepository extends ServiceEntityRepository
                     WHERE k.id = :kid_id AND o.id = :book_id
                     '
                 )
-                // ->setParameter('kid_id', $kid_id, 'category_id', $category_id);
+
                 ->setParameters(array('kid_id'=> $kid_id, 'book_id' => $book_id));
     
-                // returns an array of Product objects
+
                 return $query->getResult();
        }
 
-
-//    /**
-//     * @return BookKid[] Returns an array of BookKid objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('b.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?BookKid
-//    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

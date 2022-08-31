@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=AvatarRepository::class)
@@ -24,6 +25,9 @@ class Avatar
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"KidAvatar"})
+     * @Assert\NotBlank(message = "Ce champ ne peut pas être vide")
+     * @Assert\NotNull(message = "Ce champ ne peut pas être vide")
+     * @Assert\Length(min=10)
      */
     private $url;
 
@@ -67,7 +71,6 @@ class Avatar
     public function setIsWin(int $is_win): self
     {
         $this->is_win = $is_win;
-
         return $this;
     }
 

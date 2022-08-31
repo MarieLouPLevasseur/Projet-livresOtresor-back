@@ -8,8 +8,15 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+use Symfony\Component\Validator\Constraints as Assert;
+use Symdony\Component\Validator\Constraints\NotBlank;
+
+
+
+
 /**
  * @ORM\Entity(repositoryClass=BookRepository::class)
+ * 
  */
 class Book
 {
@@ -18,7 +25,7 @@ class Book
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
 
-     * @Groups({"booksByCategory","book_list", "books_read", "books_wish" , "books_infos"})
+     * @Groups({"booksByCategory","book_list", "books_read", "books_wish" , "books_infos", "last_book_read"})
      */
     private $id;
     
@@ -26,19 +33,28 @@ class Book
 
      * @ORM\Column(type="bigint")
      * @Groups({"booksByCategory","book_list","books_read", "books_wish", "books_infos"})
+     * @Assert\NotNull
+     * @Assert\NotBlank
+     * @Assert\Length(min=13, max=13)
      * 
      */
     private $isbn;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"booksByCategory","book_list","books_infos","books_read", "books_wish"})
+     * @Groups({"booksByCategory","book_list","books_infos","books_read", "books_wish", "last_book_read"})
+     * @Assert\NotNull
+     * @Assert\NotBlank
+     * @Assert\Length(min=2)
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "last_book_read"})
+     * @Assert\NotNull
+     * @Assert\NotBlank
+     * @Assert\Length(min=10)
      */
     private $description;
 
@@ -50,22 +66,27 @@ class Book
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"books_infos"})
      */
     private $created_at;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book")
+     * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book", cascade={"persist"})
      * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "author_list"})
+     * @Assert\Valid
      */
     private $authors;
 
     /**
-     * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="book")
+     * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="book", cascade={"persist"})
      * @Groups({"book_list"})
-     * 
      */
     private $bookKids;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"book_list","last_book_read"})
+     */
+    private $cover;
 
     public function __construct()
     {
@@ -73,7 +94,6 @@ class Book
         $this->kids = new ArrayCollection();
         $this->bookKids = new ArrayCollection();
         $this->created_at = new \DateTime();
-        
     }
 
     public function getId(): ?int
@@ -89,7 +109,6 @@ class Book
     public function setIsbn(int $isbn): self
     {
         $this->isbn = $isbn;
-
         return $this;
     }
 
@@ -101,7 +120,6 @@ class Book
     public function setTitle(string $title): self
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -113,7 +131,6 @@ class Book
     public function setDescription(string $description): self
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -125,7 +142,6 @@ class Book
     public function setPublisher(?string $publisher): self
     {
         $this->publisher = $publisher;
-
         return $this;
     }
 
@@ -137,7 +153,6 @@ class Book
     public function setCreatedAt(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
-
         return $this;
     }
 
@@ -155,7 +170,6 @@ class Book
             $this->authors[] = $author;
             $author->addBook($this);
         }
-
         return $this;
     }
 
@@ -164,7 +178,6 @@ class Book
         if ($this->authors->removeElement($author)) {
             $author->removeBook($this);
         }
-
         return $this;
     }
 
@@ -182,7 +195,6 @@ class Book
             $this->bookKids[] = $bookKid;
             $bookKid->setBook($this);
         }
-
         return $this;
     }
 
@@ -194,6 +206,18 @@ class Book
                 $bookKid->setBook(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCover(): ?string
+    {
+        return $this->cover;
+    }
+
+    public function setCover(string $cover): self
+    {
+        $this->cover = $cover;
 
         return $this;
     }

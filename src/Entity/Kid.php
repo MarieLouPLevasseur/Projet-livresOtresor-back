@@ -10,31 +10,33 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-
-
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=KidRepository::class)
+ * @UniqueEntity(fields={"username"}, message="Merci de choisir un autre pseudonyme")
  */
+
 class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "author_list"})
+     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "userConnected"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "author_list"})
+     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "author_list", "userConnected"})
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=3)( message = "Le nom d'utilisateur doit contenir au moins 3 caractères")
      */
     private $username;
 
     /**
+     * 
      * @ORM\Column(type="string", length=255)
      * @Groups({"userkids_list"})
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
@@ -44,7 +46,7 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list","books_infos"})
+     * @Groups({"book_list","books_infos", "userConnected"})
      */
     private $profile_avatar;
 
@@ -60,6 +62,7 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=Role::class, inversedBy="kids")
+     * @Groups({"userConnected"})
      */
     private $role;
 
@@ -80,7 +83,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
         $this->diploma = new ArrayCollection();
         $this->avatar = new ArrayCollection();
         $this->bookKids = new ArrayCollection();
-        $this->role = "ROLE_KID";
     }
 
     public function getId(): ?int
@@ -96,7 +98,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUsername(string $username): self
     {
         $this->username = $username;
-
         return $this;
     }
 
@@ -108,7 +109,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): self
     {
         $this->password = $password;
-
         return $this;
     }
 
@@ -120,7 +120,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     public function setProfileAvatar(string $profile_avatar): self
     {
         $this->profile_avatar = $profile_avatar;
-
         return $this;
     }
 
@@ -137,14 +136,12 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
         if (!$this->diploma->contains($diploma)) {
             $this->diploma[] = $diploma;
         }
-
         return $this;
     }
 
     public function removeDiploma(diploma $diploma): self
     {
         $this->diploma->removeElement($diploma);
-
         return $this;
     }
 
@@ -161,14 +158,12 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
         if (!$this->avatar->contains($avatar)) {
             $this->avatar[] = $avatar;
         }
-
         return $this;
     }
 
     public function removeAvatar(avatar $avatar): self
     {
         $this->avatar->removeElement($avatar);
-
         return $this;
     }
 
@@ -180,7 +175,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRole(?role $role): self
     {
         $this->role = $role;
-
         return $this;
     }
 
@@ -192,7 +186,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUser(?User $user): self
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -210,7 +203,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
             $this->bookKids[] = $bookKid;
             $bookKid->setKid($this);
         }
-
         return $this;
     }
 
@@ -222,13 +214,12 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
                 $bookKid->setKid(null);
             }
         }
-
         return $this;
     }
+
     /**
      * Returning a salt is only needed, if you are not using a modern
      * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
-     *
      * @see UserInterface
      */
     public function getSalt(): ?string
@@ -247,12 +238,11 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return [$this->role];
+        return [$this->role->getName()];
     }
 
     /**
      * A visual identifier that represents this user.
-     *
      * @see UserInterface
      */
     public function getUserIdentifier(): string
