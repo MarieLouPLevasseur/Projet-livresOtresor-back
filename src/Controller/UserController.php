@@ -58,18 +58,9 @@ class UserController extends AbstractController
 
 
         if (count($errors) > 0) {
-            /*
-            * Uses a __toString method on the $errors variable which is a
-            * ConstraintViolationList object. This gives us a nice string
-            * for debugging.
-            */
-            $errorsStringBook = (string) $errors;
+           
+            return $this->ErrorMessageNotValid($errors);
 
-            $error = [
-                'error' => true,
-                'message' => $errorsStringBook
-            ];
-            return $this->json($error, Response::HTTP_BAD_REQUEST);
         }
 
             $role = $roleRepository->findOneByRoleName("ROLE_USER");
@@ -82,11 +73,11 @@ class UserController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            $error = [
+            $message = [
                 'error' => false,
                 'message' => "L'utilisateur a bien été enregistré"
             ];
-            return $this->json($error, 201);
+            return $this->json($message, 201);
     }
 
 
@@ -185,13 +176,8 @@ class UserController extends AbstractController
 
         if (count($errors) > 0) {
           
-            $errorsStringBook = (string) $errors;
+            return $this->ErrorMessageNotValid($errors);
 
-            $error = [
-                'error' => true,
-                'message' => $errorsStringBook
-            ];
-            return $this->json($error, Response::HTTP_BAD_REQUEST);
         }
 
         $password = $passwordHasher->hashPassword($kidData, $kidData->getPassword());
@@ -200,7 +186,13 @@ class UserController extends AbstractController
         $em->persist($kidData);
         $em->flush();
 
-        return $this->json("L'enfant a bien été enregistré", Response::HTTP_OK);        
+        $message = [
+            'error' => false,
+            'message' => "L'enfant a bien été enregistré"
+        ];
+
+
+        return $this->json($message, Response::HTTP_OK);        
 
     }
 
@@ -270,13 +262,8 @@ class UserController extends AbstractController
             $errors = $validator->validatePropertyValue($dataKid, 'username', $dataKid->getUsername());
             if ((count($errors) > 0) ){
                
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+                return $this->ErrorMessageNotValid($errors);
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
             }   
 
             // set
@@ -290,13 +277,8 @@ class UserController extends AbstractController
             $errors = $validator->validatePropertyValue($dataKid, 'password', $dataKid->getPassword());
             if ((count($errors) > 0)) {
  
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+                return $this->ErrorMessageNotValid($errors);
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
             }
 
             $password = $passwordHasher->hashPassword($dataKid, $dataKid->getPassword());
@@ -347,14 +329,9 @@ class UserController extends AbstractController
         if($dataUser->getEmail() == !null){
             $errors = $validator->validatePropertyValue($dataUser, 'email', $dataUser->getEmail());
             if ((count($errors) > 0) ){
-               
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+                
+                return $this->ErrorMessageNotValid($errors);
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
             }   
             $user->setEmail($dataUser->getEmail());
         } 
@@ -364,14 +341,8 @@ class UserController extends AbstractController
         if($dataUser->getFirstname()!== null){
             $errors = $validator->validatePropertyValue($dataUser, 'firstname', $dataUser->getFirstname());
             if ((count($errors) > 0) ){
-               
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
+                return $this->ErrorMessageNotValid($errors);
             } 
             $user->setFirstname($dataUser->getFirstname());  
         }
@@ -382,13 +353,8 @@ class UserController extends AbstractController
             $errors = $validator->validatePropertyValue($dataUser, 'lastname', $dataUser->getLastname());
             if ((count($errors) > 0)) {
                
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+                return $this->ErrorMessageNotValid($errors);
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
             }
             $user->setLastname($dataUser->getLastname());
         }
@@ -399,13 +365,8 @@ class UserController extends AbstractController
             $errors = $validator->validatePropertyValue($dataUser, 'password', $dataUser->getPassword());
             if ((count($errors) > 0)) {
  
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+                return $this->ErrorMessageNotValid($errors);
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
             }
 
             $password = $passwordHasher->hashPassword($dataUser, $dataUser->getPassword());
@@ -441,7 +402,7 @@ class UserController extends AbstractController
         $em->remove($user);
         $em->flush();
 
-        return $this->prepareResponse("L'utilisateur supprimé avec succès",[] ,[], false, Response::HTTP_OK);
+        return $this->prepareResponse("The User has been deleted successfully",[] ,[], false, Response::HTTP_OK);
     }
 
 
@@ -495,9 +456,36 @@ class UserController extends AbstractController
         $em->remove($kid);
         $em->flush();
 
-        return $this->prepareResponse("L'enfant a été supprimé avec succès", [] ,[], false, Response::HTTP_OK);
+        return $this->prepareResponse("The kid was succesfully deleted", [] ,[], false, Response::HTTP_OK);
 
         }
+
+        
+
+    /**
+     * Sent error message if not valid
+     * @param mixed $errors errors found during validation
+     * 
+     */
+    private function ErrorMessageNotValid($errors){
+
+        if ((count($errors) > 0)) {
+
+             /*
+            * Uses a __toString method on the $errors variable which is a
+            * ConstraintViolationList object. This gives us a nice string
+            * for debugging.
+            */
+ 
+            $errorsString = (string) $errors;
+            $error = [
+                'error' => true,
+                'message' => $errorsString
+            ];
+
+            return $this->json($error, Response::HTTP_BAD_REQUEST);
+        }
+    }
 
     /**
      * Send error message if not found
@@ -505,6 +493,7 @@ class UserController extends AbstractController
      * @param int $id id
      */
     private function ErrorMessageNotFound( $messageError, $id){
+        
 
         
             $error = [

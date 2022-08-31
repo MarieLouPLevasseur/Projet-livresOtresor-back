@@ -68,13 +68,8 @@ class KidController extends AbstractController
             $errors = $validator->validatePropertyValue($dataKid, 'profile_avatar', $dataKid->getProfileAvatar());
             if ((count($errors) > 0) ){
                
-                $errorsString = (string) $errors;
-                $error = [
-                    'error' => true,
-                    'message' => $errorsString
-                ];
+                return $this->ErrorMessageNotValid($errors);
 
-                return $this->json($error, Response::HTTP_BAD_REQUEST);
             }   
             $kid->setProfileAvatar($dataKid->getProfileAvatar());
         } 
@@ -153,13 +148,8 @@ class KidController extends AbstractController
                         
                         if ((count($errors) > 0) ){
                             
-                            $errorsString = (string) $errors;
-                            $error = [
-                                'error' => true,
-                                'message' => $errorsString
-                            ];
-            
-                            return $this->json($error, Response::HTTP_BAD_REQUEST);
+                            return $this->ErrorMessageNotValid($errors);
+
                         }   
     
                         $currentBookKid->setCategory($categoryGiven);
@@ -174,13 +164,8 @@ class KidController extends AbstractController
                     $errors = $validator->validatePropertyValue($dataKid, 'rating', $dataKid->getRating());
                     if ((count($errors) > 0) ){
                         
-                        $errorsString = (string) $errors;
-                        $error = [
-                            'error' => true,
-                            'message' => $errorsString
-                        ];
-        
-                        return $this->json($error, Response::HTTP_BAD_REQUEST);
+                        return $this->ErrorMessageNotValid($errors);
+
                     }  
                     
                     $currentBookKid->setRating($dataKid->getRating());
@@ -193,13 +178,8 @@ class KidController extends AbstractController
                     $errors = $validator->validatePropertyValue($dataKid, 'comment', $dataKid->getComment());
                     if ((count($errors) > 0) ){
                         
-                        $errorsString = (string) $errors;
-                        $error = [
-                            'error' => true,
-                            'message' => $errorsString
-                        ];
-        
-                        return $this->json($error, Response::HTTP_BAD_REQUEST);
+                        return $this->ErrorMessageNotValid($errors);
+
                     }   
                     $currentBookKid->setComment($dataKid->getComment());
                 } 
@@ -211,13 +191,8 @@ class KidController extends AbstractController
                     $errors = $validator->validatePropertyValue($dataKid, 'is_read', $dataKid->getIsRead());
                     if ((count($errors) > 0) ){
                         
-                        $errorsString = (string) $errors;
-                        $error = [
-                            'error' => true,
-                            'message' => $errorsString
-                        ];
-        
-                        return $this->json($error, Response::HTTP_BAD_REQUEST);
+                        return $this->ErrorMessageNotValid($errors);
+
                     }   
                     $currentBookKid->setIsRead($dataKid->getIsRead());
                 }   
@@ -646,21 +621,11 @@ class KidController extends AbstractController
 
         // ********  CHECK ERRORS ************
 
-        $errorsBookKid = $validator->validate($bookKid);
+        $errors = $validator->validate($bookKid);
 
-        if ((count($errorsBookKid) > 0) ){
-            /*
-            * Uses a __toString method on the $errors variable which is a
-            * ConstraintViolationList object. This gives us a nice string
-            * for debugging.
-            */
-            $errorsStringBook = (string) $errorsBookKid;
+        if ((count($errors) > 0) ){
 
-                $error = [
-                    'error' => true,
-                    'message book' => $errorsStringBook
-                ];
-            return $this->json($error, Response::HTTP_BAD_REQUEST);
+            return $this->ErrorMessageNotValid($errors);
 
         }
 
@@ -1015,5 +980,29 @@ class KidController extends AbstractController
         ];
         return $this->json($error, Response::HTTP_NOT_FOUND);         
 
-}
+    }
+     /**
+     * Sent error message if not valid
+     * @param mixed $errors errors found during validation
+     * 
+     */
+    private function ErrorMessageNotValid($errors){
+
+        if ((count($errors) > 0)) {
+
+             /*
+            * Uses a __toString method on the $errors variable which is a
+            * ConstraintViolationList object. This gives us a nice string
+            * for debugging.
+            */
+ 
+            $errorsString = (string) $errors;
+            $error = [
+                'error' => true,
+                'message' => $errorsString
+            ];
+
+            return $this->json($error, Response::HTTP_BAD_REQUEST);
+        }
+    }
 }

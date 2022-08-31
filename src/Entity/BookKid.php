@@ -19,7 +19,7 @@ class BookKid
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"book_list", "book_list", "books_infos", "books_read", "books_wish", "last_book_read"})
+     * @Groups({"book_list", "book_list", "books_infos", "books_read", "books_wish", "last_book_read", "booksByCategory"})
      */
     private $id;
 
