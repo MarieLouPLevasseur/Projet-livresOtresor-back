@@ -60,6 +60,22 @@
 #     paths:
 #         '^/': null
 
+# ce qui marche à garder sans les autorisations ****************************************
+# nelmio_cors:
+#     defaults:
+#         origin_regex: true
+#         allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+#         allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
+#         allow_headers: ['Content-Type', 'Authorization']
+#         expose_headers: ['Link']
+#         max_age: 3600
+#     paths:
+#         '^/':
+#             allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+#             allow_headers: ['Content-Type', 'Authorization']
+#             allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
+#             max_age: 3600
+# *********************************************************************
 
 nelmio_cors:
     defaults:
@@ -70,8 +86,18 @@ nelmio_cors:
         expose_headers: ['Link']
         max_age: 3600
     paths:
-        '^/':
-            allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+        "^/":
+            # allow_origin: ["*"]
+            # allow_headers: ["X-Custom-Auth", "Content-Type", "Authorization", "Access-Control-Allow-Origin","Access-Control-Allow-Methods","Access-Control-Allow-Headers"]
             allow_headers: ['Content-Type', 'Authorization']
+            # allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
+            # max_age: 3600
+            # "^/":
+            origin_regex: true
+            # allow_origin: ['^http://localhost/:[0-9]+']
+            allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+            # allow_origin: ['^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$']
+            # allow_headers: ['Content-Type', 'Authorization']
             allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
             max_age: 3600
+            hosts: ["^api."]            

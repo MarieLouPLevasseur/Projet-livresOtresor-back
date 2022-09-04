@@ -2,12 +2,23 @@
 #index:
 #    path: /
 #    controller: App\Controller\DefaultController::index
+#********* ANCIEN CODE qui fonctionne*********
 login_check:
   path: /api/v1/login/user/login_check
 kid_login_check:
   path: /api/v1/login/kid/login_check
+# *****************************************
+# login_check:
+#   path: /api/v1/login/user/login_check
+#   controller: App\Controller\AuthUserController::login
+#   methods: POST
+# kid_login_check:
+#   path: /api/v1/login/kid/login_check
+#   controller: App\Controller\AuthKidController::login
+#   methods: POST
 
-
+api_login_check:
+    path: /api/login_check
 
 
 #index:

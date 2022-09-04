@@ -14,31 +14,41 @@ security:
         app_kid_provider:
             entity:
                 class: App\Entity\Kid
+                # class: App\Security\KidProvider
                 property: username
 
     firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
+       
 
-        main: 
-            lazy: true
-            custom_authenticator: App\Security\UserAuthenticator
 
+       
+            # entry_point: lexik_jwt_authentication.jwt_token_authenticator
+            # custom_authenticator: App\Security\UserAuthenticator
+            # custom_authenticator: App\Security\KidProvider
+            # custom_authenticator: lexik_jwt_authentication.jwt_token_authenticator
+            # entry_point: App\Security\UserAuthenticator
+            # provider: app_kid_provider
+        # login:
+        #     pattern: ^/api/login
+        #     stateless: true
+        #     json_login:
+        #         check_path: /api/login_check
+        #         success_handler: lexik_jwt_authentication.handler.authentication_success
+        #         failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        # 
         kid_secured_area:
-            pattern:   ^/api/v1/login
+            pattern:   ^/api/v1/login/kid
             provider: app_kid_provider
             json_login:
                 login_path: /api/v1/login/kid
                 check_path: app_login_kid
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
-
             logout:
                 path: app_logout
 
         user_secured_area:
-            pattern:   ^/
+            pattern:   ^/api/v1/login/user
             provider: app_user_provider
             json_login:
                 login_path: /api/v1/login/user
@@ -47,6 +57,28 @@ security:
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
             logout:
                 path: app_logout
+
+        api:
+            pattern:   ^/api
+            stateless: true
+            provider: app_kid_provider
+            # custom_authenticators:
+            #         - lexik_jwt_authentication.jwt_token_authenticator
+            jwt: ~
+
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main: 
+            lazy: true
+
+       
+       
+          
+            
+
+        
                 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
