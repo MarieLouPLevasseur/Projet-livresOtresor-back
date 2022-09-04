@@ -18,10 +18,7 @@ security:
                 property: username
 
     firewalls:
-       
-
-
-       
+  
             # entry_point: lexik_jwt_authentication.jwt_token_authenticator
             # custom_authenticator: App\Security\UserAuthenticator
             # custom_authenticator: App\Security\KidProvider

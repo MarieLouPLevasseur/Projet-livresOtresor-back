@@ -21,6 +21,7 @@ class AuthUserController extends AbstractController
     public function userLogin(Request $request,SerializerInterface $serializer,JWTTokenManagerInterface $JWTManager, UserRepository $userRepository,UserPasswordHasherInterface $passwordHasher)//: Response
     {
 
+        dd("je test le user");
 
          // Get posted datas
          $data = $request->getContent();
