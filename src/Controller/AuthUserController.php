@@ -21,60 +21,58 @@ class AuthUserController extends AbstractController
     public function userLogin(Request $request,SerializerInterface $serializer,JWTTokenManagerInterface $JWTManager, UserRepository $userRepository,UserPasswordHasherInterface $passwordHasher)//: Response
     {
 
-        dd("je test le user");
-
-         // Get posted datas
-         $data = $request->getContent();
-         $parsed_json = json_decode($data);
+        //  // Get posted datas
+        //  $data = $request->getContent();
+        //  $parsed_json = json_decode($data);
  
-         // Check if email exists
-         $email = $parsed_json->{"email"};
+        //  // Check if email exists
+        //  $email = $parsed_json->{"email"};
  
-         if (null == $email) {
-             return $this->json([
-                 'message' => 'missing credentials',
-             ], Response::HTTP_BAD_REQUEST);
-         }
+        //  if (null == $email) {
+        //      return $this->json([
+        //          'message' => 'missing credentials',
+        //      ], Response::HTTP_BAD_REQUEST);
+        //  }
 
  
-         // Check if kid exist
-         $validatedUser = $userRepository->loadUserByIdentifier($email);
+        //  // Check if kid exist
+        //  $validatedUser = $userRepository->loadUserByIdentifier($email);
  
-         if (!$validatedUser) {
-             return $this->json([
-                 'message' => 'No kid found',
-             ], Response::HTTP_BAD_REQUEST);
-         }
+        //  if (!$validatedUser) {
+        //      return $this->json([
+        //          'message' => 'No kid found',
+        //      ], Response::HTTP_BAD_REQUEST);
+        //  }
  
-         // Check if password valid
-         $passwordGiven = $parsed_json->{"password"};
- 
- 
-         $passwordCheck = $passwordHasher->isPasswordValid($validatedUser, $passwordGiven);
+        //  // Check if password valid
+        //  $passwordGiven = $parsed_json->{"password"};
  
  
-         if ($passwordCheck === false) {
-             return $this->json([
-                 'message' => 'False credentials',
-             ], Response::HTTP_UNAUTHORIZED);
-         }
- 
-         // dd($passwordCheck);
- 
-         $token =  $JWTManager->create($validatedUser);
-         $jsonUserData = $serializer->serialize($validatedUser, 'json', ['groups' => 'userConnected']);
+        //  $passwordCheck = $passwordHasher->isPasswordValid($validatedUser, $passwordGiven);
  
  
-         $finalJson = '
-             {
-             "user" : '.$jsonUserData.' ,
-             "token" : "'.$token.'"
-             }
-             ';
+        //  if ($passwordCheck === false) {
+        //      return $this->json([
+        //          'message' => 'False credentials',
+        //      ], Response::HTTP_UNAUTHORIZED);
+        //  }
  
-         return new JsonResponse ($finalJson, 200,[],true);
+        //  // dd($passwordCheck);
+ 
+        //  $token =  $JWTManager->create($validatedUser);
+        //  $jsonUserData = $serializer->serialize($validatedUser, 'json', ['groups' => 'userConnected']);
+ 
+ 
+        //  $finalJson = '
+        //      {
+        //      "user" : '.$jsonUserData.' ,
+        //      "token" : "'.$token.'"
+        //      }
+        //      ';
+ 
+        //  return new JsonResponse ($finalJson, 200,[],true);
         // all manage by UserAuthenticator
-        // return $this->json("houston...on a un probleme chez les users",400);
+        return $this->json("houston...on a un probleme chez les users",400);
 
     }
 

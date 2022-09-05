@@ -37,7 +37,7 @@ class KidController extends AbstractController
      * Update a kid avatar only
      * 
      * @Route("/{id}/avatar", name="update_kid_avatar", methods="PATCH", requirements={"id"="\d+"})
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
 

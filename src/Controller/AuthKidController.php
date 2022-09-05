@@ -36,66 +36,58 @@ class AuthKidController extends AbstractController implements ServiceSubscriberI
     public function kidLogin(Request $request,SerializerInterface $serializer,JWTTokenManagerInterface $JWTManager, KidRepository $kidRepository,UserPasswordHasherInterface $passwordHasher){
 
        
-        // Get posted datas
-        $data = $request->getContent();
-        $parsed_json = json_decode($data);
+        // // Get posted datas
+        // $data = $request->getContent();
+        // $parsed_json = json_decode($data);
 
-        // Check if username exists
-        $username = $parsed_json->{"username"};
+        // // Check if username exists
+        // $username = $parsed_json->{"username"};
 
-        if (null == $username) {
-            return $this->json([
-                'message' => 'missing credentials',
-            ], Response::HTTP_BAD_REQUEST);
-        }
+        // if (null == $username) {
+        //     return $this->json([
+        //         'message' => 'missing credentials',
+        //     ], Response::HTTP_BAD_REQUEST);
+        // }
 
+        // // Check if kid exist
+        // $validatedKid = $kidRepository->loadUserByIdentifier($username);
 
-        // $connected = $this->$jWTAuthenticator->getUserProvider();
-        // $connected = $this->security->getUser();
-        // $connected = $JWTManager->getUserIdClaim();
-        // dd($connected);
+        // if (!$validatedKid) {
+        //     return $this->json([
+        //         'message' => 'No kid found',
+        //     ], Response::HTTP_BAD_REQUEST);
+        // }
 
-        // Check if kid exist
-        $validatedKid = $kidRepository->loadUserByIdentifier($username);
-
-        if (!$validatedKid) {
-            return $this->json([
-                'message' => 'No kid found',
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        // Check if password valid
-        $passwordGiven = $parsed_json->{"password"};
+        // // Check if password valid
+        // $passwordGiven = $parsed_json->{"password"};
 
 
-        $passwordCheck = $passwordHasher->isPasswordValid($validatedKid, $passwordGiven);
+        // $passwordCheck = $passwordHasher->isPasswordValid($validatedKid, $passwordGiven);
 
 
-        if ($passwordCheck === false) {
-            return $this->json([
-                'message' => 'False credentials',
-            ], Response::HTTP_UNAUTHORIZED);
-        }
+        // if ($passwordCheck === false) {
+        //     return $this->json([
+        //         'message' => 'False credentials',
+        //     ], Response::HTTP_UNAUTHORIZED);
+        // }
 
-        // dd($passwordCheck);
-
-        $token =  $JWTManager->create($validatedKid);
-        $jsonKidData = $serializer->serialize($validatedKid, 'json', ['groups' => 'userConnected']);
+        // $token =  $JWTManager->create($validatedKid);
+        // $jsonKidData = $serializer->serialize($validatedKid, 'json', ['groups' => 'userConnected']);
 
 
-        $finalJson = '
-            {
-            "user" : '.$jsonKidData.' ,
-            "token" : "'.$token.'"
-            }
-            ';
+        // $finalJson = '
+        //     {
+        //     "user" : '.$jsonKidData.' ,
+        //     "token" : "'.$token.'"
+        //     }
+        //     ';
 
-        return new JsonResponse ($finalJson, 200,[],true);
+        // return new JsonResponse ($finalJson, 200,[],true);
 
       
 
         // all manage by UserAuthenticator
-        // return $this->json("houston...on a un probleme chez les kids",400);
+        return $this->json("houston...on a un probleme chez les kids",400);
 
     }
 
