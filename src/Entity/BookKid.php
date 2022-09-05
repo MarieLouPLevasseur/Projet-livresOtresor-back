@@ -62,7 +62,7 @@ class BookKid
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="bookKids", cascade={"persist"})
-     * @Groups({"booksByCategory"})
+     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish", "author_list","last_book_read","book_list"})
      * 
      */
     private $category;

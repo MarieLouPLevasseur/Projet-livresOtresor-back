@@ -36,7 +36,7 @@ class BookController extends AbstractController
             $books = $bookRepository->findBooksbyTitle($query);
         }
 
-        dd($books);
+        // dd($books);
 
         return $this->prepareResponse(
             'OK',
