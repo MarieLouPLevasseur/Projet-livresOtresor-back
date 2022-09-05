@@ -37,7 +37,7 @@ class KidController extends AbstractController
      * Update a kid avatar only
      * 
      * @Route("/{id}/avatar", name="update_kid_avatar", methods="PATCH", requirements={"id"="\d+"})
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
 
@@ -205,18 +205,20 @@ class KidController extends AbstractController
         }
 
         
+        // @IsGranted("IS_AUTHENTICATED_FULLY")
 
-
-     /**
-     * Show last book modified for a kid
-     *
-     * @Route("/{id_kid}/books/last_read", name="last_book_read", methods="GET", requirements={"id_kid"="\d+"})
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
-     */
+    /**
+    * Show last book modified for a kid
+    *
+    * @Route("/{id_kid}/books/last_read", name="last_book_read", methods="GET", requirements={"id_kid"="\d+"})
+    * @IsGranted("IS_AUTHENTICATED_FULLY")
+    * 
+    */
     public function showLastReadBook( 
         int $id_kid,
         BookKidRepository $bookKidRepository,
-        KidRepository $kidRepository
+        KidRepository $kidRepository,
+        SerializerInterface $serializer
         ): Response
     {
 
@@ -232,11 +234,21 @@ class KidController extends AbstractController
 
         $mostRecentBook= $bookKidRepository->findBy(["kid"=>$id_kid], ['updated_at' => 'DESC'],1);
 
-        return $this->prepareResponse(
-            'OK',
-            ['groups' => 'last_book_read'],
-            ['data' => $mostRecentBook ]
-        );
+            // dd($mostRecentBook);
+            $jsonMostRecentBook ="";
+            foreach ($mostRecentBook as $currentBook){
+
+                $jsonMostRecentBook = $serializer->serialize($currentBook, 'json',['groups' => 'last_book_read']);
+            }
+            // $jsonMostRecentBook = $serializer->serialize($mostRecentBook, 'json',['groups' => 'last_book_read']);
+            return new JsonResponse($jsonMostRecentBook, 200,[],true );
+
+
+        // return $this->prepareResponse(
+        //     'OK',
+        //     ['groups' => 'last_book_read'],
+        //     ['Bookkid' => $mostRecentBook ]
+        // );
 
     }
 

@@ -38,4 +38,18 @@ class KidRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function loadUserByIdentifier(string $username): ?Kid
+    {
+        $entityManager = $this->getEntityManager();
+
+        return $entityManager->createQuery(
+                'SELECT k
+                FROM App\Entity\Kid k
+                WHERE k.username = :query'
+                
+            )
+            ->setParameter('query', $username)
+            ->getOneOrNullResult();
+    }
 }

@@ -96,7 +96,7 @@ class UserAuthenticator extends AbstractAuthenticator
 
         $user = $token->getUser();
         $tokenJWT = $this->JWTManager->create($user);
-
+     
         $jsonUserData = $this->serializer->serialize($user, 'json', ['groups' => 'userConnected']);
 
 

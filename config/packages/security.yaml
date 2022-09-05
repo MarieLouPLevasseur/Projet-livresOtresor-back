@@ -7,6 +7,10 @@ security:
             algorithm: auto
 
     providers:
+
+        chain_provider:
+            chain:
+                providers: [app_user_provider, app_kid_provider]
         app_user_provider:
             entity:
                 class: App\Entity\User
@@ -17,28 +21,33 @@ security:
                 property: username
 
     firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-
-        main: 
-            lazy: true
-            custom_authenticator: App\Security\UserAuthenticator
-
+  
+            # entry_point: lexik_jwt_authentication.jwt_token_authenticator
+            # custom_authenticator: App\Security\UserAuthenticator
+           
+            # entry_point: App\Security\UserAuthenticator
+            # provider: app_kid_provider
+        # login:
+        #     pattern: ^/api/login
+        #     stateless: true
+        #     json_login:
+        #         check_path: /api/login_check
+        #         success_handler: lexik_jwt_authentication.handler.authentication_success
+        #         failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        # 
         kid_secured_area:
-            pattern:   ^/api/v1/login
+            pattern:   ^/api/v1/login/kid
             provider: app_kid_provider
             json_login:
                 login_path: /api/v1/login/kid
                 check_path: app_login_kid
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
-
             logout:
                 path: app_logout
 
         user_secured_area:
-            pattern:   ^/
+            pattern:   ^/api/v1/login/user
             provider: app_user_provider
             json_login:
                 login_path: /api/v1/login/user
@@ -47,45 +56,30 @@ security:
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
             logout:
                 path: app_logout
+
+        api:
+            pattern:   ^/api
+            stateless: true
+            provider: chain_provider
+            jwt: ~
+
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main: 
+            lazy: true
+
+
                 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_USER }
         - { path: ^/api/v1/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/registration, roles: PUBLIC_ACCESS }
 
         - { path: ^/api/v1, roles: IS_AUTHENTICATED_FULLY }
 
-        # public : /api/v1/users
-
-        # IS_AUTHENTICATED_FULLY:
-            #  /api/v1/categories
-            # /api/v1/kids/{id}/books
-            # /api/v1/kids/{id}/books/read
-            # /api/v1/kids/{id}/books/wish
-            # /api/v1/kids/{id}/category/{id}/books
-            # /api/v1/kids/{id}/avatars
-            # /api/v1/kids/{id}/diplomas
-            # /api/v1/kids/{id}/books CREATE
-            # /api/v1/kids/{id}/books/progress_bar
-            # /api/v1/kids/{id}/books/{id} GET
-            # /api/v1/kids/{id}/books/last_read --> pas encore fait
-            # /api/v1/avatars/{id}
-            # /api/v1/diplomas/{id}
-            # /api/v1/kids/{id}/bookkids/{id} DELETE --> pas encore fait
-            # /api/v1/kids/{id}/bookkids/{id} PATCH  --> pas encore fait
-
-        # user : 
-            
-            # /api/v1/users/{id} GET
-            # /api/v1/users/{id} UPDATE 
-            # /api/v1/users/{id} DELETE --> pas encore fait
-            # /api/v1/users/{id}/kids GET
-            # /api/v1/users/{id}/kids CREATE
-            
-            # /api/v1/users/{id}/kids/{id} UPDATE --> pas encore fait 
-            # /api/v1/users/{id}/kids/{id} DELETE --> pas encore fait
 
     role_hierarchy:
         ROLE_USER: ROLE_USER
