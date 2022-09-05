@@ -7,6 +7,10 @@ security:
             algorithm: auto
 
     providers:
+
+        chain_provider:
+            chain:
+                providers: [app_user_provider, app_kid_provider]
         app_user_provider:
             entity:
                 class: App\Entity\User
@@ -58,7 +62,7 @@ security:
         api:
             pattern:   ^/api
             stateless: true
-            provider: app_kid_provider
+            provider: chain_provider
             # custom_authenticators:
             #         - lexik_jwt_authentication.jwt_token_authenticator
             jwt: ~

@@ -33,7 +33,7 @@ class UserVoter extends Voter
                 if ($userSubject->getRole() === 'ROLE_KID')
                 {
                     // and user connected is a kid
-                    if (in_array('ROLE_MANAGER', $connectedUser->getRoles()))
+                    if (in_array('ROLE_USER', $connectedUser->getRoles()))
                     {
                         // limit access
                         return false;
