@@ -84,7 +84,8 @@ class Book
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list","last_book_read"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "author_list","last_book_read"})
+
      */
     private $cover;
 
