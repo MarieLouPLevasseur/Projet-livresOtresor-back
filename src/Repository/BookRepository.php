@@ -53,4 +53,31 @@ class BookRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
+
+    /**
+      * Find/search movies by title/content
+      *
+      * @param string $query user search 
+
+      * @return void
+      */
+      public function findBooksbyTitle(string $query)//:? Book
+      {
+          $builder = $this->createQueryBuilder('b');
+          $builder
+              ->where(
+                  $builder->expr()->andX(
+                      $builder->expr()->orX(
+                          $builder->expr()->like('b.title', ':query'),
+                          $builder->expr()->like('b.description', ':query'),
+                      ),
+                     //  $builder->expr()->isNotNull('m.released_at')
+                  )
+              )
+              ->setParameter('query', '%' . $query . '%')
+          ;
+          return $builder
+              ->getQuery()
+              ->getResult();
+      }
 }
