@@ -846,67 +846,10 @@ class KidController extends AbstractController
         }
 
         $allAuthors = $bookKidRepository->findByAuthors($id_kid);
-        // dd($test);
-        // $allAuthors = [];
-        // foreach($allBooks as $currentBook){
-        //     $author = $currentBook->getAuthors();
-        //     // dd($author);
-        //     // $name = $author->getName();
-        //     // if (!in_array($name,$allAuthors)) {
-        //         $allAuthors []= $author;
-        //     // }
-        // }
-
-        // ***********************test**************
-        // $booksAuthors = $authors->getBook();
-
-        // $currentBook=[];
-        //     foreach ($booksAuthors as $book){
-
-        //         $bookkid = $bookKidRepository->findOneByKidandBook($id_kid, $book->getId());
-
-        //         if($bookkid !== null){
-        //         $currentBook [] = $book;
-        //         }
-        //     }       
-        // dd($currentBook);
-        // ***************************************
-        // dd($allAuthors);
-
-        // $allName =[];
-        // foreach($allAuthors as $currentAuthor){
-
-        //     $name = $currentAuthor->name;
-        //     $allName []= $name;
-        // }
-        // $test = $bookKidRepository->findOneByKidandBook($id_kid,);
-
-        // récupere tous les book d'un enfant avec findOneByKidandBook
-
-        // recupere tous les book des auteurs complet
-
-        // compare les deux tableaux et ejecte ceux non présent
-
-        // dd($allAuthors);
-
-        // $authors = $bookKid->getBook()->getAuthors();
-        // foreach ($authors as $author) {
-        //     $nameAuthorGiven = $author->getName();
-            
-        //     $isAuthorInBase = $authorRepository->findAuthorByName($nameAuthorGiven);
-            
-        //     if ($isAuthorInBase !== []) {
-        //         // if exist set this one and don't let create a new author with same name
-
-        //         foreach ($isAuthorInBase as $authorToSetFromBase) {
-        //             $bookKid->getBook()->removeAuthor($author);
-        //             $bookKid->getBook()->addAuthor($authorToSetFromBase);
-        //         }
-        //     }      
-        // }
+       
         
-            $jsonBookKid = $serializer->serialize($allAuthors, 'json',['groups' => 'author_list'] );
-            // dd($jsonBookKid);
+            // $jsonBookKid = $serializer->serialize($allAuthors, 'json',['groups' => 'author_list'] );
+           
         // return $this->json($jsonBookKid,200);
         // return $this->prepareResponse(
         //         'OK',  

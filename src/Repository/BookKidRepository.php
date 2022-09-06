@@ -136,7 +136,7 @@ class BookKidRepository extends ServiceEntityRepository
             ->select('bk')
             ->from('App\Entity\BookKid', 'bk')
             ->join('bk.book', 'b')
-            ->join('b.authors', 'a')
+            ->join('b.authors', 'a') // join collection on the entity (not the property on the table) because of many to many
             ->addSelect('a.id')
             ->addSelect('a.name')
             ->where('bk.kid = :kid_id')
