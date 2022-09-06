@@ -837,16 +837,18 @@ class KidController extends AbstractController
                 $author = $currentBook->getAuthors();
                 $allAuthors []= $author;
             }
+        
+        
             $jsonBookKid = $serializer->serialize($allAuthors, 'json',['groups' => 'author_list'] );
             // dd($jsonBookKid);
         // return $this->json($jsonBookKid,200);
-        return $this->prepareResponse(
-                'OK',  
-                ['groups' => 'author_list'],
-                ['authors' => $allAuthors]
-            );
+        // return $this->prepareResponse(
+        //         'OK',  
+        //         ['groups' => 'author_list'],
+        //         ['authors' => $allAuthors]
+        //     );
         
-        // return new JsonResponse($jsonBookKid, Response::HTTP_OK, [],true);
+        return new JsonResponse($jsonBookKid, Response::HTTP_OK, [],true);
     }
 
 

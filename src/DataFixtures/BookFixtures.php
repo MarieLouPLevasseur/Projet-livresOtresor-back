@@ -136,6 +136,8 @@ class BookFixtures extends Fixture implements DependentFixtureInterface
                     $bookKidObj = new BookKid();
                     $bookKidObj->setIsRead(mt_rand(0,1));
                     $bookKidObj->setKid($faker->randomElement($allKids));
+                    $bookKidObj->setCategory($faker->randomElement($allCategories));
+
                     $bookObj->addBookKid($bookKidObj);
 
 
