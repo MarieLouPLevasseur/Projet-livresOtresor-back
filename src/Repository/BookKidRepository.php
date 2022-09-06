@@ -118,4 +118,35 @@ class BookKidRepository extends ServiceEntityRepository
                 return $query->getResult();
        }
 
+       /**
+       * Find Authors by kid 
+       *
+       * @return  mixed
+       * 
+       */
+      public function findByAuthors()
+      {
+        $kid_id = 126;
+
+        $entityManager = $this->getEntityManager();
+       
+        $qb = $entityManager->createQueryBuilder();
+        
+        $qb      
+            ->select('bk')
+            ->from('App\Entity\BookKid', 'bk')
+            ->join('bk.book', 'b')
+            ->join('b.authors', 'a')
+            ->addSelect('a.id')
+            ->addSelect('a.name')
+            ->where('bk.kid = :kid_id')
+            ->setParameter('kid_id', $kid_id)
+            ->groupBy('a.name');
+
+        $result = $qb->getQuery()->getResult();
+
+
+        return $result;
+      }
+
 }

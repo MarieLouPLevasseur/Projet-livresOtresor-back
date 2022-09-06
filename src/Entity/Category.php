@@ -17,13 +17,13 @@ class Category
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "author_list", "category"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "category"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "author_list", "category"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "category"})
 
      */
     private $name;

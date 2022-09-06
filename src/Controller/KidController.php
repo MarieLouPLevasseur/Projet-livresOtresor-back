@@ -812,9 +812,10 @@ class KidController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
-    public function listAuthors(int $id_kid, kidRepository $kidRepository, AuthorRepository $authors, SerializerInterface $serializer): Response
+    public function listAuthors(int $id_kid, kidRepository $kidRepository, AuthorRepository $authors,BookKidRepository $bookKidRepository, SerializerInterface $serializer): Response
     {
         $kid = $kidRepository->find($id_kid);
+        // $kid = $kidRepository->find($id_kid);
 
         // CHECK KID exists
 
@@ -824,20 +825,74 @@ class KidController extends AbstractController
 
         }
         $allBookKid = $kid->getBookKids();
+      
 
         $allBooks = [];
-            foreach ($allBookKid as $bookKid){
+        foreach ($allBookKid as $bookKid){
+            
+            $book = $bookKid->getBook();
+            $allBooks [] = $book;
+        }
 
-                $book = $bookKid->getBook();
-                $allBooks [] = $book;
-            }
+        $allAuthors = $bookKidRepository->findByAuthors();
+        // dd($test);
+        // $allAuthors = [];
+        // foreach($allBooks as $currentBook){
+        //     $author = $currentBook->getAuthors();
+        //     // dd($author);
+        //     // $name = $author->getName();
+        //     // if (!in_array($name,$allAuthors)) {
+        //         $allAuthors []= $author;
+        //     // }
+        // }
 
-        $allAuthors = [];
-            foreach($allBooks as $currentBook){
-                $author = $currentBook->getAuthors();
-                $allAuthors []= $author;
-            }
-        
+        // ***********************test**************
+        // $booksAuthors = $authors->getBook();
+
+        // $currentBook=[];
+        //     foreach ($booksAuthors as $book){
+
+        //         $bookkid = $bookKidRepository->findOneByKidandBook($id_kid, $book->getId());
+
+        //         if($bookkid !== null){
+        //         $currentBook [] = $book;
+        //         }
+        //     }       
+        // dd($currentBook);
+        // ***************************************
+        // dd($allAuthors);
+
+        // $allName =[];
+        // foreach($allAuthors as $currentAuthor){
+
+        //     $name = $currentAuthor->name;
+        //     $allName []= $name;
+        // }
+        // $test = $bookKidRepository->findOneByKidandBook($id_kid,);
+
+        // récupere tous les book d'un enfant avec findOneByKidandBook
+
+        // recupere tous les book des auteurs complet
+
+        // compare les deux tableaux et ejecte ceux non présent
+
+        // dd($allAuthors);
+
+        // $authors = $bookKid->getBook()->getAuthors();
+        // foreach ($authors as $author) {
+        //     $nameAuthorGiven = $author->getName();
+            
+        //     $isAuthorInBase = $authorRepository->findAuthorByName($nameAuthorGiven);
+            
+        //     if ($isAuthorInBase !== []) {
+        //         // if exist set this one and don't let create a new author with same name
+
+        //         foreach ($isAuthorInBase as $authorToSetFromBase) {
+        //             $bookKid->getBook()->removeAuthor($author);
+        //             $bookKid->getBook()->addAuthor($authorToSetFromBase);
+        //         }
+        //     }      
+        // }
         
             $jsonBookKid = $serializer->serialize($allAuthors, 'json',['groups' => 'author_list'] );
             // dd($jsonBookKid);

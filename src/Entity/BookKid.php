@@ -55,14 +55,14 @@ class BookKid
 
     /**
      * @ORM\ManyToOne(targetEntity=Book::class, inversedBy="bookKids", cascade={"persist"})
-     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish", "author_list","last_book_read"})
+     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish","last_book_read"})
      * @Assert\Valid
      */
     private $book;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="bookKids", cascade={"persist"})
-     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish", "author_list","last_book_read","book_list"})
+     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish","last_book_read","book_list"})
      * 
      */
     private $category;
