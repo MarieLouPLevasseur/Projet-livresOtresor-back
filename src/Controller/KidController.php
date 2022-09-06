@@ -619,7 +619,8 @@ class KidController extends AbstractController
             AuthorRepository $authorRepository,
             BookRepository $bookRepository,
             KidRepository $kidRepository,
-            BookKidRepository $bookKidRepository
+            BookKidRepository $bookKidRepository,
+            CategoryRepository $categoryRepository
     )  
 
     {
@@ -704,6 +705,13 @@ class KidController extends AbstractController
 
             $bookKid->setKid($kid);
 
+        // ********  SET Category ************
+
+            $category = $categoryRepository->findOneBy(['name'=>"Non-classé"],);
+            // dd($category);
+            $bookKid->setCategory($category);
+
+        // persist
             $em->persist($bookKid);
 
             $em->flush();
@@ -711,6 +719,9 @@ class KidController extends AbstractController
             return $this->prepareResponse(
                 'The book has been created',[],[],false, 201, 
             );
+
+        
+            
     }
 
      /**
@@ -834,7 +845,7 @@ class KidController extends AbstractController
             $allBooks [] = $book;
         }
 
-        $allAuthors = $bookKidRepository->findByAuthors();
+        $allAuthors = $bookKidRepository->findByAuthors($id_kid);
         // dd($test);
         // $allAuthors = [];
         // foreach($allBooks as $currentBook){
@@ -902,8 +913,12 @@ class KidController extends AbstractController
         //         ['groups' => 'author_list'],
         //         ['authors' => $allAuthors]
         //     );
+
+        $data = [
+            "authors"=>$allAuthors
+        ];
         
-        return new JsonResponse($jsonBookKid, Response::HTTP_OK, [],true);
+        return new JsonResponse($data, Response::HTTP_OK, [],false);
     }
 
 

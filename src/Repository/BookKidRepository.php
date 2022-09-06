@@ -124,9 +124,9 @@ class BookKidRepository extends ServiceEntityRepository
        * @return  mixed
        * 
        */
-      public function findByAuthors()
+      public function findByAuthors($kid_id)
       {
-        $kid_id = 126;
+        // $kid_id = 126;
 
         $entityManager = $this->getEntityManager();
        
