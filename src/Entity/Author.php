@@ -20,7 +20,7 @@ class Author
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"book_list"})
+     * @Groups({"book_list","booksByCategory","books_infos", "books_read", "books_wish", "author_list"})
      */
     private $id;
 

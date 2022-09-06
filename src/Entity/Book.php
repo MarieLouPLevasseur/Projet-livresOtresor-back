@@ -70,8 +70,8 @@ class Book
     private $created_at;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book", cascade={"persist"})
-     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "author_list"})
+     * @ORM\ManyToMany(targetEntity=Author::class, mappedBy="book", cascade={"persist"}, fetch="EAGER")
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish"})
      * @Assert\Valid
      */
     private $authors;
@@ -84,7 +84,7 @@ class Book
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "author_list","last_book_read"})
+     * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish","last_book_read"})
 
      */
     private $cover;

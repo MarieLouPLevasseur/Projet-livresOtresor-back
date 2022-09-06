@@ -619,7 +619,8 @@ class KidController extends AbstractController
             AuthorRepository $authorRepository,
             BookRepository $bookRepository,
             KidRepository $kidRepository,
-            BookKidRepository $bookKidRepository
+            BookKidRepository $bookKidRepository,
+            CategoryRepository $categoryRepository
     )  
 
     {
@@ -704,6 +705,13 @@ class KidController extends AbstractController
 
             $bookKid->setKid($kid);
 
+        // ********  SET Category ************
+
+            $category = $categoryRepository->findOneBy(['name'=>"Non-classé"],);
+            // dd($category);
+            $bookKid->setCategory($category);
+
+        // persist
             $em->persist($bookKid);
 
             $em->flush();
@@ -711,6 +719,9 @@ class KidController extends AbstractController
             return $this->prepareResponse(
                 'The book has been created',[],[],false, 201, 
             );
+
+        
+            
     }
 
      /**
@@ -812,9 +823,10 @@ class KidController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
-    public function listAuthors(int $id_kid, kidRepository $kidRepository, AuthorRepository $authors, SerializerInterface $serializer): Response
+    public function listAuthors(int $id_kid, kidRepository $kidRepository, AuthorRepository $authors,BookKidRepository $bookKidRepository, SerializerInterface $serializer): Response
     {
         $kid = $kidRepository->find($id_kid);
+        // $kid = $kidRepository->find($id_kid);
 
         // CHECK KID exists
 
@@ -824,23 +836,32 @@ class KidController extends AbstractController
 
         }
         $allBookKid = $kid->getBookKids();
+      
 
         $allBooks = [];
-            foreach ($allBookKid as $bookKid){
+        foreach ($allBookKid as $bookKid){
+            
+            $book = $bookKid->getBook();
+            $allBooks [] = $book;
+        }
 
-                $book = $bookKid->getBook();
-                $allBooks [] = $book;
-            }
+        $allAuthors = $bookKidRepository->findByAuthors($id_kid);
+       
+        
+            // $jsonBookKid = $serializer->serialize($allAuthors, 'json',['groups' => 'author_list'] );
+           
+        // return $this->json($jsonBookKid,200);
+        // return $this->prepareResponse(
+        //         'OK',  
+        //         ['groups' => 'author_list'],
+        //         ['authors' => $allAuthors]
+        //     );
 
-        $allAuthors = [];
-            foreach($allBooks as $currentBook){
-                $author = $currentBook->getAuthors();
-                $allAuthors []= $author;
-            }
-
-        $jsonBookKid = $serializer->serialize($allAuthors, 'json',['groups' => 'author_list'] );
-
-        return new JsonResponse($jsonBookKid, Response::HTTP_OK, [],true);
+        $data = [
+            "authors"=>$allAuthors
+        ];
+        
+        return new JsonResponse($data, Response::HTTP_OK, [],false);
     }
 
 
