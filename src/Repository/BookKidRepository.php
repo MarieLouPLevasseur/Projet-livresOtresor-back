@@ -149,4 +149,64 @@ class BookKidRepository extends ServiceEntityRepository
         return $result;
       }
 
+      
+
+       /**
+       * Find Series by kid 
+       *
+       * @return  mixed
+       * 
+       */
+      public function findBySeries($kid_id)
+      {
+        // $kid_id = 70;
+
+        $entityManager = $this->getEntityManager();
+       
+        $qb = $entityManager->createQueryBuilder();
+        
+        $qb      
+            ->select('bk')
+            ->from('App\Entity\BookKid', 'bk')
+            ->join('bk.series', 's') // join collection on the entity (not the property on the table) because of many to many
+            ->addSelect('s.id')
+            ->addSelect('s.name')
+            ->where('bk.kid = :kid_id')
+            ->setParameter('kid_id', $kid_id)
+            ->groupBy('s.name');
+
+        $result = $qb->getQuery()->getResult();
+
+
+        return $result;
+      }
+
+      
+
+       /**
+       * Find all book_kid by: kid and serie 
+       *
+       * @param int $serie_id
+       * @param int $kid_id
+       * @return  mixed
+       * 
+       */
+      public function findAllByKidAndSerie($kid_id, $serie_id)
+      {
+               $entityManager = $this->getEntityManager();
+               $query = $entityManager->createQuery(
+                   
+                   'SELECT bk, k
+                   FROM App\Entity\BookKid bk
+                   JOIN bk.kid k
+                   JOIN bk.series s
+                   WHERE k.id = :kid_id AND s.id = :series_id
+                   '
+               )
+
+               ->setParameters(array('kid_id'=> $kid_id, 'series_id' => $serie_id));
+   
+
+               return $query->getResult();
+      }
 }
