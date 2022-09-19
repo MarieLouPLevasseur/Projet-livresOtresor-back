@@ -3,16 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Kid;
+use App\Entity\Series;
 use App\Entity\BookKid;
 use Doctrine\ORM\EntityManager;
 use App\Repository\KidRepository;
 use App\Repository\BookRepository;
 use App\Repository\AuthorRepository;
 use App\Repository\AvatarRepository;
+use App\Repository\SeriesRepository;
 use App\Repository\BookKidRepository;
 use App\Repository\DiplomaRepository;
 use App\Repository\CategoryRepository;
-use App\Repository\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\MakerBundle\Validator;
 use Symfony\Component\HttpFoundation\Request;
@@ -965,6 +966,10 @@ class KidController extends AbstractController
         return $this->prepareResponse("the book has been remove successfully",[],[],false,200);
 
     }
+
+// *************************************************************************************************************************************************
+// *************************************************************** SERIES***************************************************************************
+
     /**
      * @Route("/{id_kid}/bookkids/series", name="list_series", methods="GET", requirements={"id_kid"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
@@ -987,7 +992,7 @@ class KidController extends AbstractController
         return new JsonResponse($allSeries, Response::HTTP_OK, [],false);
 
     }
-     
+
     /**
      * @Route("/{id_kid}/bookkids/series/{id_serie}", name="list_books_by_serie", methods="GET", requirements={"id_kid"="\d+", "id_serie"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
@@ -1032,6 +1037,92 @@ class KidController extends AbstractController
         );
 
     }
+
+    /**
+     * @Route("/{id_kid}/bookkids/{id_bookKid}/series", name="create_serie", methods="POST", requirements={"id_kid"="\d+", "id_bookKid"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @return Response
+     */
+    public function createSerie(
+        int $id_kid,
+        int $id_bookKid,
+        BookKidRepository $bookKidRepository,
+        SeriesRepository $seriesRepository,
+        EntityManagerInterface $em,
+        KidRepository $kidRepository,
+        Request $request,
+        SerializerInterface $serializer,
+        ValidatorInterface $validator
+        ){
+
+        $kid = $kidRepository->find($id_kid);
+
+        // CHECK KID exists
+
+        if ($kid === null )
+        {
+            return $this->ErrorMessageNotFound("The kid is not found for id: ", $id_kid);
+
+        }
+
+        $bookKid = $bookKidRepository->find($id_bookKid);
+
+        // CHECK BOOKKID exists
+
+        if ($bookKid === null )
+        {
+            return $this->ErrorMessageNotFound("The bookKkid is not found for id: ", $id_bookKid);
+
+        }
+
+        // **********DATAS**************
+
+            $data = $request->getcontent();
+            $serieGiven = $serializer->deserialize($data, Series::class, 'json');
+            $kid = $kidRepository->find($id_kid);
+
+
+            // ********  CHECK ERRORS ************
+
+            $errors = $validator->validate($serieGiven);
+
+            if ((count($errors) > 0) ){
+
+                return $this->ErrorMessageNotValid($errors);
+
+            }
+
+            // ********  CHECK if authors exists ************
+
+             
+                    $nameSerieGiven = $serieGiven->getName();
+                    
+                    $isSerieInBase = $seriesRepository->findOneBy((['name'=>$nameSerieGiven]));
+                    
+                    if ($isSerieInBase !== null) {
+                        // if exist set this one and don't let create a new serie with same name
+                        
+                        // $bookKid->removeBookKid($series);
+                        $bookKid->setSeries($isSerieInBase);
+                        
+                    }      
+                    else {
+                        $bookKid->setSeries($serieGiven);
+                    }
+                    
+        $em->persist($bookKid);
+        // $em->persist($serieGiven);
+        $em->flush();
+               
+                    // return new JsonResponse("ouiiiiiii", 200,[], false);
+
+                    return $this->prepareResponse(
+                        'The serie has been created successfully',[],[],false, 201, 
+                    );
+
+    }
+// *************************************************************************************************************************************************
+// *************************************************************** Support Functions ***************************************************************
 
     private function prepareResponse(
         string $message, 

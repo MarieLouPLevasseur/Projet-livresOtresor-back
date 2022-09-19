@@ -39,6 +39,22 @@ class SeriesRepository extends ServiceEntityRepository
         }
     }
 
+//     /**
+//     * Find an Serie by name
+//     * 
+//     * @param array $author_name 
+//     * @return Author[] Returns an array of Author objects
+//     */
+//    public function findAuthorByName($author_name): array
+//    {
+//        return $this->createQueryBuilder('a')
+//            ->andWhere('a.name = :val')
+//            ->setParameter('val', $author_name)
+//            ->getQuery()
+//            ->getResult()
+//        ;
+//    }
+
 //    /**
 //     * @return Series[] Returns an array of Series objects
 //     */
