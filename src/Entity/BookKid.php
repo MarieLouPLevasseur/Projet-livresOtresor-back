@@ -73,6 +73,11 @@ class BookKid
      */
     private $updated_at;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Series::class, inversedBy="bookKids")
+     */
+    private $series;
+
     public function __construct()
     {
         $this->updated_at = new \DateTime();
@@ -162,6 +167,18 @@ class BookKid
     public function setUpdatedAt(\DateTimeInterface $updated_at): self
     {
         $this->updated_at = $updated_at;
+        return $this;
+    }
+
+    public function getSeries(): ?Series
+    {
+        return $this->series;
+    }
+
+    public function setSeries(?Series $series): self
+    {
+        $this->series = $series;
+
         return $this;
     }
 

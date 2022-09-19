@@ -50,7 +50,7 @@ class Book
     private $title;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="text")
      * @Groups({"booksByCategory","book_list","books_infos", "books_read", "books_wish", "last_book_read"})
      * @Assert\NotNull
      * @Assert\NotBlank
