@@ -826,7 +826,6 @@ class KidController extends AbstractController
     public function listAuthors(int $id_kid, kidRepository $kidRepository, AuthorRepository $authors,BookKidRepository $bookKidRepository, SerializerInterface $serializer): Response
     {
         $kid = $kidRepository->find($id_kid);
-        // $kid = $kidRepository->find($id_kid);
 
         // CHECK KID exists
 
@@ -974,7 +973,47 @@ class KidController extends AbstractController
         return $this->prepareResponse("the book has been remove successfully",[],[],false,200);
 
     }
+    /**
+     * @Route("/{id_kid}/bookkids/series", name="list_series", methods="GET", requirements={"id_kid"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @return Response
+     */
+    public function listSeries(int $id_kid,BookKidRepository $bookKidRepository, EntityManagerInterface $em, KidRepository $kidRepository){
 
+        $kid = $kidRepository->find($id_kid);
+
+        // CHECK KID exists
+
+        if ($kid === null )
+        {
+            return $this->ErrorMessageNotFound("The kid is not found for id: ", $id_kid);
+
+        }
+
+        // $allBookKid = $kid->getBookKids();
+      
+
+        // $allSeries = [];
+        // foreach ($allBookKid as $bookKid){
+            
+        //     $serie = $bookKid->getSeries();
+        //     $allSeries [] = $serie;
+        // }
+
+        $allSeries = $bookKidRepository->findBySeries($id_kid);
+
+        // dd($allSeries);
+        return new JsonResponse($allSeries, Response::HTTP_OK, [],false);
+
+        
+        // return $this->prepareResponse(
+        //     'OK',
+        //     ['groups' => 'series_list'],
+        //     $allSeries,false, 200, 
+        // );
+
+
+    }
      
     private function prepareResponse(
         string $message, 
