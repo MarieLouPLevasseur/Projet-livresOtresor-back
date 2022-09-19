@@ -35,6 +35,80 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
  */
 class KidController extends AbstractController
 {
+    
+   
+
+   // *************************************************************************************************************************************************
+// *************************************************************** Category***************************************************************************
+
+
+     /**
+     * List all books of a category for a kid
+     * 
+     * @Route("/{id_kid}/category/{id_cat}/books", name="show_category_books", methods="GET", requirements={"id_kid"="\d+"}, requirements={"id_cat"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     */
+    public function listBooksbyCategory(
+        int $id_kid,
+        int $id_cat,
+        BookKidRepository $bookKidRepository,
+        SerializerInterface $serializer
+       )
+    {
+
+        $allBooksByCategory = $bookKidRepository->findAllByKidAndCategory($id_kid, $id_cat);
+
+        $jsonBooksCategoryList = $serializer->serialize($allBooksByCategory, 'json',['groups' => 'booksByCategory']);
+
+        return new JsonResponse($jsonBooksCategoryList, Response::HTTP_OK, [],true);
+    }
+
+// *************************************************************************************************************************************************
+// *************************************************************** Rewards***************************************************************************
+
+    /**
+     * List all avatars of a kid
+     * 
+     * @Route("/{id_kid}/avatars", name="show_avatars", methods="GET", requirements={"id_kid"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     */
+    public function listAllAvatars(
+        int $id_kid,
+        KidRepository $kidRepository,
+        AvatarRepository $avatarRepository,
+        BookKidRepository $bookKidRepository,
+        SerializerInterface $serializer
+       ): Response
+    {
+        $currentKid = $kidRepository->find($id_kid);
+
+            if ($currentKid === null )
+            {
+
+                return $this->ErrorMessageNotFound("The kid not found for id: ", $id_kid);
+
+            }
+
+        // count books
+
+        $currentReadbooks = $bookKidRepository->findAllByIsRead(true,$id_kid);
+        $totalBooksRead = count($currentReadbooks);
+
+        // check if totalBooksRead < or = to 'is_win' and set those
+        $currentAvatarsWon = $avatarRepository->findAllByIsWinValue($totalBooksRead);
+
+            foreach($currentAvatarsWon as $avatar){
+
+                $currentKid->addAvatar($avatar);
+            }
+
+        $currentKidAvatars = $currentKid->getAvatar();      
+        $jsonAvatarsList = $serializer->serialize($currentKidAvatars, 'json',['groups' => 'KidAvatar']);
+
+
+        return new JsonResponse($jsonAvatarsList, Response::HTTP_OK, [],true);
+    }
+
      /** 
      * Update a kid avatar only
      * 
@@ -82,179 +156,54 @@ class KidController extends AbstractController
         return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
     }
 
+
      /**
-     * Update a Book
-     *
-     * @Route("/{id_kid}/bookkids/{id_bookKid}", name="update_book", methods="PATCH", requirements={"id_kid"="\d+"}, requirements={"id_bookKid"="\d+"})
+     * List all diplomas of a kid
+     * 
+     * @Route("/{id_kid}/diplomas", name="show_diplomas", methods="GET", requirements={"id_kid"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function updateBook( 
+    public function listAllDiplomas(
         int $id_kid,
-        int $id_bookKid,
-        BookKidRepository $bookKidRepository,
         KidRepository $kidRepository,
-        SerializerInterface $serializer,
-        Request $request,
-        ValidatorInterface $validator,
-        CategoryRepository $categoryRepository,
-        EntityManagerInterface $em
-        ): Response
+        DiplomaRepository $diplomaRepository,
+        BookKidRepository $bookKidRepository,
+        SerializerInterface $serializer
+       ): Response
+    {
+        $currentKid = $kidRepository->find($id_kid);
+
+
+
+        if ($currentKid === null )
         {
 
-            $data = $request->getContent();
-            $dataKid = $serializer->deserialize($data, BookKid::class, 'json');
-            
-            // CHECK KID
+            return $this->ErrorMessageNotFound("The kid not found for id: ", $id_kid);
 
-                $kid = $kidRepository->find($id_kid);
-
-                    if ($kid === null )
-                    {
-                        return $this->ErrorMessageNotFound("The kid not found for id: ", $id_kid);
-
-                    }
-
-            // CHECK BOOK_KID
-
-                $currentBookKid = $bookKidRepository->find($id_bookKid);
-
-                    if ($currentBookKid === null )
-                    {
-                        return $this->ErrorMessageNotFound("No Bookid found for id: ", $id_bookKid);
-
-                    }   
-
-
-            // CHECK CATEGORY
-            
-                $parsed_json = json_decode($data);
-
-                // Check if category exists in given json
-
-                    if ($dataKid->getCategory() !== null) {
-                        
-                        $categoryID = $parsed_json->{"category"}->{"id"};
-                        $categoryGiven= $categoryRepository->find($categoryID);
-                        
-                        
-                        // if exist in json: check if exists in database
-                        if ($categoryGiven === null) {
-
-                            return $this->ErrorMessageNotFound("The Category not found for id: ", $categoryID);
-
-                        }
-
-                        // Check datas given
-
-                        $errors = $validator->validatePropertyValue($dataKid, 'category', $dataKid->getCategory());
-                        
-                        if ((count($errors) > 0) ){
-                            
-                            return $this->ErrorMessageNotValid($errors);
-
-                        }   
-    
-                        $currentBookKid->setCategory($categoryGiven);
-
-
-                    }
-                 
-            // CHECK RATING if given
-
-                if($dataKid->getRating() !== null){
-                    
-                    $errors = $validator->validatePropertyValue($dataKid, 'rating', $dataKid->getRating());
-                    if ((count($errors) > 0) ){
-                        
-                        return $this->ErrorMessageNotValid($errors);
-
-                    }  
-                    
-                    $currentBookKid->setRating($dataKid->getRating());
-                
-                } 
-            // CHECK COMMENT if given
-
-                if($dataKid->getComment() !== null){
-                    
-                    $errors = $validator->validatePropertyValue($dataKid, 'comment', $dataKid->getComment());
-                    if ((count($errors) > 0) ){
-                        
-                        return $this->ErrorMessageNotValid($errors);
-
-                    }   
-                    $currentBookKid->setComment($dataKid->getComment());
-                } 
-                
-            // CHECK IS_READ if given
-
-                if($dataKid->getIsRead() !== null){
-                    
-                    $errors = $validator->validatePropertyValue($dataKid, 'is_read', $dataKid->getIsRead());
-                    if ((count($errors) > 0) ){
-                        
-                        return $this->ErrorMessageNotValid($errors);
-
-                    }   
-                    $currentBookKid->setIsRead($dataKid->getIsRead());
-                }   
-                
-
-            $em->persist($currentBookKid);
-            $em->flush();
-
-            return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
         }
 
-        
-        // @IsGranted("IS_AUTHENTICATED_FULLY")
+        // count books
 
-    /**
-    * Show last book modified for a kid
-    *
-    * @Route("/{id_kid}/books/last_read", name="last_book_read", methods="GET", requirements={"id_kid"="\d+"})
-    * @IsGranted("IS_AUTHENTICATED_FULLY")
-    * 
-    */
-    public function showLastReadBook( 
-        int $id_kid,
-        BookKidRepository $bookKidRepository,
-        KidRepository $kidRepository,
-        SerializerInterface $serializer
-        ): Response
-    {
+        $currentReadbooks = $bookKidRepository->findAllByIsRead(true,$id_kid);
+        $totalBooksRead = count($currentReadbooks);
 
-        $currentkid = $kidRepository->find($id_kid);
 
-        // CHECK KID
+        // check if totalBooks < or = to 'is_win' and set those
+        $currentDiplomasWon = $diplomaRepository->findAllByIsWinValue($totalBooksRead);
 
-            if ($currentkid === null )
-            {
-                return $this->ErrorMessageNotFound("The kid not found for id: ", $id_kid);
+            foreach($currentDiplomasWon as $diploma){
 
+                $currentKid->addDiploma($diploma);
             }
 
-        $mostRecentBook= $bookKidRepository->findBy(["kid"=>$id_kid], ['updated_at' => 'DESC'],1);
-
-            // dd($mostRecentBook);
-            $jsonMostRecentBook ="";
-            foreach ($mostRecentBook as $currentBook){
-
-                $jsonMostRecentBook = $serializer->serialize($currentBook, 'json',['groups' => 'last_book_read']);
-            }
-            // $jsonMostRecentBook = $serializer->serialize($mostRecentBook, 'json',['groups' => 'last_book_read']);
-            return new JsonResponse($jsonMostRecentBook, 200,[],true );
+        $currentDiplomas = $currentKid->getDiploma();      
+        $jsonDiplomasList = $serializer->serialize($currentDiplomas, 'json',['groups' => 'KidDiploma']);
 
 
-        // return $this->prepareResponse(
-        //     'OK',
-        //     ['groups' => 'last_book_read'],
-        //     ['Bookkid' => $mostRecentBook ]
-        // );
-
+        return new JsonResponse($jsonDiplomasList, Response::HTTP_OK, [],true);
     }
 
-    /**
+     /**
      * Show element for progress bar
      *
      * @Route("/{id_kid}/books/progress_bar", name="progress_bar", methods="GET")
@@ -438,118 +387,213 @@ class KidController extends AbstractController
         return $this->json($data, 200);
 
     }
+// *************************************************************************************************************************************************
+// *************************************************************** Books ***************************************************************************
 
-     /**
-     * List all books of a category for a kid
-     * 
-     * @Route("/{id_kid}/category/{id_cat}/books", name="show_category_books", methods="GET", requirements={"id_kid"="\d+"}, requirements={"id_cat"="\d+"})
+
+  /**
+     * Update a Book
+     *
+     * @Route("/{id_kid}/bookkids/{id_bookKid}", name="update_book", methods="PATCH", requirements={"id_kid"="\d+"}, requirements={"id_bookKid"="\d+"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function listBooksbyCategory(
+    public function updateBook( 
         int $id_kid,
-        int $id_cat,
+        int $id_bookKid,
         BookKidRepository $bookKidRepository,
-        SerializerInterface $serializer
-       )
-    {
+        KidRepository $kidRepository,
+        SerializerInterface $serializer,
+        Request $request,
+        ValidatorInterface $validator,
+        CategoryRepository $categoryRepository,
+        SeriesRepository $seriesRepository,
+        EntityManagerInterface $em
+        ): Response
+        {
 
-        $allBooksByCategory = $bookKidRepository->findAllByKidAndCategory($id_kid, $id_cat);
+            $data = $request->getContent();
+            $dataKid = $serializer->deserialize($data, BookKid::class, 'json');
+            // parsed to get Category and Series
+            $parsed_json = json_decode($data);
 
-        $jsonBooksCategoryList = $serializer->serialize($allBooksByCategory, 'json',['groups' => 'booksByCategory']);
+            // CHECK KID
 
-        return new JsonResponse($jsonBooksCategoryList, Response::HTTP_OK, [],true);
-    }
+                $kid = $kidRepository->find($id_kid);
 
+                    if ($kid === null )
+                    {
+                        return $this->ErrorMessageNotFound("The kid not found for id: ", $id_kid);
+
+                    }
+
+            // CHECK BOOK_KID
+
+                $currentBookKid = $bookKidRepository->find($id_bookKid);
+
+                    if ($currentBookKid === null )
+                    {
+                        return $this->ErrorMessageNotFound("No Bookkid found for id: ", $id_bookKid);
+
+                    }   
+
+
+            // CHECK CATEGORY
+            
+
+                // Check if category exists in given json
+
+                    if ($dataKid->getCategory() !== null) {
+                        
+                        $categoryID = $parsed_json->{"category"}->{"id"};
+                        $categoryGiven= $categoryRepository->find($categoryID);
+                        
+                        
+                        // if exist in json: check if exists in database
+                    if ($categoryGiven === null) {
+                            return $this->ErrorMessageNotFound("The Category not found for id: ", $categoryID);
+                    }
+
+                        $currentBookKid->setCategory($categoryGiven);
+
+                    }
+                 
+            // CHECK RATING if given
+
+                if($dataKid->getRating() !== null){
+                    
+                    $errors = $validator->validatePropertyValue($dataKid, 'rating', $dataKid->getRating());
+                    if ((count($errors) > 0) ){
+                        
+                        return $this->ErrorMessageNotValid($errors);
+
+                    }  
+                    
+                    $currentBookKid->setRating($dataKid->getRating());
+                
+                } 
+            // CHECK COMMENT if given
+
+                if($dataKid->getComment() !== null){
+                    
+                    $errors = $validator->validatePropertyValue($dataKid, 'comment', $dataKid->getComment());
+                    if ((count($errors) > 0) ){
+                        
+                        return $this->ErrorMessageNotValid($errors);
+
+                    }   
+                    $currentBookKid->setComment($dataKid->getComment());
+                } 
+                
+            // CHECK IS_READ if given
+
+                if($dataKid->getIsRead() !== null){
+                    
+                    $errors = $validator->validatePropertyValue($dataKid, 'is_read', $dataKid->getIsRead());
+                    if ((count($errors) > 0) ){
+                        
+                        return $this->ErrorMessageNotValid($errors);
+
+                    }   
+                    $currentBookKid->setIsRead($dataKid->getIsRead());
+                }   
+
+            // CHECK SERIES if given
+
+             // **********DATAS**************
+                if($dataKid->getSeries() !== null){
+
+                    // If key name exists: 
+
+                        if($dataKid->getSeries()->getName() !== null){
+
+                            $serieNameGiven = $parsed_json->{"series"}->{"name"};
+
+                            // if name already exist
+                                $isSerieInBase = $seriesRepository->findOneBy((['name'=>$serieNameGiven]));
+                                if ($isSerieInBase !== null) {
+                                    
+                                    // set database object found
+                                    $currentBookKid->setSeries($isSerieInBase);
+
+                                }    
+                                
+                                else {
+                                    // CHECK datas given 
+            
+                                        $errors = $validator->validatePropertyValue($dataKid, 'series', $dataKid->getSeries());
+                            
+                                        if ((count($errors) > 0)){
+                            
+                                            return $this->ErrorMessageNotValid($errors);
+                            
+                                        }
+                                    // set new object
+                                    $currentBookKid->setSeries($dataKid->getSeries());
+                                }
+                        
+                        }
+                        else {
+                            $serieIdGiven = $parsed_json->{"series"}->{"id"};
+                         
+                            $serieFromDatabase= $seriesRepository->find($serieIdGiven);
+                        
+                            // if exists set database object 
+                                $currentBookKid->setSeries($serieFromDatabase);
+
+                            // if does not exist: send error
+                            if ($serieFromDatabase === null) {
+
+                                return $this->ErrorMessageNotFound("The Serie is not found for id: ", $serieIdGiven);
+                            }
+                        }
+        
+                }
+         
+                
+
+            $em->persist($currentBookKid);
+            $em->flush();
+
+            return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
+        }
+
+        
 
     /**
-     * List all avatars of a kid
-     * 
-     * @Route("/{id_kid}/avatars", name="show_avatars", methods="GET", requirements={"id_kid"="\d+"})
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
-     */
-    public function listAllAvatars(
+    * Show last book modified for a kid
+    *
+    * @Route("/{id_kid}/books/last_read", name="last_book_read", methods="GET", requirements={"id_kid"="\d+"})
+    * @IsGranted("IS_AUTHENTICATED_FULLY")
+    * 
+    */
+    public function showLastReadBook( 
         int $id_kid,
-        KidRepository $kidRepository,
-        AvatarRepository $avatarRepository,
         BookKidRepository $bookKidRepository,
+        KidRepository $kidRepository,
         SerializerInterface $serializer
-       ): Response
+        ): Response
     {
-        $currentKid = $kidRepository->find($id_kid);
 
-            if ($currentKid === null )
+        $currentkid = $kidRepository->find($id_kid);
+
+        // CHECK KID
+
+            if ($currentkid === null )
             {
-
                 return $this->ErrorMessageNotFound("The kid not found for id: ", $id_kid);
 
             }
 
-        // count books
+        $mostRecentBook= $bookKidRepository->findBy(["kid"=>$id_kid], ['updated_at' => 'DESC'],1);
 
-        $currentReadbooks = $bookKidRepository->findAllByIsRead(true,$id_kid);
-        $totalBooksRead = count($currentReadbooks);
+            $jsonMostRecentBook ="";
+            foreach ($mostRecentBook as $currentBook){
 
-        // check if totalBooksRead < or = to 'is_win' and set those
-        $currentAvatarsWon = $avatarRepository->findAllByIsWinValue($totalBooksRead);
-
-            foreach($currentAvatarsWon as $avatar){
-
-                $currentKid->addAvatar($avatar);
+                $jsonMostRecentBook = $serializer->serialize($currentBook, 'json',['groups' => 'last_book_read']);
             }
+            return new JsonResponse($jsonMostRecentBook, 200,[],true );  
 
-        $currentKidAvatars = $currentKid->getAvatar();      
-        $jsonAvatarsList = $serializer->serialize($currentKidAvatars, 'json',['groups' => 'KidAvatar']);
-
-
-        return new JsonResponse($jsonAvatarsList, Response::HTTP_OK, [],true);
     }
-
-     /**
-     * List all diplomas of a kid
-     * 
-     * @Route("/{id_kid}/diplomas", name="show_diplomas", methods="GET", requirements={"id_kid"="\d+"})
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
-     */
-    public function listAllDiplomas(
-        int $id_kid,
-        KidRepository $kidRepository,
-        DiplomaRepository $diplomaRepository,
-        BookKidRepository $bookKidRepository,
-        SerializerInterface $serializer
-       ): Response
-    {
-        $currentKid = $kidRepository->find($id_kid);
-
-
-
-        if ($currentKid === null )
-        {
-
-            return $this->ErrorMessageNotFound("The kid not found for id: ", $id_kid);
-
-        }
-
-        // count books
-
-        $currentReadbooks = $bookKidRepository->findAllByIsRead(true,$id_kid);
-        $totalBooksRead = count($currentReadbooks);
-
-
-        // check if totalBooks < or = to 'is_win' and set those
-        $currentDiplomasWon = $diplomaRepository->findAllByIsWinValue($totalBooksRead);
-
-            foreach($currentDiplomasWon as $diploma){
-
-                $currentKid->addDiploma($diploma);
-            }
-
-        $currentDiplomas = $currentKid->getDiploma();      
-        $jsonDiplomasList = $serializer->serialize($currentDiplomas, 'json',['groups' => 'KidDiploma']);
-
-
-        return new JsonResponse($jsonDiplomasList, Response::HTTP_OK, [],true);
-    }
-
 
     /**
      * Show details for a book
@@ -603,7 +647,6 @@ class KidController extends AbstractController
 
     }
 
-        /*************************Routes coded using the prepare response method*******************************************************************/
 
      /**
      * Create a book
@@ -726,6 +769,60 @@ class KidController extends AbstractController
             
     }
 
+    /**
+     * @Route("/{id_kid}/bookkids/{id_bookKid}", name="delete_book", methods="DELETE", requirements={"id_kid"="\d+", "id_bookKid"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @return Response
+     */
+   
+    public function deleteBooks(int $id_kid, int $id_bookKid ,BookKidRepository $bookKidRepository, EntityManagerInterface $em, KidRepository $kidRepository){
+
+        $kid = $kidRepository->find($id_kid);
+        $bookKid = $bookKidRepository->find($id_bookKid);
+   
+        // CHECK KID exists
+
+        if ($kid === null )
+        {
+
+            return $this->ErrorMessageNotFound("The kid is not found for id: ", $id_kid);
+
+        }
+
+        // CHECK BOOKKID exists
+
+        if ($bookKid === null )
+        {
+
+            return $this->ErrorMessageNotFound("The Bookkid is not found for id: ", $id_bookKid);
+
+        }
+
+        $currentBookKid = $kid->getBookKids();
+        
+        $arrayBookkid = [];
+
+            foreach($currentBookKid as $bookkid){
+                $arrayBookkid [] = $bookkid;
+            }
+
+            if (!in_array($bookKid, $arrayBookkid)){
+
+                $error = [
+                    'error'=> true,
+                    'message'=> "The book is not own by this kid. Can't delete this book."
+                ];
+
+                return $this->json($error, Response::HTTP_NOT_FOUND);
+            }
+
+        $em->remove($bookKid);
+        $em->flush();
+
+        return $this->prepareResponse("the book has been remove successfully",[],[],false,200);
+
+    }
+
      /**
      * List all books for a kid
      * 
@@ -817,6 +914,8 @@ class KidController extends AbstractController
                 ['data' => $currentBooksWish ]
             );
     }
+// *************************************************************************************************************************************************
+// *************************************************************** Authors***************************************************************************
 
      /**
      * List all authors names
@@ -913,59 +1012,7 @@ class KidController extends AbstractController
         ); 
     }
 
-     /**
-     * @Route("/{id_kid}/bookkids/{id_bookKid}", name="delete_book", methods="DELETE", requirements={"id_kid"="\d+", "id_bookKid"="\d+"})
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
-     * @return Response
-     */
-   
-     public function deleteBooks(int $id_kid, int $id_bookKid ,BookKidRepository $bookKidRepository, EntityManagerInterface $em, KidRepository $kidRepository){
-
-        $kid = $kidRepository->find($id_kid);
-        $bookKid = $bookKidRepository->find($id_bookKid);
-   
-        // CHECK KID exists
-
-        if ($kid === null )
-        {
-
-            return $this->ErrorMessageNotFound("The kid is not found for id: ", $id_kid);
-
-        }
-
-        // CHECK BOOKKID exists
-
-        if ($bookKid === null )
-        {
-
-            return $this->ErrorMessageNotFound("The Bookkid is not found for id: ", $id_bookKid);
-
-        }
-
-        $currentBookKid = $kid->getBookKids();
-        
-        $arrayBookkid = [];
-
-            foreach($currentBookKid as $bookkid){
-                $arrayBookkid [] = $bookkid;
-            }
-
-            if (!in_array($bookKid, $arrayBookkid)){
-
-                $error = [
-                    'error'=> true,
-                    'message'=> "The book is not own by this kid. Can't delete this book."
-                ];
-
-                return $this->json($error, Response::HTTP_NOT_FOUND);
-            }
-
-        $em->remove($bookKid);
-        $em->flush();
-
-        return $this->prepareResponse("the book has been remove successfully",[],[],false,200);
-
-    }
+     
 
 // *************************************************************************************************************************************************
 // *************************************************************** SERIES***************************************************************************
@@ -1092,7 +1139,7 @@ class KidController extends AbstractController
 
             }
 
-            // ********  CHECK if authors exists ************
+            // ********  CHECK if Serie exists ************
 
              
                     $nameSerieGiven = $serieGiven->getName();
@@ -1109,7 +1156,7 @@ class KidController extends AbstractController
                     else {
                         $bookKid->setSeries($serieGiven);
                     }
-                    
+
         $em->persist($bookKid);
         // $em->persist($serieGiven);
         $em->flush();
@@ -1119,8 +1166,9 @@ class KidController extends AbstractController
                     return $this->prepareResponse(
                         'The serie has been created successfully',[],[],false, 201, 
                     );
-
     }
+
+
 // *************************************************************************************************************************************************
 // *************************************************************** Support Functions ***************************************************************
 
