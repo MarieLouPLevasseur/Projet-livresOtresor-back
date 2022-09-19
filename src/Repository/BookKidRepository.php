@@ -181,4 +181,32 @@ class BookKidRepository extends ServiceEntityRepository
         return $result;
       }
 
+      
+
+       /**
+       * Find all book_kid by: kid and serie 
+       *
+       * @param int $serie_id
+       * @param int $kid_id
+       * @return  mixed
+       * 
+       */
+      public function findAllByKidAndSerie($kid_id, $serie_id)
+      {
+               $entityManager = $this->getEntityManager();
+               $query = $entityManager->createQuery(
+                   
+                   'SELECT bk, k
+                   FROM App\Entity\BookKid bk
+                   JOIN bk.kid k
+                   JOIN bk.series s
+                   WHERE k.id = :kid_id AND s.id = :series_id
+                   '
+               )
+
+               ->setParameters(array('kid_id'=> $kid_id, 'series_id' => $serie_id));
+   
+
+               return $query->getResult();
+      }
 }

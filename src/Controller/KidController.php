@@ -12,6 +12,7 @@ use App\Repository\AvatarRepository;
 use App\Repository\BookKidRepository;
 use App\Repository\DiplomaRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\MakerBundle\Validator;
 use Symfony\Component\HttpFoundation\Request;
@@ -847,15 +848,6 @@ class KidController extends AbstractController
         $allAuthors = $bookKidRepository->findByAuthors($id_kid);
        
         
-            // $jsonBookKid = $serializer->serialize($allAuthors, 'json',['groups' => 'author_list'] );
-           
-        // return $this->json($jsonBookKid,200);
-        // return $this->prepareResponse(
-        //         'OK',  
-        //         ['groups' => 'author_list'],
-        //         ['authors' => $allAuthors]
-        //     );
-
         $data = [
             "authors"=>$allAuthors
         ];
@@ -990,31 +982,57 @@ class KidController extends AbstractController
 
         }
 
-        // $allBookKid = $kid->getBookKids();
-      
-
-        // $allSeries = [];
-        // foreach ($allBookKid as $bookKid){
-            
-        //     $serie = $bookKid->getSeries();
-        //     $allSeries [] = $serie;
-        // }
-
         $allSeries = $bookKidRepository->findBySeries($id_kid);
 
-        // dd($allSeries);
         return new JsonResponse($allSeries, Response::HTTP_OK, [],false);
-
-        
-        // return $this->prepareResponse(
-        //     'OK',
-        //     ['groups' => 'series_list'],
-        //     $allSeries,false, 200, 
-        // );
-
 
     }
      
+    /**
+     * @Route("/{id_kid}/bookkids/series/{id_serie}", name="list_books_by_serie", methods="GET", requirements={"id_kid"="\d+", "id_serie"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @return Response
+     */
+    public function listAllbooksBySerie(
+        int $id_kid,
+        int $id_serie,
+        BookKidRepository $bookKidRepository,
+        KidRepository $kidRepository,
+        SeriesRepository $seriesRepository,
+        SerializerInterface $serializer
+        ){
+
+        $kid = $kidRepository->find($id_kid);
+
+        // CHECK KID exists
+
+        if ($kid === null )
+        {
+            return $this->ErrorMessageNotFound("The kid is not found for id: ", $id_kid);
+
+        }
+
+        $serie = $seriesRepository->find($id_serie);
+
+        // CHECK SERIE exists
+
+        if ($serie === null )
+        {
+            return $this->ErrorMessageNotFound("The serie is not found for id: ", $id_serie);
+
+        }
+
+        $allBooksBySerie = $bookKidRepository->findAllByKidAndSerie($id_kid, $id_serie);
+
+        $jsonBooksSerieList = $serializer->serialize($allBooksBySerie, 'json',['groups' => 'booksByCategory']);
+
+
+        return $this->prepareResponse(
+            'ok',['groups' => 'booksByCategory'],["bookkid"=>$allBooksBySerie],false, 201, 
+        );
+
+    }
+
     private function prepareResponse(
         string $message, 
         array $options = [], 
