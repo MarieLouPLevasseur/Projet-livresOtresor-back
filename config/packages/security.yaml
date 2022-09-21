@@ -1,0 +1,86 @@
+security:
+    enable_authenticator_manager: true
+    encoders:
+        App\Entity\User:
+            algorithm: auto
+        App\Entity\Kid:
+            algorithm: auto
+
+    providers:
+
+        chain_provider:
+            chain:
+                providers: [app_user_provider, app_kid_provider]
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+        app_kid_provider:
+            entity:
+                class: App\Entity\Kid
+                property: username
+
+    firewalls:
+  
+            # entry_point: lexik_jwt_authentication.jwt_token_authenticator
+            # custom_authenticator: App\Security\UserAuthenticator
+           
+            # entry_point: App\Security\UserAuthenticator
+            # provider: app_kid_provider
+        # login:
+        #     pattern: ^/api/login
+        #     stateless: true
+        #     json_login:
+        #         check_path: /api/login_check
+        #         success_handler: lexik_jwt_authentication.handler.authentication_success
+        #         failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        # 
+        kid_secured_area:
+            pattern:   ^/api/v1/login/kid
+            provider: app_kid_provider
+            json_login:
+                login_path: /api/v1/login/kid
+                check_path: app_login_kid
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            logout:
+                path: app_logout
+
+        user_secured_area:
+            pattern:   ^/api/v1/login/user
+            provider: app_user_provider
+            json_login:
+                login_path: /api/v1/login/user
+                check_path: app_login_user
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            logout:
+                path: app_logout
+
+        api:
+            pattern:   ^/api
+            stateless: true
+            provider: chain_provider
+            jwt: ~
+
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main: 
+            lazy: true
+
+
+                
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/api/v1/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/registration, roles: PUBLIC_ACCESS }
+
+        - { path: ^/api/v1, roles: IS_AUTHENTICATED_FULLY }
+
+
+    role_hierarchy:
+        ROLE_USER: ROLE_USER
+        ROLE_KID: ROLE_KID
