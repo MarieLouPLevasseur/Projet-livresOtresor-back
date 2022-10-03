@@ -444,19 +444,19 @@ class KidController extends AbstractController
 
                     if ($dataKid->getCategory() !== null) {
                         
-                        $categoryID = $parsed_json->{"category"}->{"id"};
-                        $categoryGiven= $categoryRepository->find($categoryID);
-                        
-                        
-                        // if exist in json: check if exists in database
-                    if ($categoryGiven === null) {
-                            return $this->ErrorMessageNotFound("The Category not found for id: ", $categoryID);
-                    }
+                        if ($parsed_json->{"category"}->{"id"} !== 0) {
+                            $categoryID = $parsed_json->{"category"}->{"id"};
+                            $categoryGiven= $categoryRepository->find($categoryID);
 
-                        $currentBookKid->setCategory($categoryGiven);
 
+                            // if exist in json: check if exists in database
+                            if ($categoryGiven === null) {
+                                return $this->ErrorMessageNotFound("The Category not found for id: ", $categoryID);
+                            }
+
+                            $currentBookKid->setCategory($categoryGiven);
+                        }
                     }
-                 
             // CHECK RATING if given
 
                 if($dataKid->getRating() !== null){
