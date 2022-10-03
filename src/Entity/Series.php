@@ -19,13 +19,13 @@ class Series
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"series_list"})
+     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish","last_book_read","book_list", "series_list"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"series_list"})
+     * @Groups({"booksByCategory","books_infos", "books_read", "books_wish","last_book_read","book_list", "series_list"})
      * @Assert\NotNull
      * @Assert\NotBlank
      */
