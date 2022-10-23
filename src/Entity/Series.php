@@ -32,7 +32,7 @@ class Series
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="series")
+     * @ORM\OneToMany(targetEntity=BookKid::class, mappedBy="series",fetch="EAGER")
      */
     private $bookKids;
 
