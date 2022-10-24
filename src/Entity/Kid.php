@@ -38,7 +38,6 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * 
      * @ORM\Column(type="string", length=255)
-     * @Groups({"userkids_list"})
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=5, max=20)( message = "Le mot de passe doit contenir entre 5 et 20 caractères")
      */
@@ -46,7 +45,7 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list","books_infos", "userConnected"})
+     * @Groups({"book_list","books_infos", "userConnected", "userkids_list"})
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=10)
      */
