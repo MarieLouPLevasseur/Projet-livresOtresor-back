@@ -74,7 +74,7 @@ class BookKid
     private $updated_at;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Series::class, inversedBy="bookKids", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity=Series::class, inversedBy="bookKids", cascade={"persist"}, fetch="EAGER")
      * @Groups({"booksByCategory","books_infos", "books_read", "books_wish","last_book_read","book_list"})
      */
     private $series;

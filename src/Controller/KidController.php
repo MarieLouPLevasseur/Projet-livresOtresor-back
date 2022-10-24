@@ -501,12 +501,20 @@ class KidController extends AbstractController
 
              // **********DATAS**************
                 if($dataKid->getSeries() !== null){
-
                     // If key name exists: 
+                    $serieNameGiven = $parsed_json->{"series"}->{"name"};
 
-                        if($dataKid->getSeries()->getName() !== null){
+                    // check if there is only blank characters
+                    $serieNameGiven = trim($serieNameGiven);
 
-                            $serieNameGiven = $parsed_json->{"series"}->{"name"};
+                    if ($serieNameGiven === "") {
+                        //must not be registrer since empty
+                            //Check if a collection exist already on this book_kid and give if so
+
+                                $currentSerieOnBookKid = $currentBookKid->getSeries();
+                                $currentBookKid->setSeries($currentSerieOnBookKid);
+                        }
+                        else if($dataKid->getSeries()->getName() !== null){
 
                             // if name already exist
                                 $isSerieInBase = $seriesRepository->findOneBy((['name'=>$serieNameGiven]));
@@ -514,9 +522,7 @@ class KidController extends AbstractController
                                     
                                     // set database object found
                                     $currentBookKid->setSeries($isSerieInBase);
-
                                 }    
-                                
                                 else {
                                     // CHECK datas given 
             
@@ -528,28 +534,11 @@ class KidController extends AbstractController
                             
                                         }
                                     // set new object
-                                    $currentBookKid->setSeries($dataKid->getSeries());
+                                   
+                                            $currentBookKid->setSeries($dataKid->getSeries());
                                 }
-                        
                         }
-                        else {
-                            $serieIdGiven = $parsed_json->{"series"}->{"id"};
-                         
-                            $serieFromDatabase= $seriesRepository->find($serieIdGiven);
-                        
-                            // if exists set database object 
-                                $currentBookKid->setSeries($serieFromDatabase);
-
-                            // if does not exist: send error
-                            if ($serieFromDatabase === null) {
-
-                                return $this->ErrorMessageNotFound("The Serie is not found for id: ", $serieIdGiven);
-                            }
-                        }
-        
                 }
-         
-                
 
             $em->persist($currentBookKid);
             $em->flush();
