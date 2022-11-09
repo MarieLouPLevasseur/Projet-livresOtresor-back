@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -83,13 +84,15 @@ class UserController extends AbstractController
             //     ->text("Nous sommes heureux de vous compter parmis nos membres");
             // $mailer->send($email);
             
-            $email = (new Email())
+            $email = (new TemplatedEmail())
                 ->from('livresOtresor@apotheose.com')
                 ->to($user->getEmail())
                 ->subject('Bienvenue sur le site de livres O Trésor!')
-                ->text("Nous sommes content de vous compter parmis nos membres {$user->getFirstName()}! ❤️");
-                // TODO find text content and HTML render
-
+                // ->text("Nous sommes content de vous compter parmis nos membres {$user->getFirstName()}! ❤️")
+                // ->html("<h1>Nous sommes content de vous compter parmis nos membres {$user->getFirstName()}! ❤️</h1>");
+                ->htmlTemplate('email/welcome.html.twig');
+                // TODO find text content and replace
+                
                 $mailer->send($email);
 
             $message = [
