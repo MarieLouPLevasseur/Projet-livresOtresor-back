@@ -1,78 +1,84 @@
-{% apply inky_to_html %}
-    <container>
+{% apply inky_to_html |inline_css(source('@styles/foundation-emails.css'), source('@styles/email.css'))%}
+
+  <container class="container">
         <row class="header">
             <columns>
-                <a href="http://localhost:3000/"> Lien pour la page d'accueil
-                    {# <img src="{{ email.image('@images/email/logo.png') }}" class="logo" alt="SpaceBar Logo"> #}
+                <a href="http://localhost:3000/"> 
+                    {# <img src="{{ email.image('@images/email/logo.png') }}" class="logo" alt="LivresOTresor Logo"> #}
+                    <img src="{{absolute_url( asset('assets/images/logo.png')) }}" class="logo" alt="LivresOTresor Logo">
                 </a>
             </columns>
         </row>
-        <row class="welcome">
-            <columns>
-                <spacer size="35"></spacer>
-                <h1>
-                    <center>
-                        {# Nice to meet you {{ email.toName }}! #}
-                        Content de te rencontrer à personnaliser
-                    </center>
-                </h1>
-                <spacer size="10"></spacer>
-            </columns>
-        </row>
-        <spacer size="30"></spacer>
-        <row>
-            <columns>
-                <p>
-                    Welcome to <strong>the Space Bar</strong>, we can't wait to read what you have to write.
-                    Get started on your first article and connect with the space bar community.
-                </p>
-            </columns>
-        </row>
-        <row>
-            <columns>
-                <center>
-                    {# <button href="{{ url('admin_article_new') }}">Get writing!</button> #} Je sais pas ce que c'est
-                </center>
-            </columns>
-        </row>
-        <row>
-            <columns>
-                <p>
-                    Check out our existing articles and share your thoughts in the comments!
-                </p>
-            </columns>
-        </row>
-        <row>
-            <columns>
-                <center>
-                    {# <button href="{{ url('app_homepage') }}">Get reading!</button> #} je sais toujours pas
-                </center>
-            </columns>
-        </row>
-        <row>
-            <columns>
-                <p>
-                    We're so excited that you've decided to join us in our corner of the universe,
-                    it's a friendly one with other creative and insightful writers just like you!
-                    Need help from a friend? We're always just a message away.
-                </p>
-            </columns>
-        </row>
-        <row class="footer">
-            <columns>
-                <p>Cheers,</p>
-                <p>Your friendly <em>Space Bar Team</em></p>
-            </columns>
-        </row>
-        <row class="bottom">
-            <columns>
-                <center>
-                    <spacer size="20"></spacer>
-                    <div>
-                        Sent with ❤️ from the friendly folks at The Space Bar
-                    </div>
-                </center>
-            </columns>
-        </row>
-    </container>
+       
+                            <row class="welcome">
+                                <columns>
+                                    <spacer size="35"></spacer>
+                                    <h1>                                        
+                                            Bienvenue {{email.toName | capitalize}}
+                                       
+                                    </h1>
+                                    <spacer size="10"></spacer>
+                                </columns>
+                            </row>
+                            <spacer size="30"></spacer>
+                             <row>
+                                <columns>
+                                    <p>
+                                        Nous sommes heureux de vous accueillir dans l'accompagnement à la lecture pour votre enfant.
+                                    </p>
+                                </columns>
+                            </row>
+                            <row>
+                                <columns>
+                                    <p>
+                                        Créer un compte enfant dans votre espace parent et enregistrez son premier livre lu pour débloquer sa première récompense et le motiver à la lecture!
+                                    </p>
+                                </columns>
+                            </row>
+                            <row>
+                                <columns>
+                                    <p>
+                                        Ici, pas d'échange entre les enfants. C'est votre espace privé pour consulter, stocker et motivé votre enfant en toute sécurité. 
+                                       <a href="www.livresotresor.fr/tutoriel"> Un tutoriel</a> d'accompagnement est présent sur le site pour vous aider, ainsi qu'une <a href="www.livresotresor.fr/faq"> FAQ </a>qui répondra à la plupart des questions.
+                                    </p>
+                                </columns>
+                            </row>
+                            <row>
+                                <columns>
+                                    <center>
+                                    Ce site est un projet à taille humaine créer par des étudiants en fin de formations de développement informatique.
+                                    N'hésitez pas à nous faire des retours en cas de dysfonctionnement. Nous tenterons de régler le problème au plus tôt. 
+                                    </center>
+                                </columns>
+                            </row>
+                            <row>
+                                <columns>
+                                    <p>
+                                Au plaisir de donner goût à la lecture à votre enfant!
+                                </p>
+                                </columns>
+                            </row>
+                            <row>
+                                 <columns>
+                                    <p>Passez une excellente journée</p>
+                                    <p>Amicalement, <em>Livres O'Trésor</em></p>
+                                </columns>
+
+                            </row>
+                            
+
+                            <row class="bottom">
+                                <columns>
+                                    <center>
+                                        <spacer size="20"></spacer>
+                                        <div class= "footer">
+                                            Envoyé avec toute notre amitié ❤️ par l'équipe de livres O Trésor
+                                        </div>
+                                    </center>
+                                </columns>
+                            </row>
+                        </container> 
 {% endapply %}
+
+
+ 

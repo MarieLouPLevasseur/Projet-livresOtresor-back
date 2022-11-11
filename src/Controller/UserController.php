@@ -5,20 +5,21 @@ namespace App\Controller;
 use App\Entity\Kid;
 use App\Entity\User;
 use App\Repository\KidRepository;
+use Symfony\Component\Mime\Email;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
+use Symfony\Component\Mime\Address;
 use App\Repository\AvatarRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -85,12 +86,15 @@ class UserController extends AbstractController
             // $mailer->send($email);
             
             $email = (new TemplatedEmail())
-                ->from('livresOtresor@apotheose.com')
-                ->to($user->getEmail())
+                ->from(new Address('livresOtresor@apotheose.com', 'Livres O Trésor'))
+                ->to(new Address ($user->getEmail(), $user->getFirstName()))
                 ->subject('Bienvenue sur le site de livres O Trésor!')
                 // ->text("Nous sommes content de vous compter parmis nos membres {$user->getFirstName()}! ❤️")
                 // ->html("<h1>Nous sommes content de vous compter parmis nos membres {$user->getFirstName()}! ❤️</h1>");
-                ->htmlTemplate('email/welcome.html.twig');
+                ->htmlTemplate('email/welcome.html.twig')
+                ->context([
+                    'user'=>$user
+                ]);
                 // TODO find text content and replace
                 
                 $mailer->send($email);
