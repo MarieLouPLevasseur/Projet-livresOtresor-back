@@ -1,0 +1,50 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f3f3f3;
+    font-family: Helvetica, Arial, sans-serif;
+}
+h1 {
+    background-color: #4363A6;
+    color: #ffffff;
+    font-weight: normal;
+    text-align: center;
+    margin: none;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+hr {
+    border: 3px solid #4363A6;
+    margin: 20px;
+}
+.welcome {
+    background-color: #4363A6;
+    text-align: center;
+}
+.bottom {
+    background-color: #f3f3f3;
+}
+.logo {
+    width: 50%;
+}
+.text-center {
+    text-align: center;
+}
+table.button a {
+    background-color: #4363A6;
+}
+table.button table td {
+    background-color: #4363A6;
+    border: 2px solid #4363A6;
+}
+img{
+    margin: auto;
+}
+.footer{
+    background-color: white;
+
+}
+.container {
+    border: solid 3px #4363A6;
+}
+  

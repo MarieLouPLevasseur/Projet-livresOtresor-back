@@ -24,6 +24,7 @@
         "symfony/dotenv": "5.4.*",
         "symfony/flex": "^1.17|^2",
         "symfony/framework-bundle": "5.4.*",
+        "symfony/mailer": "5.4.*",
         "symfony/maker-bundle": "^1.43",
         "symfony/password-hasher": "5.4.*",
         "symfony/property-access": "5.4.*",
@@ -33,8 +34,13 @@
         "symfony/security-bundle": "5.4.*",
         "symfony/security-csrf": "5.4.*",
         "symfony/serializer": "5.4.*",
+        "symfony/twig-bundle": "5.4.*",
         "symfony/validator": "5.4.*",
-        "symfony/yaml": "5.4.*"
+        "symfony/yaml": "5.4.*",
+        "twig/cssinliner-extra": "^3.4",
+        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/inky-extra": "^3.4",
+        "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
         "symfony/debug-bundle": "5.4.*",
