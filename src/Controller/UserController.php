@@ -95,7 +95,6 @@ class UserController extends AbstractController
                 ->context([
                     'user'=>$user
                 ]);
-                // TODO find text content and replace
                 
                 $mailer->send($email);
 
@@ -486,7 +485,75 @@ class UserController extends AbstractController
         return $this->prepareResponse("The kid was succesfully deleted", [] ,[], false, Response::HTTP_OK);
 
         }
+    /**
+     * Reset Password for a User
+     * 
+     * @Route("/resetPassword", name="resetPassword", methods="post")
+     * @return Response
+     */
+    public function resetPassword(UserRepository $userRepository,EntityManagerInterface $em, 
+    Request $request, 
+    SerializerInterface $serializer,
+    UserPasswordHasherInterface $passwordHasher,
+    MailerInterface $mailer
 
+    ) :Response
+    {
+
+        $data = $request->getContent();
+
+        // TODO finaliser la méthode de remise à 0 du email
+        $parseData = json_decode($data);
+        $mailGiven = $parseData->{"email"};
+
+        
+        $user = $userRepository->findOneBy(["email"=>$mailGiven]);
+
+        // CHECK Mail exists
+
+        if ($user === null )
+        {
+            return $this->json("No message sent",200,[],[]);
+        }
+
+        // create new password
+
+        $randomLowerLetter      = substr(str_shuffle("abcdefghijklmnopqrstuvwxyz"), 2, 4);
+        $randomUpperLetter      = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 2, 4);
+        $randomInt              = random_int(101, 999);
+        $randomSpecialCharacter = substr(str_shuffle("&#{[(|-\_^@$%!?*><"), 2, 4);
+            
+            $passwordSend = $randomLowerLetter . $randomInt . $randomSpecialCharacter . $randomUpperLetter;
+
+        // send new password
+
+            $email = (new TemplatedEmail())
+            ->from(new Address('livresOtresor@apotheose.com', 'Livres O Trésor'))
+            ->to(new Address ($user->getEmail(), $user->getFirstName()))
+            ->subject('Livres O Trésor: réinitialisation du mot de passe')
+            ->htmlTemplate('email/resetPassword.html.twig')
+            ->context([
+                'user'=>$user,
+                'password'=>$passwordSend
+            ]);
+            
+            $mailer->send($email);
+
+        $message = [
+            'error' => false,
+            'message' => "Message has been sent correctly"
+        ];
+        
+        // Set new password
+        
+        $password = $passwordHasher->hashPassword($user, $passwordSend);
+        $user ->setPassword($password);
+        
+        $em->persist($user);
+        $em->flush();
+        
+        return $this->json($message, 200);
+    }
         
 
     /**
@@ -561,4 +628,6 @@ class UserController extends AbstractController
         }
         return $this->json($responseData, $httpCode, $headers, $options);
     }
+
+   
 }
