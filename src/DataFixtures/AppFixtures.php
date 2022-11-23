@@ -57,7 +57,7 @@ class AppFixtures extends Fixture
             $userObj->setLastname('front');
             $userObj->setEmail('livresOtresor@apotheose.com');
             
-            $hashedPassword = $this->passwordHasher->hashPassword($userObj, 'devinci');
+            $hashedPassword = $this->passwordHasher->hashPassword($userObj, 'Devinci!00');
             $userObj->setPassword($hashedPassword);
             $userObj->setRole($roleObj);
 

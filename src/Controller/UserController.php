@@ -262,6 +262,24 @@ class UserController extends AbstractController
         $data = $request->getContent();
         $dataKid = $serializer->deserialize($data, Kid::class, 'json');
 
+        // ******** CHECK FIRSTNAME *********
+
+
+        if($dataKid->getFirstname() !== null){
+
+
+            // CHECK datas given
+
+            $errors = $validator->validatePropertyValue($dataKid, 'firstname', $dataKid->getFirstname());
+            if ((count($errors) > 0) ){
+               
+                return $this->ErrorMessageNotValid($errors);
+
+            }   
+
+            // set
+            $kid->setFirstname($dataKid->getFirstname());
+        } 
         // ******** CHECK USERNAME *********
 
 
@@ -502,7 +520,6 @@ class UserController extends AbstractController
 
         $data = $request->getContent();
 
-        // TODO finaliser la méthode de remise à 0 du email
         $parseData = json_decode($data);
         $mailGiven = $parseData->{"email"};
 
