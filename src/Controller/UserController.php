@@ -37,6 +37,56 @@ class UserController extends AbstractController
         $this->passwordHasher = $passwordHasher;
     }
 
+     /**
+     * @Route("/users/{user_id}/checkCredential", name="api_user_checkCredential",  methods="POST", requirements={"user_id"="\d+"})
+     */
+    public function checkCredential($user_id,
+                                    Request $request,
+                                    SerializerInterface $serializer,
+                                    UserRepository $userRepository,
+                                    UserPasswordHasherInterface $passwordHasher
+                                    )
+                                    //: Response
+    {
+        // Get posted datas
+        $data = $request->getContent();
+        $parsed_json = json_decode($data);
+        
+        $user = $userRepository->find($user_id);
+
+         // CHECK USER exists
+ 
+         if ($user === null )
+         {
+ 
+             return $this->ErrorMessageNotFound("The user not found for id: ", $user_id);
+ 
+         }
+ 
+         // Check if password valid
+         $passwordGiven = $parsed_json->{"password"};
+ 
+         
+          $passwordCheck = $passwordHasher->isPasswordValid($user, $passwordGiven);
+         
+        //  dd($passwordCheck);
+ 
+         if ($passwordCheck === false) {
+             return $this->json([
+                 'message' => 'False credentials',
+             ], Response::HTTP_UNAUTHORIZED);
+         }
+ 
+         return $this->json([
+            'message' => 'Ok',
+        ], Response::HTTP_OK);
+        
+        return $this->json("houston...on a un probleme chez les users",400);
+
+    }
+
+
+
     /**
      * Add a user (registration)
      *
@@ -220,6 +270,7 @@ class UserController extends AbstractController
         return $this->json($message, Response::HTTP_OK);        
 
     }
+    
 
     /** 
      * Update a kid
@@ -265,7 +316,7 @@ class UserController extends AbstractController
         // ******** CHECK FIRSTNAME *********
 
 
-        if($dataKid->getFirstname() !== null){
+        if($dataKid->getFirstname() !== ""){
 
 
             // CHECK datas given
@@ -282,8 +333,7 @@ class UserController extends AbstractController
         } 
         // ******** CHECK USERNAME *********
 
-
-        if($dataKid->getUsername() !== null){
+        if(($dataKid->getUsername() !== "") && ($dataKid->getUsername() !== $kid->getUsername())){
 
             // CHECK USERNAME already exists
 
@@ -315,7 +365,7 @@ class UserController extends AbstractController
         
         //***** CHECK PASSWORD *******
 
-        if ($dataKid->getPassword()!== null) {
+        if ($dataKid->getPassword()!== "") {
 
             $errors = $validator->validatePropertyValue($dataKid, 'password', $dataKid->getPassword());
             if ((count($errors) > 0)) {
@@ -430,7 +480,8 @@ class UserController extends AbstractController
      * @IsGranted("ROLE_USER")
      * @return Response
      */
-    public function delete(int $id, EntityManagerInterface $em, UserRepository $userRepository) :Response
+    public function delete(int $id, EntityManagerInterface $em, UserRepository $userRepository, MailerInterface $mailer
+    ) :Response
     {
 
        $user = $userRepository->find($id);
@@ -442,6 +493,16 @@ class UserController extends AbstractController
                 return $this->ErrorMessageNotFound("The user not found for id: ", $id);
 
             }
+            $email = (new TemplatedEmail())
+                ->from(new Address('livresOtresor@gmail.com', 'Livres O Trésor'))
+                ->to(new Address ($user->getEmail(), $user->getFirstName()))
+                ->subject('Suppression compte site Livres O Trésor')
+                ->htmlTemplate('email/deleteAccount.html.twig')
+                ->context([
+                    'user'=>$user
+                ]);
+                
+                $mailer->send($email);
 
         $em->remove($user);
         $em->flush();

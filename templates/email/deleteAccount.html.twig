@@ -1,0 +1,84 @@
+{% apply inky_to_html |inline_css(source('@styles/foundation-emails.css'), source('@styles/email.css'))%}
+
+  <container class="container">
+        <row class="header">
+            <columns>
+                <a href="http://localhost:3000/"> 
+                    {# <img src="{{ email.image('@images/email/logo.png') }}" class="logo" alt="LivresOTresor Logo"> #}
+                    <img src="{{absolute_url( asset('assets/images/logo.png')) }}" class="logo" alt="LivresOTresor Logo">
+                </a>
+            </columns>
+        </row>
+       
+                            <row class="welcome">
+                                <columns>
+                                    <spacer size="35"></spacer>
+                                    <h1>                                        
+                                            Au Revoir {{email.toName | capitalize}}
+                                       
+                                    </h1>
+                                    <spacer size="10"></spacer>
+                                </columns>
+                            </row>
+                            <spacer size="30"></spacer>
+                            <row>
+                                <columns>
+                                    <p>
+                                     Vous avez souhaitez mettre fin à votre inscription chez nous et nous le respectons.
+                                    </p>
+                                </columns>
+                            </row>
+                             <row>
+                                <columns>
+                                    <p>
+                                        Nous sommes heureux de vous avoir compté parmis nos membres lors de l'accompagnement à la lecture de vos enfants.
+                                    </p>
+                                </columns>
+                            </row>
+                            <row>
+                                <columns>
+                                    <p>
+                                            Nous espérons que vous avez pris plaisir a évoluer au sein de notre structure. 
+                                         
+                                    </p>
+                                </columns>
+                            </row>
+                            <row>
+                                <columns>
+                                    <p>
+                                        N'hésitez pas à nous faire remonter toutes remarques, suggestions ou commentaires constructifs sur le site: livresotresor@gmail.com
+                                    </p>
+                                </columns>
+                            </row>
+                           
+                            <row>
+                                <columns>
+                                    <p>
+                                Bonne journée et bonne continuation!
+                                </p>
+                                </columns>
+                            </row>
+                            <row>
+                                 <columns>
+                                    <p>Passez une excellente journée</p>
+                                    <p>Amicalement, <em>Livres O'Trésor</em></p>
+                                </columns>
+
+                            </row>
+                            
+
+                            <row class="bottom">
+                                <columns>
+                                    <center>
+                                        <spacer size="20"></spacer>
+                                        <div class= "footer">
+                                            Envoyé avec toute notre amitié ❤️ par l'équipe de Livres O Trésor
+                                        </div>
+                                    </center>
+                                </columns>
+                            </row>
+                        </container> 
+{% endapply %}
+
+
+ 
