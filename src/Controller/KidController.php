@@ -406,17 +406,14 @@ class KidController extends AbstractController
        )
     {
         // ! En cours de développement
+        // get the data to pass to the template
+        $data = json_decode($request->getContent(), true);
 
-        // $html2pdf = new Html2Pdf();
-        // $html2pdf->writeHTML('<h1>HelloWorld</h1>This is my first test');
-        // $html2pdf->output();
+        // dd($data);
 
-          // get the data to pass to the template
-        //   $data = array( 'my_data' => 'some value' );
-          $data = array( 'text' => 'hello World' );
 
           // render the template
-          $html = $this->renderView('pdf/pdfBookList.html.twig', $data);
+          $html = $this->renderView('pdf/pdfBookList.html.twig', ['booksList' => $data]);
   
           // convert to PDF
           $html2pdf = new Html2Pdf('P', 'A4', 'fr', true, 'UTF-8', array(15, 5, 15, 5));

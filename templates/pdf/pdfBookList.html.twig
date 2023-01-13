@@ -5,6 +5,27 @@
     </head>
     <body>
         <h1>Ma Liste de livres en PDF</h1>
-        <p>{{ text }}</p>
+
+{% for book in booksList %}
+    <h2>{{ book.book.title }}</h2>
+    <p>{{ book.comment }}</p>
+    <p> Noté: {{ book.rating == null ? '(non renseigné)' : book.rating }} sur 5 étoiles</p>
+    <p>C'est un livre lu? {{ book.is_read == 1 ? 'Oui' : 'Non' }}</p>
+    <p>ISBN: {{ book.book.isbn }}</p>
+    <p>Description: {{ book.book.description }}</p>
+    <p>Editeur: {{ book.book.publisher }}</p>
+
+       <hr>
+ <p>Auteurs:
+{% for author in book.book.authors %}
+        {{ author.name }},
+        
+    {% endfor %}
+</p>
+       
+    
+{% endfor %}
+
+        {# <p>{{ text }}</p> #}
     </body>
 </html>
