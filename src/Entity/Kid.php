@@ -30,16 +30,12 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "userConnected"})
-     * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
-     * @Assert\Length(min=3)( message = "Le nom d'utilisateur doit contenir au moins 3 caractères")
      */
     private $username;
 
     /**
      * 
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
-     * @Assert\Length(min=5, max=20)( message = "Le mot de passe doit contenir entre 5 et 20 caractères")
      */
     private $password;
 
@@ -77,6 +73,14 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
      * @Groups({"book_list"})
      */
     private $bookKids;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "userConnected"})
+     * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
+     * @Assert\Length(min=3)( message = "Le nom d'utilisateur doit contenir au moins 3 caractères")
+     */
+    private $firstname;
 
     public function __construct()
     {
@@ -249,6 +253,18 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return (string) $this->username;
+    }
+
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
+    public function setFirstname(string $firstname): self
+    {
+        $this->firstname = $firstname;
+
+        return $this;
     }
 
     

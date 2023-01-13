@@ -50,6 +50,8 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
               $userObj->setEmail($faker->unique->email());
 
 
+
+            //   $hashedPassword = $this->passwordHasher->hashPassword($userObj, 'Devinci!'.$i);
               $hashedPassword = $this->passwordHasher->hashPassword($userObj, 'devinci');
               $userObj->setPassword($hashedPassword);
             //   $userObj->setPassword('devinci');
@@ -70,7 +72,8 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
                 for ($i = 0; $i < $nbKids; $i++) {
                     $kidObj = new Kid();
 
-                    $kidObj->setUsername($faker->firstname());
+                    $kidObj->setUsername($faker->firstname().random_int(3,999));
+                    $kidObj->setFirstname($faker->firstname());
 
                     $hashedPassword = $this->passwordHasher->hashPassword($kidObj, 'devinci');
                     $kidObj->setPassword($hashedPassword);
