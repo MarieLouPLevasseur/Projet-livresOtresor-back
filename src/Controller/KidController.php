@@ -27,6 +27,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Spipu\Html2Pdf\Html2Pdf;
 
 
 /**
@@ -389,6 +390,30 @@ class KidController extends AbstractController
     }
 // *************************************************************************************************************************************************
 // *************************************************************** Books ***************************************************************************
+
+  /**
+     * Genera PDF with books selected
+     * 
+     * @Route("/{id_kid}/bookkids/pdf", name="generate_pdf_books", methods="POST", requirements={"id_kid"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     */
+    public function generatePDFBook(
+        int $id_kid,
+        
+        BookKidRepository $bookKidRepository,
+        SerializerInterface $serializer
+       )
+    {
+        // ! En cours de développement
+        // $allBooksByCategory = $bookKidRepository->findAllByKidAndCategory($id_kid, $id_cat);
+
+        // $jsonBooksCategoryList = $serializer->serialize($allBooksByCategory, 'json',['groups' => 'booksByCategory']);
+
+        $html2pdf = new Html2Pdf();
+        $html2pdf->writeHTML('<h1>HelloWorld</h1>This is my first test');
+        $html2pdf->output();
+        // return new JsonResponse($jsonBooksCategoryList, Response::HTTP_OK, [],true);
+    }
 
 
   /**
