@@ -399,20 +399,39 @@ class KidController extends AbstractController
      */
     public function generatePDFBook(
         int $id_kid,
-        
-        BookKidRepository $bookKidRepository,
+        Request $request,
+        //  Pdf $pdf,
+        // BookKidRepository $bookKidRepository,
         SerializerInterface $serializer
        )
     {
         // ! En cours de développement
-        // $allBooksByCategory = $bookKidRepository->findAllByKidAndCategory($id_kid, $id_cat);
 
-        // $jsonBooksCategoryList = $serializer->serialize($allBooksByCategory, 'json',['groups' => 'booksByCategory']);
+        // $html2pdf = new Html2Pdf();
+        // $html2pdf->writeHTML('<h1>HelloWorld</h1>This is my first test');
+        // $html2pdf->output();
 
-        $html2pdf = new Html2Pdf();
-        $html2pdf->writeHTML('<h1>HelloWorld</h1>This is my first test');
-        $html2pdf->output();
-        // return new JsonResponse($jsonBooksCategoryList, Response::HTTP_OK, [],true);
+          // get the data to pass to the template
+        //   $data = array( 'my_data' => 'some value' );
+          $data = array( 'text' => 'hello World' );
+
+          // render the template
+          $html = $this->renderView('pdf/pdfBookList.html.twig', $data);
+  
+          // convert to PDF
+          $html2pdf = new Html2Pdf('P', 'A4', 'fr', true, 'UTF-8', array(15, 5, 15, 5));
+          $html2pdf->writeHTML($html);
+  
+        // Génération du PDF à partir du contenu HTML
+          // download the PDF
+          $pdfContent= $html2pdf->output('ma_liste_de_livres.pdf');
+
+        // Envoi du PDF en réponse
+        $response = new Response($pdfContent);
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="ma_liste_de_livres.pdf"');
+
+        return $response;
     }
 
 
