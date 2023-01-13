@@ -51,7 +51,8 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
 
 
-              $hashedPassword = $this->passwordHasher->hashPassword($userObj, 'Devinci!'.$i);
+            //   $hashedPassword = $this->passwordHasher->hashPassword($userObj, 'Devinci!'.$i);
+              $hashedPassword = $this->passwordHasher->hashPassword($userObj, 'devinci');
               $userObj->setPassword($hashedPassword);
             //   $userObj->setPassword('devinci');
               $userObj->setRole($userRole);
