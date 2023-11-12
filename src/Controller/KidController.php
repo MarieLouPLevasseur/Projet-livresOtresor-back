@@ -745,17 +745,26 @@ class KidController extends AbstractController
             // dd($category);
             $bookKid->setCategory($category);
 
-        // persist
-            $em->persist($bookKid);
+            try {
 
-            $em->flush();
+            // persist
+                $em->persist($bookKid);
 
-            return $this->prepareResponse(
-                'The book has been created',[],[],false, 201, 
-            );
+                $em->flush();
 
+                return $this->prepareResponse(
+                    'The book has been created',[],[],false, 201, 
+                );
+
+            } catch (\Exception $e) {
+                //TODO En cas d'erreur, loggez l'erreur pour le débogage (facultatif)
+                // Logger::error($e->getMessage());
         
-            
+                return $this->json([
+                    'error' => true,
+                    'message' => 'An error occurred while creating the book: ' . $e->getMessage(),
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
     }
 
     /**
