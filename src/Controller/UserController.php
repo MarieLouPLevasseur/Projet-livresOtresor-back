@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Kid;
 use App\Entity\User;
+use Psr\Log\LoggerInterface;
 use App\Repository\KidRepository;
 use Symfony\Component\Mime\Email;
 use App\Repository\RoleRepository;
@@ -31,10 +32,13 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UserController extends AbstractController
 {
     private $passwordHasher;
+    private $logger;
 
-    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    public function __construct(UserPasswordHasherInterface $passwordHasher,LoggerInterface $logger)
     {
         $this->passwordHasher = $passwordHasher;
+        $this->logger = $logger;
+
     }
 
      /**
@@ -77,10 +81,14 @@ class UserController extends AbstractController
              ], Response::HTTP_UNAUTHORIZED);
          }
  
+         $this->logger->debug('Check Credential OK');
+
          return $this->json([
             'message' => 'Ok',
         ], Response::HTTP_OK);
         
+        $this->logger->debug('Check Credential false');
+
         return $this->json("houston...on a un probleme chez les users",400);
 
     }
@@ -454,7 +462,7 @@ class UserController extends AbstractController
 
         // CHECK PASSWORD if given
 
-        if ($dataUser->getPassword()!== null) {
+        if ($dataUser->getPassword()!== null && !empty($dataUser->getPassword)) {
             $errors = $validator->validatePropertyValue($dataUser, 'password', $dataUser->getPassword());
             if ((count($errors) > 0)) {
  
@@ -469,6 +477,7 @@ class UserController extends AbstractController
 
         $em->persist($user);
         $em->flush();
+        $this->logger->info('mise à jour du User OK');
 
         return $this->prepareResponse('Sucessfully updated', [], [], false, Response::HTTP_OK );
     }
