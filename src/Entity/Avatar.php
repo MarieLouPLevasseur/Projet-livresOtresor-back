@@ -18,13 +18,13 @@ class Avatar
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"KidAvatar"})
+     * @Groups({"KidAvatar","adminAvatars"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"KidAvatar"})
+     * @Groups({"KidAvatar","adminAvatars"})
      * @Assert\NotBlank(message = "Ce champ ne peut pas être vide")
      * @Assert\NotNull(message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=10)
@@ -33,6 +33,7 @@ class Avatar
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"adminAvatars"})
      */
     private $is_win;
 

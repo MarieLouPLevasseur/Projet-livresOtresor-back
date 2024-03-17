@@ -29,7 +29,7 @@ class AppFixtures extends Fixture
     {
         
         // ROLES
-            $roleArray = ['ROLE_KID','ROLE_USER'];
+            $roleArray = ['ROLE_KID','ROLE_USER','ROLE_ADMIN'];
 
                 foreach($roleArray as $role){
 
@@ -38,6 +38,7 @@ class AppFixtures extends Fixture
 
                     $manager->persist($roleObj);
                 }
+                $manager->flush();
 
         // CATEGORIES
             $categoriesArray = ['Non-classé', 'Aventure','BD','Contes','Documentaires', 'Fantastique','Humour', 'Policier', 'Philosophique','Science-fiction'];
@@ -49,6 +50,9 @@ class AppFixtures extends Fixture
                     $categoryObj->setName($category);
                     $manager->persist($categoryObj);
                 }
+        // Set ADMIN
+        $userRole= $manager->getRepository(Role::class)->findOneByRoleName('ROLE_ADMIN');
+
 
         // USER FOR API
             $userObj = new User();
@@ -59,81 +63,44 @@ class AppFixtures extends Fixture
             
             $hashedPassword = $this->passwordHasher->hashPassword($userObj, 'Devinci!00');
             $userObj->setPassword($hashedPassword);
-            $userObj->setRole($roleObj);
+            $userObj->setRole($userRole);
 
             $manager->persist($userObj);
 
-
-        // AVATARS
-         // iswin= amount of book read to get the image
             $avatarsArray = [
-                ['URL'=>'https://zupimages.net/up/22/34/7g4i.png',
-                'IsWin'=> 0],
-                ['URL'=>'https://zupimages.net/up/22/34/e9mx.png',
-                'IsWin'=> 1],
-                ['URL'=>'https://zupimages.net/up/22/34/iyfi.png',
-                'IsWin'=> 4],
-                ['URL'=>'https://zupimages.net/up/22/34/mcth.png',
-                'IsWin'=> 7],
-                ['URL'=>'https://zupimages.net/up/22/34/k9ko.png',
-                'IsWin'=> 10],
-                ['URL'=>'https://zupimages.net/up/22/34/uadk.png',
-                'IsWin'=> 13],
-                ['URL'=>'https://zupimages.net/up/22/34/efu4.png',
-                'IsWin'=> 16],
-                ['URL'=>'https://zupimages.net/up/22/34/m1yr.png',
-                'IsWin'=> 19],
-                ['URL'=>'https://zupimages.net/up/22/34/ghr9.png',
-                'IsWin'=> 23],
-                ['URL'=>'https://zupimages.net/up/22/34/v8hz.png',
-                'IsWin'=> 28],
-                ['URL'=>'https://zupimages.net/up/22/34/h1rm.png', 
-                'IsWin'=> 33],
-                ['URL'=>'https://zupimages.net/up/22/34/i9gr.png', 
-                'IsWin'=> 33],
-                ['URL'=>'https://zupimages.net/up/22/34/4qva.png', 
-                'IsWin'=> 38],
-                ['URL'=>'https://zupimages.net/up/22/34/2nf1.png', 
-                'IsWin'=> 38 ],
-                ['URL'=>'https://zupimages.net/up/22/34/k70i.png', 
-                'IsWin'=> 43],
-                ['URL'=>'https://zupimages.net/up/22/34/y139.png', 
-                'IsWin'=> 43],
-                ['URL'=>'https://zupimages.net/up/22/34/1x4x.png', 
-                'IsWin'=> 48],
-                ['URL'=>'https://zupimages.net/up/22/34/xst4.png',  
-                'IsWin'=> 48],
-                ['URL'=>'https://zupimages.net/up/22/34/4x7f.png', 
-                'IsWin'=> 53],
-                ['URL'=>'https://zupimages.net/up/22/34/ceve.png',
-                'IsWin'=> 58],
-                ['URL'=>'https://zupimages.net/up/22/34/q3t5.png',
-                'IsWin'=> 63],
-                ['URL'=>'https://zupimages.net/up/22/34/6yp7.png',
-                'IsWin'=> 68],
-                ['URL'=>'https://zupimages.net/up/22/34/b1dr.png',
-                'IsWin'=> 73],
-                ['URL'=>'https://zupimages.net/up/22/34/jsyv.png',
-                'IsWin'=> 78],
-                ['URL'=>'https://zupimages.net/up/22/34/mexa.png',
-                'IsWin'=> 83],
-                ['URL'=>'https://zupimages.net/up/22/34/8d6j.png',
-                'IsWin'=> 88],
-                ['URL'=>'https://zupimages.net/up/22/34/1e19.png',
-                'IsWin'=> 93],
-                ['URL'=>'https://zupimages.net/up/22/34/y380.png',
-                'IsWin'=> 98],
-                ['URL'=>'https://zupimages.net/up/22/34/0zvc.png',
-                'IsWin'=> 98],
-                ['URL'=>'https://zupimages.net/up/22/34/bfc8.png',
-                'IsWin'=> 103],
-                ['URL'=>'https://zupimages.net/up/22/34/reoy.png',
-                'IsWin'=> 108],
-                ['URL'=>'https://zupimages.net/up/22/34/w2j0.png',
-                'IsWin'=> 113],
-
+                ['URL' => '/img/avatars/0default_avatar.png', 'IsWin' => 0],
+                ['URL' => '/img/avatars/1monstre_violet.png', 'IsWin' => 1],
+                ['URL' => '/img/avatars/2monstre_bleu.png', 'IsWin' => 4],
+                ['URL' => '/img/avatars/3monstre_bleu.png', 'IsWin' => 7],
+                ['URL' => '/img/avatars/4monstre_rose.png', 'IsWin' => 10],
+                ['URL' => '/img/avatars/5monstre_violet.png', 'IsWin' => 13],
+                ['URL' => '/img/avatars/6monstre_rose.png', 'IsWin' => 16],
+                ['URL' => '/img/avatars/7poisson_orange.png', 'IsWin' => 19],
+                ['URL' => '/img/avatars/8pieuvre_orange.png', 'IsWin' => 23],
+                ['URL' => '/img/avatars/9poisson_violet.png', 'IsWin' => 28],
+                ['URL' => '/img/avatars/10fille.png', 'IsWin' => 33],
+                ['URL' => '/img/avatars/11garcon.png', 'IsWin' => 33],
+                ['URL' => '/img/avatars/12garcon.png', 'IsWin' => 38],
+                ['URL' => '/img/avatars/13fille.png', 'IsWin' => 38],
+                ['URL' => '/img/avatars/14garcon.png', 'IsWin' => 43],
+                ['URL' => '/img/avatars/15fille.png', 'IsWin' => 43],
+                ['URL' => '/img/avatars/16garcon.png', 'IsWin' => 48],
+                ['URL' => '/img/avatars/17fille.png', 'IsWin' => 48],
+                ['URL' => '/img/avatars/18garcon.png', 'IsWin' => 53],
+                ['URL' => '/img/avatars/19monstre_lunette.png', 'IsWin' => 58],
+                ['URL' => '/img/avatars/20monstre_lunette.png', 'IsWin' => 63],
+                ['URL' => '/img/avatars/21cat_black.png', 'IsWin' => 68],
+                ['URL' => '/img/avatars/22-a_cat_white.png', 'IsWin' => 73],
+                ['URL' => '/img/avatars/22-b_cat_white.png', 'IsWin' => 78],
+                ['URL' => '/img/avatars/23lion.png', 'IsWin' => 83],
+                ['URL' => '/img/avatars/24dog.png', 'IsWin' => 88],
+                ['URL' => '/img/avatars/25chouette.png', 'IsWin' => 93],
+                ['URL' => '/img/avatars/26monster_music.png', 'IsWin' => 98],
+                ['URL' => '/img/avatars/27dragon.png', 'IsWin' => 98],
+                ['URL' => '/img/avatars/28monster.png', 'IsWin' => 103],
+                ['URL' => '/img/avatars/29monster_red.png', 'IsWin' => 108],
+                ['URL' => '/img/avatars/30monster_green.png', 'IsWin' => 113]
             ];
-
                 foreach($avatarsArray as $avatar){
                     $avatarObj= new Avatar();
 
@@ -143,33 +110,27 @@ class AppFixtures extends Fixture
                     $manager->persist($avatarObj);
                 }
 
-        // DIPLOMAS
-          // iswin= amount of book read to get the image
-            $diplomasArray = [
-                ['URL'=>'https://zupimages.net/up/22/34/03gf.png',
-                'IsWin'=> 1],
-                ['URL'=>'https://zupimages.net/up/22/34/se8q.png',
-                'IsWin'=> 10],
-                ['URL'=>'https://zupimages.net/up/22/34/ug9y.png',
-                'IsWin'=> 20],
-                ['URL'=>'https://zupimages.net/up/22/34/anu4.png',
-                'IsWin'=> 30],
-                ['URL'=>'https://zupimages.net/up/22/34/v70m.png',
-                'IsWin'=> 40]
-
-            ];
-
+                $diplomasArray = [
+                    ['url'=>'/img/diplomes/diplome_1.png',
+                    'isWin'=> 1],
+                    ['url'=>'/img/diplomes/diplome_10.png',
+                    'isWin'=> 10],
+                    ['url'=>'/img/diplomes/diplome_20.png',
+                    'isWin'=> 20],
+                    ['url'=>'/img/diplomes/diplome_30.png',
+                    'isWin'=> 30],
+                    ['url'=>'/img/diplomes/diplome_40.png',
+                    'isWin'=> 40]
+        
+                ];
                 foreach($diplomasArray as $diploma){
                     $diplomaObj= new Diploma();
 
-                    $diplomaObj->setUrl($diploma["URL"]);
-                    $diplomaObj->setIsWin($diploma["IsWin"]);
+                    $diplomaObj->setUrl($diploma["url"]);
+                    $diplomaObj->setIsWin($diploma["isWin"]);
 
                     $manager->persist($diplomaObj);
                 }
-
-
-
        $manager->flush();
     }
 

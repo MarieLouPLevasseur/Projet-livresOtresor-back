@@ -24,13 +24,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user_list", "userConnected"})
+     * @Groups({"user_list", "userConnected","adminUsers"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_list", "userConnected"})
+     * @Groups({"user_list", "userConnected","adminUsers"})
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=3)( message = "Le prénom doit contenir au moins 3 caractères")
      */
@@ -38,7 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_list", "userConnected"})
+     * @Groups({"user_list", "userConnected","adminUsers"})
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=2)( message = "Le prénom doit contenir au moins 2 caractères")
      */
@@ -47,7 +47,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_list", "userConnected"})
+     * @Groups({"user_list", "userConnected","adminUsers"})
      * @Assert\Email( message = "Cet email n'est pas valide")
      * @Assert\NotNull( message = "Ce champ ne peut pas être vide")
      * @Assert\Length(min=5)( message = "L'email doit contenir au moins 5 caractères")
@@ -64,14 +64,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=Role::class, inversedBy="users")
-     * @Groups({"user_list", "userConnected"})
+     * @Groups({"user_list", "userConnected","adminUsers"})
      */
     private $role;
 
     /**
      * @ORM\OneToMany(targetEntity=Kid::class, mappedBy="user", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="kid_id", referencedColumnName="id", nullable=false)
-     * @Groups({"userkids_list"})
+     * @Groups({"userkids_list","adminUsers"})
      */
     private $kid;
 

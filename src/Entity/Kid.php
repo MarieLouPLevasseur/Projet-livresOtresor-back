@@ -23,13 +23,13 @@ class Kid implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "userConnected"})
+     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "userConnected","adminUsers"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "userConnected"})
+     * @Groups({"book_list","books_infos", "userkids_list", "books_read", "books_wish", "userConnected","adminUsers"})
      */
     private $username;
 

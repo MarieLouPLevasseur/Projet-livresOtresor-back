@@ -17,18 +17,19 @@ class Diploma
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"KidDiploma"})
+     * @Groups({"KidDiploma","adminDiplomas"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"KidDiploma"})
+     * @Groups({"KidDiploma","adminDiplomas"})
      */
     private $url;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"adminDiplomas"})
      */
     private $is_win;
 
